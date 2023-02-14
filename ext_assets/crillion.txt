@@ -1,0 +1,22 @@
+;; Ball bounding box constants
+BALL_HEIGHT  = #$0A  ; Height of the ball graphic within the sprite(s)
+BALL_WIDTH   = #$0A  ; Width of the ball graphic within the sprite(s)
+BALL_TOP     = #$03  ; Top offset of the ball graphic
+BALL_LEFT    = #$03  ; Left offset of the ball graphic
+
+;; Ball variables
+ball_xpos    .db 1   ; left pixel x-position on screen
+ball_ypos    .db 1   ; top pixel y-position on screen
+ball_lives   .db 1   ; number of lives left
+ball_score   .db 5   ; decimal score, five bytes (0-9)
+ball_bonus   .db 3   ; decimal bonus points, three bytes (0-9)
+
+;; Ball flags
+;; #% c c c l r v n a
+;;    | | | | | | | +-- ball is dead (0) or alive (1)
+;;    | | | | | | +---- ball is being nudged (1) or not (0)
+;;    | | | | | +------ ball moves up (0) or down (1)
+;;    | | | | +-------- ball is moving right (1) or not (0)
+;;    | | | +---------- ball is moving left (1) or not (0)
+;;    +-+-+------------ ball color (1-6)
+ball_flags   .db 1
