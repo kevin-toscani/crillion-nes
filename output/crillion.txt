@@ -1,0 +1,487 @@
+                                ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                                ;;
+                                ;;    ╔══ ╔═╗  ╖ ╖   ╖   ╖ ╔══╗ ╔══╗
+                                ;;    ║   ║ ║  ║ ║   ║   ║ ║  ║ ║  ║
+                                ;;    ║   ╠═╩╗ ║ ║   ║   ║ ║  ║ ║  ║
+                                ;;    ║   ║  ║ ║ ║   ║   ║ ║  ║ ║  ║
+                                ;;    ╚══ ╙  ╙ ╙ ╚══ ╚══ ╙ ╚══╝ ╙  ╙
+                                ;;
+                                ;;  A 2023 NES port of the Commodore 64 game "Crillion"
+                                ;;
+                                ;;  Design, sound, graphics and program by Oliver Kirwa
+                                ;;  © 1987,1988
+                                ;;
+                                ;;  NES port by Kevin81 © 2023
+                                ;;
+                                ;;
+                                
+                                
+                                ;; Project constants and macros
+                                .include "include/constants.asm"
+                                ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                                ;;
+                                ;; include/constants.asm
+                                ;;
+                                ;; List of general constant declarations, like addresses and
+                                ;; input button values, for example. These constants should
+                                ;; make developing easier and code better readable.
+                                ;;
+                                ;;
+                                
+                                ;; Cartridge RAM/ROM constants
+                                ADDR_ZEROPAGE  = $0000
+                                ADDR_SOUNDRAM  = $0100
+                                ADDR_OTHERRAM  = $0200
+                                ADDR_SPRITERAM = $0200
+                                ADDR_STARTBANK = $8000
+                                ADDR_ENDBANK   = $C000
+                                ADDR_VECTORS   = $FFFA
+                                ADDR_CHRROM    = $0000
+                                
+                                ;; PPU constants
+                                PPU_CRTL   = $2000
+                                PPU_MASK   = $2001
+                                PPU_STATUS = $2002
+                                PPU_SCROLL = $2005
+                                PPU_ADDR   = $2006
+                                PPU_DATA   = $2007
+                                
+                                ;; Object attribute model addresses
+                                OAM_ADDR   = $2003
+                                OAM_DATA   = $2004
+                                OAM_DMA    = $4014
+                                
+                                ;; Audio processing unit addresses
+                                APU_CTRL   = $4010
+                                APU_STATUS = $4015
+                                APU_FC     = $4017
+                                
+                                ;; Joypad input addresses
+                                JOYPAD_1   = $4016
+                                JOYPAD_2   = $4017
+                                
+                                ;; Joypad buttons
+                                BUTTON_A      = #%10000000
+                                BUTTON_B      = #%01000000
+                                BUTTON_SELECT = #%00100000
+                                BUTTON_START  = #%00010000
+                                BUTTON_UP     = #%00001000
+                                BUTTON_DOWN   = #%00000100
+                                BUTTON_LEFT   = #%00000010
+                                BUTTON_RIGHT  = #%00000001
+                                
+                                ;; Custom game constants
+                                .include "game/include/constants.asm"                                ;; additional game-specific constants go here
+                                .include "include/macros.asm"
+                                ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                                ;;
+                                ;; include/macros.asm
+                                ;;
+                                ;; List of macros to include in the game. Currently none.
+                                ;;
+                                ;;
+                                
+                                ;; game-specific macros
+                                .include "game/include/macros.asm"
+                                ;; additional game-specific macros go here
+                                
+                                ;; iNES header (can vary per game)
+                                .include "game/include/header.asm"
+                                ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                                ;;
+                                ;; include/header.asm
+                                ;;
+                                ;; The iNES header for the game. This tells the hardware /
+                                ;; emulator the number of PRG-ROM and CHR-ROM banks, which
+                                ;; mapper to use, the mirroring type, and some other ROM info.
+                                ;;
+                                ;; See https://www.nesdev.org/wiki/INES for more info.
+                                ;;
+                                ;;
+                                
+                                	;; iNES identifier
+      4E 45 53 1A               	.db "NES", $1A
+                                
+                                	;; Number of PRG-ROM (1) and CHR-ROM (1) banks
+      01 01                     	.db $01, $01
+                                	
+                                	;; Mapper (0, or NROM)
+      00                        	.db %00000000
+      00                        	.db %00000000
+                                
+                                	;; Add an additional 8 bytes of padding
+      00 00 00 00 00 00 00 00   	.db $00, $00, $00, $00, $00, $00, $00, $00
+                                
+                                
+                                ;; Zero page RAM
+                                .enum ADDR_ZEROPAGE
+00000                           	.include "ram/zp.asm"
+00000                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+00000                           ;;
+00000                           ;; include/zp_ram.asm
+00000                           ;;
+00000                           ;; List of zero-page RAM variables. Currently only holds a
+00000                           ;; variable to keep track of button presses, but will contain
+00000                           ;; more variables that should be accessed often or easily by
+00000                           ;; the game at any time, like temporary variables used by
+00000                           ;; subroutines or macros, game status flags, and the like.
+00000                           ;;
+00000                           ;;
+00000                           
+00000                               ;; Reserve ten temporary variables for use in subroutines.
+00000                               temp              .dsb 10
+0000A                           
+0000A                               ;; Reserve a two-byte temporary variable for use with 16-bit
+0000A                               ;; operations (like addresses)
+0000A                               temp16            .dsb 2
+0000C                           
+0000C                               ;; Two-byte variable to store a pointer address
+0000C                               pointer           .dsb 2
+0000E                           
+0000E                               ;; Variable to store button presses
+0000E                           	buttons_prev      .dsb 1
+0000F                           	buttons_held      .dsb 1
+00010                           	buttons_pressed   .dsb 1
+00011                           	buttons_released  .dsb 1
+00012                           
+00012                               ;; PPU mask buffer variable, used to store the new value of
+00012                               ;; the PPU mask outside NMI
+00012                               soft_ppu_mask     .dsb 1
+00013                           
+00013                               ;; Variables to skip NMI handling
+00013                               skip_nmi          .dsb 1
+00014                           	force_skip_nmi    .dsb 1
+00015                           
+00015                               ;; Counters and seeds
+00015                               frame_counter     .dsb 1
+00016                               frame_counter_60  .dsb 1
+00017                               second_counter    .dsb 2
+00019                               random_seed       .dsb 1
+0001A                           
+0001A                           	;; Game specific variables
+0001A                           	.include "game/ram/zp.asm"
+0001A                           ;; game-specific zero-page variables go here
+0001A                           	0001A                           .ende
+                                
+                                ;; Other RAM
+                                .enum ADDR_OTHERRAM
+00200                           	.include "ram/misc.asm"
+00200                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+00200                           ;;
+00200                           ;; ram/misc.asm
+00200                           ;;
+00200                           ;; List of additional, non-zeropage RAM variables. Currently
+00200                           ;; empty, but will hold data like the OAM buffer and other,
+00200                           ;; less-often accessed, global variables.
+00200                           ;;
+00200                           ;;
+00200                           
+00200                           
+00200                           	;; Game specific RAM variables
+00200                           	.include "game/ram/misc.asm"
+00200                           ;; miscellaneous (non-zeropage) ram variables go here
+00200                           .ende
+                                
+                                ;; Instantly go to the static bank
+                                .org ADDR_ENDBANK
+0C000                           
+0C000                           ;; Reset script
+0C000                           RESET:
+0C000                           	.include "interrupt/reset.asm"
+0C000                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+0C000                           ;;
+0C000                           ;; include/reset.asm
+0C000                           ;;
+0C000                           ;; Basic reset script. Disables rendering, clears memory, moves
+0C000                           ;; sprites off screen and (re)initializes the game.
+0C000                           ;;
+0C000                           ;;
+0C000                           
+0C000                               ;; Ignore IRQ's
+0C000 78                            SEI
+0C001                           
+0C001                               ;; Disable decimal mode
+0C001 D8                            CLD
+0C002                           
+0C002                               ;; Disable APU frame IRQ
+0C002 A2 40                         LDX #$40
+0C004 8E 17 40                      STX APU_FC
+0C007                           
+0C007                               ;; Set up the stack
+0C007 A2 FF                         LDX #$FF
+0C009 9A                            TXS
+0C00A                           
+0C00A                               ;; Disable NMI, rendering, DMC and APU IRQ's
+0C00A E8                            INX
+0C00B 8E 00 20                      STX PPU_CRTL
+0C00E 8E 01 20                      STX PPU_MASK
+0C011 8E 10 40                      STX APU_CTRL
+0C014 8E 15 40                      STX APU_STATUS
+0C017                           
+0C017                               ;; Clear the vBlank flag
+0C017 2C 02 20                      BIT PPU_STATUS
+0C01A                           
+0C01A                               ;; Wait for vBlank
+0C01A 20 7A C0                      JSR sub_WaitForVBlank
+0C01D                           
+0C01D                               ;; Clear memory
+0C01D                               -clrMem:
+0C01D                                   ;; Move sprites off screen
+0C01D A9 FE                             LDA #$FE
+0C01F 9D 00 02                          STA ADDR_SPRITERAM,x
+0C022                           
+0C022                                   ;; Clear other memory
+0C022 A9 00                             LDA #$00
+0C024 95 00                             STA ADDR_ZEROPAGE,x
+0C026 9D 00 01                          STA $0100,x
+0C029 9D 00 03                          STA $0300,x
+0C02C 9D 00 04                          STA $0400,x
+0C02F 9D 00 05                          STA $0500,x
+0C032 9D 00 06                          STA $0600,x
+0C035 9D 00 07                          STA $0700,x
+0C038                           
+0C038                           		;; Clear next in line
+0C038 E8                        		INX
+0C039 D0 E2                         BNE -clrMem
+0C03B                           
+0C03B                               ;; Wait for vBlank
+0C03B 20 7A C0                      JSR sub_WaitForVBlank
+0C03E                           
+0C03E                               ;; Initialize game
+0C03E                               .include "game/interrupt/reset.asm"
+0C03E                           ;; game initialization goes here
+0C03E                           
+0C03E                           
+0C03E                           ;; Main game loop
+0C03E                           MainGameLoop:
+0C03E                           	.include "game/main.asm"
+0C03E                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+0C03E                           ;;
+0C03E                           ;; game/main.asm
+0C03E                           ;;
+0C03E                           ;; The main game loop content.
+0C03E                           ;;
+0C03E                           ;;
+0C03E                           
+0C03E                           
+0C03E                               ;; Store previous buttons
+0C03E A5 0F                         LDA buttons_held
+0C040 85 0E                         STA buttons_prev
+0C042                           
+0C042                               ;; Read controller input
+0C042 20 66 C0                      JSR sub_ReadController
+0C045                           
+0C045                               ;; Get buttons released
+0C045 A5 0F                         LDA buttons_held
+0C047 49 FF                         EOR #$FF
+0C049 25 0E                         AND buttons_prev
+0C04B 85 11                         STA buttons_released
+0C04D                           
+0C04D                               ;; Set buttons pressed
+0C04D A5 0E                         LDA buttons_prev
+0C04F 49 FF                         EOR #$FF
+0C051 25 0F                         AND buttons_held
+0C053 85 10                         STA buttons_pressed
+0C055 4C 3E C0                  	JMP MainGameLoop
+0C058                           
+0C058                           ;; Subroutines
+0C058                           .include "include/subroutines.asm"
+0C058                           
+0C058                           ;; RNG
+0C058                           .include "subroutine/GetRandomNumber.asm"
+0C058                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+0C058                           ;;
+0C058                           ;; subroutine/GetRandomNumber.asm
+0C058                           ;;
+0C058                           ;; Simple and fast random number generator by White Flame.
+0C058                           ;;
+0C058                           ;; Set random_seed to an arbitrary number to randomize between
+0C058                           ;; gaming sessions, for instance using the frame counter upon
+0C058                           ;; pressing START on the intro screen.
+0C058                           ;;
+0C058                           ;;     ;; IF START PRESSED:
+0C058                           ;;     LDA frame_counter
+0C058                           ;;     STA random_seed
+0C058                           ;;
+0C058                           ;; Source:
+0C058                           ;; codebase64.org/doku.php?id=base:small_fast_8-bit_prng
+0C058                           ;;
+0C058                           ;;
+0C058                           
+0C058                           sub_GetRandomNumber:
+0C058                               ;; Force EOR if random_seed is zero
+0C058 A5 19                         LDA random_seed
+0C05A F0 05                         BEQ +doEor
+0C05C                           
+0C05C                               ;; Shift left, and EOR if the high bit is set
+0C05C 0A                            ASL
+0C05D F0 04                         BEQ +noEor
+0C05F 90 02                         BCC +noEor
+0C061                           
+0C061                           +doEor:
+0C061 49 1D                         EOR #$1D
+0C063                           
+0C063                           +noEor:
+0C063 85 19                         STA random_seed
+0C065                           
+0C065 60                            RTS
+0C066                           
+0C066                           
+0C066                           ;; Read controller input
+0C066                           .include "subroutine/ReadController.asm"
+0C066                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+0C066                           ;;
+0C066                           ;; subroutine/ReadController.asm
+0C066                           ;;
+0C066                           ;; Subroutine that polls the controller and stores the input
+0C066                           ;; buttons in a variable. This version only handles controller
+0C066                           ;; 1. Expects "buttons" variable to be declared in RAM.
+0C066                           ;;
+0C066                           ;;
+0C066                           
+0C066                           sub_ReadController:
+0C066                           
+0C066                               ;; Set strobe bit
+0C066 A9 01                         LDA #$01
+0C068 8D 16 40                      STA JOYPAD_1
+0C06B                           
+0C06B                               ;; Set up ring counter
+0C06B 85 0F                         STA buttons_held
+0C06D                           
+0C06D                               ;; Clear strobe bit
+0C06D 4A                            LSR
+0C06E 8D 16 40                      STA JOYPAD_1
+0C071                           
+0C071                               ;; Loop through button presses
+0C071                               -
+0C071 AD 16 40                          LDA JOYPAD_1
+0C074 4A                                LSR
+0C075 26 0F                             ROL buttons_held
+0C077                           
+0C077                               ;; Check if ring counter is done
+0C077 90 F8                         BCC -
+0C079                           
+0C079                               ;; Return from subroutine
+0C079 60                            RTS
+0C07A                           
+0C07A                           
+0C07A                           ;; vBlank wait
+0C07A                           .include "subroutine/WaitForVBlank.asm"
+0C07A                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+0C07A                           ;;
+0C07A                           ;; subroutine/WaitForVBlank.asm
+0C07A                           ;;
+0C07A                           ;; Subroutine that essentially pauses script execution until
+0C07A                           ;; vBlank happens.
+0C07A                           ;;
+0C07A                           ;;
+0C07A                           
+0C07A                           sub_WaitForVBlank:
+0C07A 2C 02 20                      BIT $2002
+0C07D 10 FB                         BPL sub_WaitForVBlank
+0C07F 60                            RTS
+0C080                           
+0C080                           
+0C080                           ;; Game specific subroutines
+0C080                           .include "game/include/subroutines.asm"
+0C080                           ;; additional game-specific subroutines go here
+0C080                           
+0C080                           ;; NMI handler
+0C080                           NMI:
+0C080                           	.include "interrupt/nmi.asm"
+0C080                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+0C080                           ;;
+0C080                           ;; include/nmi.asm
+0C080                           ;;
+0C080                           ;; Non-maskable interrupt script. This script is being executed
+0C080                           ;; when vBlank hits.
+0C080                           ;;
+0C080                           ;;
+0C080                           
+0C080                               ;; Preserve accumulator through stack
+0C080 48                            PHA
+0C081                           
+0C081                               ;; Should NMI be skipped?
+0C081 A5 13                         LDA skip_nmi
+0C083 F0 03                         BEQ +
+0C085 4C BA C0                          JMP +skip_nmi
+0C088                               +
+0C088                           
+0C088                               ;; When in NMI, skip additional NMI requests
+0C088 A9 01                         LDA #$01
+0C08A 85 13                         STA skip_nmi
+0C08C                           
+0C08C                               ;; Preserve X, Y, and PC through stack
+0C08C 8A                            TXA
+0C08D 48                            PHA
+0C08E 98                            TYA
+0C08F 48                            PHA
+0C090 08                            PHP
+0C091                           	
+0C091                           	;; Check forced NMI skip
+0C091 A5 14                     	LDA force_skip_nmi
+0C093 F0 03                     	BEQ +
+0C095 4C 9D C0                  		JMP +force_skip_nmi
+0C098                           	+
+0C098                           
+0C098                           	;; Update PPU mask
+0C098                           	;LDA #$00
+0C098                           	;STA PPU_CRTL
+0C098 A5 12                     	LDA soft_ppu_mask
+0C09A 8D 01 20                  	STA PPU_MASK
+0C09D                           	
+0C09D                           	
+0C09D                           	;; Additional PPU updates go here
+0C09D                           
+0C09D                           	
+0C09D                           
+0C09D                           ;; This is what happens when we forced nmi skip
+0C09D                           +force_skip_nmi:
+0C09D                           
+0C09D                               ;; Increase frame counters
+0C09D E6 15                         INC frame_counter
+0C09F E6 16                         INC frame_counter_60
+0C0A1                           	
+0C0A1                               ;; Increase second counter (if 60 frames have passed)
+0C0A1 A5 16                     	LDA frame_counter_60
+0C0A3 C9 3C                     	CMP #60
+0C0A5 D0 0A                         BNE +
+0C0A7 E6 18                             INC second_counter+1
+0C0A9 D0 02                     		BNE ++
+0C0AB E6 17                     			INC second_counter
+0C0AD                                   ++
+0C0AD A9 00                             LDA #$00
+0C0AF 85 16                             STA frame_counter_60
+0C0B1                               +
+0C0B1                           
+0C0B1                               ;; Don't skip next NMI request
+0C0B1 A9 00                         LDA #$00
+0C0B3 85 13                         STA skip_nmi
+0C0B5                           
+0C0B5                               ;; Restore X, Y and PC from stack
+0C0B5 28                            PLP
+0C0B6 68                            PLA
+0C0B7 98                            TYA
+0C0B8 68                            PLA
+0C0B9 8A                            TXA
+0C0BA                           
+0C0BA                           +skip_nmi:
+0C0BA                               ;; Restore accumulator from stack
+0C0BA 68                            PLA
+0C0BB                           
+0C0BB                           	;; Return
+0C0BB 40                        	RTI
+0C0BC                           
+0C0BC                           ;; IRQ handler (empty)
+0C0BC                           IRQ:
+0C0BC                           	.include "interrupt/irq.asm"
+0C0BC 40                        	RTI0C0BD                           
+0C0BD                           ;; Interrupt vectors
+0C0BD 00 00 00 00 00 00 00 00.. .org ADDR_VECTORS
+0FFFA 80 C0                     	.dw NMI
+0FFFC 00 C0                     	.dw RESET
+0FFFE BC C0                     	.dw IRQ
+10000                           
+10000                           ;; CHR data (if any)
+10000 00 00 00 00 00 00 00 00.. .incbin "game/graphics/backgrounds.chr"
+11000 00 00 00 00 00 00 00 00.. .incbin "game/graphics/sprites.chr"
