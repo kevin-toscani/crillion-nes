@@ -1,15 +1,11 @@
 Main game blueprint
 
-On reset:
-- Set screen mode to intro
-- Draw intro screen on screen
-- Set start level pointer to 0:
-                         V
-  Start level pointer:   0   1   2   3   4   5
-  Start level list:    [01, 05, 09, 13, 17, 21]
+1) Reset
+1.1 Set screen mode to intro
+1.2 Draw intro screen on screen
+1.3 Set start level pointer to 0
 
-
-On intro screen mode:
+2) Intro screen mode
 - If user presses LEFT
   - Decrease pointer in start level list
   - Draw corresponding level number on screen [DLOS]
@@ -23,50 +19,103 @@ On intro screen mode:
   - Load current level [LCL]
 
 On game screen mode:
-- On LCL
-  - Set initial ball position
-  - Set initial vertical ball direction
-  - Set initial bonus score
-- Every frame
-  - Move the ball vertically
-- Every six frames
-  - Subtract one from the bonus counter
-- If the ball touches a border or non-null tile (top or bottom)
-  - Reverse the ball direction
-- If the ball touches a border or non-null tile (left or right)
-  - Activate ball nudge mode
-- If the ball touches a block of the same color
-  - Destroy the block
-  - Add points to score
-- If the ball touches a paint
-  - Change the ball color to the paint color
-- If the ball touches a move of the same color
-  - Move the move in the direction of the ball
-- If the ball touches a death
-  - Activate ball dead mode
-- If not in nudge, dead or win mode 
-  - If the player holds left
-    - Move the ball left
-  - If the player holds right
-    - Move the ball right
-- If no more blocks left
-  - Activate ball win mode  
-- When in nudge mode
-  - Move the ball in the opposite direction until it's in between two tile columns
-- When in dead mode
-  - Hide ball
-  - Show explosion
-  - After some seconds
-    - Decrease lives
-    - If no more lives left
-      - Go to game over mode and stop
-    - [LCL]
-- When in win mode
-  - Flash background
-  - Play win jingle
-  - Add bonus points to score
-  - After some seconds
-    - Add one to current level
-    - If current level = 26
-      - Go to game win mode and stop
-    - [LCL]
+- When in preload mode
+  - Set countdown to (about) 2 seconds
+  - Don't move ball, ignore user input
+  - When countdown is zero
+    - Disable preload mode
+- When NOT in preload mode
+  - Every frame
+    - Move the ball vertically (if not in preload mode)
+  - Every six frames
+    - Subtract one from the bonus counter 
+  - If the ball touches a border or non-null tile (top or bottom)
+    - Reverse the ball direction
+  - If the ball touches a border or non-null tile (left or right)
+    - Activate ball nudge mode
+  - If the ball touches a block of the same color
+    - Destroy the block
+    - Add points to score
+  - If the ball touches a paint
+    - Change the ball color to the paint color
+  - If the ball touches a move of the same color
+    - Move the move in the direction of the ball
+  - If the ball touches a death
+    - Activate ball dead mode
+  - If not in nudge, dead or win mode 
+    - If the player holds left
+      - Move the ball left
+    - If the player holds right
+      - Move the ball right
+  - If no more blocks left
+    - Activate ball win mode  
+  - When in nudge mode
+    - Move the ball in the opposite direction until it's in between two tile columns
+  - When in dead mode
+    - Hide ball
+    - Show explosion
+    - After some seconds
+      - Decrease lives
+      - If no more lives left
+        - Go to game over mode and stop
+      - [LCL]
+  - When in win mode
+    - Flash background
+    - Play win jingle
+    - Add bonus points to score
+    - After some seconds
+      - Add one to current level
+      - If current level = 26
+        - Go to game win mode and stop
+      - [LCL]
+
+
+==[ 1 ] ON RESET ====================================================
+
+1.1 Set screen mode to intro
+This happens by default, as a screen mode value of #$00 is for the
+intro, and the default reset routine will take care of this.
+
+1.2 Draw the intro screen on screen
+First, turn of screen drawing and ignore / skip over NMI requests.
+Then we draw the title screen. This should be stored as efficiently
+as I can think of.
+All tiles for the tile screen are in the top four rows of CHR-ROM.
+That means there are 64 tiles max. I'm thinking of the following:
+
+#% tt vvvvvv
+   || ++++++--- value (0-63)
+   ++---------- type - %00: draw tile vvvvvv
+                       %01: set ppu_addr high byte to vvvvvv
+                            the next byte is always the low byte.
+                       %11: draw shape vvv vvv
+                            000 = black void
+                            001 = T/B
+                            010 = L/R
+                            011 = random void
+                            100 = TL
+                            101 = TR
+                            110 = BR
+                            111 = BL
+
+#$3F = end of screen
+
+The intro screen data now is as follows:
+    ;; Gow to row 5, column 12
+    .db #%01000101, #%10001100
+    
+    ;; Draw 1.LEVEL:
+    .db #$01, #$26, #$16, #$0F, #$20, #$0F, #$16, #$27
+
+    ;; Gow to row 6, column 15
+    .db #%01000110, #%10001111
+    
+    ;; Draw 01
+    .db #$01, #$02
+    
+    ;; ... et cetera
+
+
+1.3 Set start level pointer to 0
+Since startlevel_pointer is a value in RAM, and RAM gets reset to
+zero by default, this is nothing to worry about either.
