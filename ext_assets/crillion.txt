@@ -1,22 +1,72 @@
-;; Ball bounding box constants
-BALL_HEIGHT  = #$0A  ; Height of the ball graphic within the sprite(s)
-BALL_WIDTH   = #$0A  ; Width of the ball graphic within the sprite(s)
-BALL_TOP     = #$03  ; Top offset of the ball graphic
-BALL_LEFT    = #$03  ; Left offset of the ball graphic
+Main game blueprint
 
-;; Ball variables
-ball_xpos    .db 1   ; left pixel x-position on screen
-ball_ypos    .db 1   ; top pixel y-position on screen
-ball_lives   .db 1   ; number of lives left
-ball_score   .db 5   ; decimal score, five bytes (0-9)
-ball_bonus   .db 3   ; decimal bonus points, three bytes (0-9)
+On reset:
+- Set screen mode to intro
+- Draw intro screen on screen
+- Set start level pointer to 0:
+                         V
+  Start level pointer:   0   1   2   3   4   5
+  Start level list:    [01, 05, 09, 13, 17, 21]
 
-;; Ball flags
-;; #% c c c l r v n a
-;;    | | | | | | | +-- ball is dead (0) or alive (1)
-;;    | | | | | | +---- ball is being nudged (1) or not (0)
-;;    | | | | | +------ ball moves up (0) or down (1)
-;;    | | | | +-------- ball is moving right (1) or not (0)
-;;    | | | +---------- ball is moving left (1) or not (0)
-;;    +-+-+------------ ball color (1-6)
-ball_flags   .db 1
+
+On intro screen mode:
+- If user presses LEFT
+  - Decrease pointer in start level list
+  - Draw corresponding level number on screen [DLOS]
+- If user presses RIGHT
+  - Increase pointer in start level list
+  - [DLOS]
+- If user presses A or START
+  - Turn off screen
+  - Set screen mode to game
+  - Set current level to where the start level pointer points to
+  - Load current level [LCL]
+
+On game screen mode:
+- On LCL
+  - Set initial ball position
+  - Set initial vertical ball direction
+  - Set initial bonus score
+- Every frame
+  - Move the ball vertically
+- Every six frames
+  - Subtract one from the bonus counter
+- If the ball touches a border or non-null tile (top or bottom)
+  - Reverse the ball direction
+- If the ball touches a border or non-null tile (left or right)
+  - Activate ball nudge mode
+- If the ball touches a block of the same color
+  - Destroy the block
+  - Add points to score
+- If the ball touches a paint
+  - Change the ball color to the paint color
+- If the ball touches a move of the same color
+  - Move the move in the direction of the ball
+- If the ball touches a death
+  - Activate ball dead mode
+- If not in nudge, dead or win mode 
+  - If the player holds left
+    - Move the ball left
+  - If the player holds right
+    - Move the ball right
+- If no more blocks left
+  - Activate ball win mode  
+- When in nudge mode
+  - Move the ball in the opposite direction until it's in between two tile columns
+- When in dead mode
+  - Hide ball
+  - Show explosion
+  - After some seconds
+    - Decrease lives
+    - If no more lives left
+      - Go to game over mode and stop
+    - [LCL]
+- When in win mode
+  - Flash background
+  - Play win jingle
+  - Add bonus points to score
+  - After some seconds
+    - Add one to current level
+    - If current level = 26
+      - Go to game win mode and stop
+    - [LCL]
