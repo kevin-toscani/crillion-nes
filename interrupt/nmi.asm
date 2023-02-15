@@ -35,7 +35,7 @@
 
     ;; Update PPU mask
     ;LDA #$00
-    ;STA PPU_CRTL
+    ;STA PPU_CTRL
     LDA soft_ppu_mask
     STA PPU_MASK
     

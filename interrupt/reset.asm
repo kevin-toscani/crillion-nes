@@ -23,7 +23,7 @@
 
     ;; Disable NMI, rendering, DMC and APU IRQ's
     INX
-    STX PPU_CRTL
+    STX PPU_CTRL
     STX PPU_MASK
     STX APU_CTRL
     STX APU_STATUS
@@ -57,6 +57,15 @@
     ;; Wait for vBlank
     JSR sub_WaitForVBlank
 
+	;; Turn on NMI, set foreground $0000, background $1000
+    LDA #%10010000
+    STA PPU_CTRL
+    
+    ;; Reset PPU scroll pointer
+    LDY #0
+    STY $2005
+    STY $2005
+    
     ;; Initialize game
     .include "game/interrupt/reset.asm"
 

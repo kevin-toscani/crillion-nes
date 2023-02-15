@@ -48,6 +48,9 @@ MainGameLoop:
 ;; Subroutines
 .include "include/subroutines.asm"
 
+;; LUTs
+.include "game/include/tables.asm"
+
 ;; NMI handler
 NMI:
     .include "interrupt/nmi.asm"
@@ -63,5 +66,5 @@ IRQ:
     .dw IRQ
 
 ;; CHR data (if any)
-.incbin "game/graphics/backgrounds.chr"
 .incbin "game/graphics/sprites.chr"
+.incbin "game/graphics/backgrounds.chr"
