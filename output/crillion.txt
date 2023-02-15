@@ -99,23 +99,23 @@
                                 ;;
                                 ;;
                                 
-                                	;; iNES identifier
-      4E 45 53 1A               	.db "NES", $1A
+                                    ;; iNES identifier
+      4E 45 53 1A                   .db "NES", $1A
                                 
-                                	;; Number of PRG-ROM (1) and CHR-ROM (1) banks
-      01 01                     	.db $01, $01
-                                	
-                                	;; Mapper (0, or NROM)
-      00                        	.db %00000000
-      00                        	.db %00000000
+                                    ;; Number of PRG-ROM (1) and CHR-ROM (1) banks
+      01 01                         .db $01, $01
+                                    
+                                    ;; Mapper (0, or NROM)
+      00                            .db %00000000
+      00                            .db %00000000
                                 
-                                	;; Add an additional 8 bytes of padding
-      00 00 00 00 00 00 00 00   	.db $00, $00, $00, $00, $00, $00, $00, $00
+                                    ;; Add an additional 8 bytes of padding
+      00 00 00 00 00 00 00 00       .db $00, $00, $00, $00, $00, $00, $00, $00
                                 
                                 
                                 ;; Zero page RAM
                                 .enum ADDR_ZEROPAGE
-00000                           	.include "ram/zp.asm"
+00000                               .include "ram/zp.asm"
 00000                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 00000                           ;;
 00000                           ;; include/zp_ram.asm
@@ -139,10 +139,10 @@
 0000C                               pointer           .dsb 2
 0000E                           
 0000E                               ;; Variable to store button presses
-0000E                           	buttons_prev      .dsb 1
-0000F                           	buttons_held      .dsb 1
-00010                           	buttons_pressed   .dsb 1
-00011                           	buttons_released  .dsb 1
+0000E                               buttons_prev      .dsb 1
+0000F                               buttons_held      .dsb 1
+00010                               buttons_pressed   .dsb 1
+00011                               buttons_released  .dsb 1
 00012                           
 00012                               ;; PPU mask buffer variable, used to store the new value of
 00012                               ;; the PPU mask outside NMI
@@ -150,7 +150,7 @@
 00013                           
 00013                               ;; Variables to skip NMI handling
 00013                               skip_nmi          .dsb 1
-00014                           	force_skip_nmi    .dsb 1
+00014                               force_skip_nmi    .dsb 1
 00015                           
 00015                               ;; Counters and seeds
 00015                               frame_counter     .dsb 1
@@ -158,14 +158,14 @@
 00017                               second_counter    .dsb 2
 00019                               random_seed       .dsb 1
 0001A                           
-0001A                           	;; Game specific variables
-0001A                           	.include "game/ram/zp.asm"
+0001A                               ;; Game specific variables
+0001A                               .include "game/ram/zp.asm"
 0001A                           ;; game-specific zero-page variables go here
-0001A                           	0001A                           .ende
+0001A                               0001A                           .ende
                                 
                                 ;; Other RAM
                                 .enum ADDR_OTHERRAM
-00200                           	.include "ram/misc.asm"
+00200                               .include "ram/misc.asm"
 00200                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 00200                           ;;
 00200                           ;; ram/misc.asm
@@ -177,8 +177,8 @@
 00200                           ;;
 00200                           
 00200                           
-00200                           	;; Game specific RAM variables
-00200                           	.include "game/ram/misc.asm"
+00200                               ;; Game specific RAM variables
+00200                               .include "game/ram/misc.asm"
 00200                           ;; miscellaneous (non-zeropage) ram variables go here
 00200                           .ende
                                 
@@ -187,7 +187,7 @@
 0C000                           
 0C000                           ;; Reset script
 0C000                           RESET:
-0C000                           	.include "interrupt/reset.asm"
+0C000                               .include "interrupt/reset.asm"
 0C000                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 0C000                           ;;
 0C000                           ;; include/reset.asm
@@ -240,8 +240,8 @@
 0C032 9D 00 06                          STA $0600,x
 0C035 9D 00 07                          STA $0700,x
 0C038                           
-0C038                           		;; Clear next in line
-0C038 E8                        		INX
+0C038                                   ;; Clear next in line
+0C038 E8                                INX
 0C039 D0 E2                         BNE -clrMem
 0C03B                           
 0C03B                               ;; Wait for vBlank
@@ -254,7 +254,7 @@
 0C03E                           
 0C03E                           ;; Main game loop
 0C03E                           MainGameLoop:
-0C03E                           	.include "game/main.asm"
+0C03E                               .include "game/main.asm"
 0C03E                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 0C03E                           ;;
 0C03E                           ;; game/main.asm
@@ -282,7 +282,7 @@
 0C04F 49 FF                         EOR #$FF
 0C051 25 0F                         AND buttons_held
 0C053 85 10                         STA buttons_pressed
-0C055 4C 3E C0                  	JMP MainGameLoop
+0C055 4C 3E C0                      JMP MainGameLoop
 0C058                           
 0C058                           ;; Subroutines
 0C058                           .include "include/subroutines.asm"
@@ -388,7 +388,7 @@
 0C080                           
 0C080                           ;; NMI handler
 0C080                           NMI:
-0C080                           	.include "interrupt/nmi.asm"
+0C080                               .include "interrupt/nmi.asm"
 0C080                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 0C080                           ;;
 0C080                           ;; include/nmi.asm
@@ -417,23 +417,23 @@
 0C08E 98                            TYA
 0C08F 48                            PHA
 0C090 08                            PHP
-0C091                           	
-0C091                           	;; Check forced NMI skip
-0C091 A5 14                     	LDA force_skip_nmi
-0C093 F0 03                     	BEQ +
-0C095 4C 9D C0                  		JMP +force_skip_nmi
-0C098                           	+
+0C091                               
+0C091                               ;; Check forced NMI skip
+0C091 A5 14                         LDA force_skip_nmi
+0C093 F0 03                         BEQ +
+0C095 4C 9D C0                          JMP +force_skip_nmi
+0C098                               +
 0C098                           
-0C098                           	;; Update PPU mask
-0C098                           	;LDA #$00
-0C098                           	;STA PPU_CRTL
-0C098 A5 12                     	LDA soft_ppu_mask
-0C09A 8D 01 20                  	STA PPU_MASK
-0C09D                           	
-0C09D                           	
-0C09D                           	;; Additional PPU updates go here
+0C098                               ;; Update PPU mask
+0C098                               ;LDA #$00
+0C098                               ;STA PPU_CRTL
+0C098 A5 12                         LDA soft_ppu_mask
+0C09A 8D 01 20                      STA PPU_MASK
+0C09D                               
+0C09D                               
+0C09D                               ;; Additional PPU updates go here
 0C09D                           
-0C09D                           	
+0C09D                               
 0C09D                           
 0C09D                           ;; This is what happens when we forced nmi skip
 0C09D                           +force_skip_nmi:
@@ -441,14 +441,14 @@
 0C09D                               ;; Increase frame counters
 0C09D E6 15                         INC frame_counter
 0C09F E6 16                         INC frame_counter_60
-0C0A1                           	
+0C0A1                               
 0C0A1                               ;; Increase second counter (if 60 frames have passed)
-0C0A1 A5 16                     	LDA frame_counter_60
-0C0A3 C9 3C                     	CMP #60
+0C0A1 A5 16                         LDA frame_counter_60
+0C0A3 C9 3C                         CMP #60
 0C0A5 D0 0A                         BNE +
 0C0A7 E6 18                             INC second_counter+1
-0C0A9 D0 02                     		BNE ++
-0C0AB E6 17                     			INC second_counter
+0C0A9 D0 02                             BNE ++
+0C0AB E6 17                                 INC second_counter
 0C0AD                                   ++
 0C0AD A9 00                             LDA #$00
 0C0AF 85 16                             STA frame_counter_60
@@ -469,18 +469,18 @@
 0C0BA                               ;; Restore accumulator from stack
 0C0BA 68                            PLA
 0C0BB                           
-0C0BB                           	;; Return
-0C0BB 40                        	RTI
+0C0BB                               ;; Return
+0C0BB 40                            RTI
 0C0BC                           
 0C0BC                           ;; IRQ handler (empty)
 0C0BC                           IRQ:
-0C0BC                           	.include "interrupt/irq.asm"
-0C0BC 40                        	RTI0C0BD                           
+0C0BC                               .include "interrupt/irq.asm"
+0C0BC 40                            RTI0C0BD                           
 0C0BD                           ;; Interrupt vectors
 0C0BD 00 00 00 00 00 00 00 00.. .org ADDR_VECTORS
-0FFFA 80 C0                     	.dw NMI
-0FFFC 00 C0                     	.dw RESET
-0FFFE BC C0                     	.dw IRQ
+0FFFA 80 C0                         .dw NMI
+0FFFC 00 C0                         .dw RESET
+0FFFE BC C0                         .dw IRQ
 10000                           
 10000                           ;; CHR data (if any)
 10000 00 00 00 00 00 00 00 00.. .incbin "game/graphics/backgrounds.chr"

@@ -25,12 +25,12 @@
 
 ;; Zero page RAM
 .enum ADDR_ZEROPAGE
-	.include "ram/zp.asm"
+    .include "ram/zp.asm"
 .ende
 
 ;; Other RAM
 .enum ADDR_OTHERRAM
-	.include "ram/misc.asm"
+    .include "ram/misc.asm"
 .ende
 
 ;; Instantly go to the static bank
@@ -38,29 +38,29 @@
 
 ;; Reset script
 RESET:
-	.include "interrupt/reset.asm"
+    .include "interrupt/reset.asm"
 
 ;; Main game loop
 MainGameLoop:
-	.include "game/main.asm"
-	JMP MainGameLoop
+    .include "game/main.asm"
+    JMP MainGameLoop
 
 ;; Subroutines
 .include "include/subroutines.asm"
 
 ;; NMI handler
 NMI:
-	.include "interrupt/nmi.asm"
+    .include "interrupt/nmi.asm"
 
 ;; IRQ handler (empty)
 IRQ:
-	.include "interrupt/irq.asm"
+    .include "interrupt/irq.asm"
 
 ;; Interrupt vectors
 .org ADDR_VECTORS
-	.dw NMI
-	.dw RESET
-	.dw IRQ
+    .dw NMI
+    .dw RESET
+    .dw IRQ
 
 ;; CHR data (if any)
 .incbin "game/graphics/backgrounds.chr"

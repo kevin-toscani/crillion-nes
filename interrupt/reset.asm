@@ -50,8 +50,8 @@
         STA $0600,x
         STA $0700,x
 
-		;; Clear next in line
-		INX
+        ;; Clear next in line
+        INX
     BNE -clrMem
 
     ;; Wait for vBlank

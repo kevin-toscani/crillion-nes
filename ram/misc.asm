@@ -9,5 +9,5 @@
 ;;
 
 
-	;; Game specific RAM variables
-	.include "game/ram/misc.asm"
+    ;; Game specific RAM variables
+    .include "game/ram/misc.asm"

@@ -21,10 +21,10 @@
     pointer           .dsb 2
 
     ;; Variable to store button presses
-	buttons_prev      .dsb 1
-	buttons_held      .dsb 1
-	buttons_pressed   .dsb 1
-	buttons_released  .dsb 1
+    buttons_prev      .dsb 1
+    buttons_held      .dsb 1
+    buttons_pressed   .dsb 1
+    buttons_released  .dsb 1
 
     ;; PPU mask buffer variable, used to store the new value of
     ;; the PPU mask outside NMI
@@ -32,7 +32,7 @@
 
     ;; Variables to skip NMI handling
     skip_nmi          .dsb 1
-	force_skip_nmi    .dsb 1
+    force_skip_nmi    .dsb 1
 
     ;; Counters and seeds
     frame_counter     .dsb 1
@@ -40,6 +40,6 @@
     second_counter    .dsb 2
     random_seed       .dsb 1
 
-	;; Game specific variables
-	.include "game/ram/zp.asm"
-	
+    ;; Game specific variables
+    .include "game/ram/zp.asm"
+    
