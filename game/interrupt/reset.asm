@@ -21,7 +21,7 @@
         LDA tbl_IntroScreenPalette,x
         STA PPU_DATA
         INX
-        CPX #$10
+        CPX #$20
     BNE -
 
     ;; Set up intro screen draw loop

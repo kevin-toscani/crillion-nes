@@ -6,6 +6,9 @@
 ;;
 ;;
 
+    ;; Reset sprite pointer every game loop
+    LDA #$00
+    STA sprite_ram_pointer
 
     ;; Store previous buttons
     LDA buttons_held
@@ -25,3 +28,7 @@
     EOR #$FF
     AND buttons_held
     STA buttons_pressed
+
+.include "game/test/tile_update.asm"
+
+.include "game/test/show_animation.asm"

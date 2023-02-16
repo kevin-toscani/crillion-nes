@@ -6,6 +6,11 @@ tbl_IntroScreenPalette:
     .db #$0F, #$29, #$14, #$30
     .db #$0F, #$00, #$10, #$30
 
+    .db #$0F, #$2C, #$12, #$30
+    .db #$0F, #$16, #$38, #$30
+    .db #$0F, #$29, #$14, #$30
+    .db #$0F, #$00, #$10, #$30
+
 
 ;; Intro: mapping logo index to chr tile
 tbl_IntroScreenLogoChr:
@@ -102,3 +107,6 @@ tbl_IntroScreenData:
 
     ;; End of intro
     .db #$3F
+
+;; test animation table
+.include "game/test/show_animation_table.asm"
