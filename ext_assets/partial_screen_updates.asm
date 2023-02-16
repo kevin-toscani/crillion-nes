@@ -59,9 +59,9 @@ ppu_buffer          .db 48
     LDA #$20
     STA ppu_buffer,y
 
-    ;; Add ppu_data (in this case, chr tile id) to buffer
+    ;; Add ppu_data (in this case, chr tile id $3C) to buffer
     INY
-    LDA #$3C ; ppu_data
+    LDA #$3C
     STA ppu_buffer,y
 
     ;; Update buffer pointer
@@ -81,8 +81,14 @@ ppu_buffer          .db 48
         JMP +no_ppu_buffer_update
     +
 
-    ;; Set up loop
+    ;; Reset ppu control register, mask and scrolling position
     LDX #$00
+    STX PPU_CTRL
+    STX PPU_MASK
+    STX PPU_SCROLL
+    STX PPU_SCROLL
+
+;; Set up loop
 -
     ;; Reset hi/lo latch
     BIT PPU_STATUS
@@ -110,6 +116,12 @@ ppu_buffer          .db 48
     LDA #$00
     STA ppu_buffer_update
     STA ppu_buffer_pointer
+
+    ;; Restore ppu control register and mask
+    LDA #%10010000
+    STA PPU_CTRL
+    LDA soft_ppu_mask
+    STA PPU_MASK
 
 ;; Continue other NMI stuff
 +no_ppu_buffer_update:
