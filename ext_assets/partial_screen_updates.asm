@@ -46,8 +46,7 @@ ppu_buffer          .db 48
     LDY ppu_buffer_pointer
     CPY #$30
     BNE +
-        LDA #$01
-        STA ppu_buffer_update
+        INC ppu_buffer_update
         JSR sub_WaitForVBlank
     +
 
@@ -70,8 +69,7 @@ ppu_buffer          .db 48
     STY ppu_buffer_pointer
 
     ;; Tell NMI to update next round
-    LDA #$01
-    STA ppu_buffer_update
+    INC ppu_buffer_update
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
