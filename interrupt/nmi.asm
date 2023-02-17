@@ -63,6 +63,10 @@
         STA frame_counter_60
     +
 
+    ;; reset ball_update_position
+    LDA #$00
+    STA ball_update_position
+
     ;; Don't skip next NMI request
     LDA #$00
     STA skip_nmi

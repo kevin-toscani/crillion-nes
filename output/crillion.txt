@@ -77,6 +77,12 @@
                                 BALL_TOP     = #$04  ; Top offset of the ball graphic
                                 BALL_LEFT    = #$04  ; Left offset of the ball graphic
                                 
+                                ;; Ball speed (high/low byte), tile and attribute
+                                BALL_SPEED_HI = #$02
+                                BALL_SPEED_LO = #$C0
+                                BALL_TILE_CHR = #$01
+                                BALL_ATTR     = #%00000000
+                                
                                 ;; Max number of animations on screen
                                 MAX_ANIMATIONS  = #$04
                                 
@@ -179,50 +185,56 @@
 0001A                               ;; Game specific variables
 0001A                               .include "game/ram/zp.asm"
 0001A                           ;; Ball variables
-0001A                           ball_xpos           .dsb 1   ; left pixel x-position on screen
-0001B                           ball_ypos           .dsb 1   ; top pixel y-position on screen
-0001C                           ball_lives          .dsb 1   ; number of lives left
-0001D                           ball_score          .dsb 5   ; decimal score, five bytes (0-9)
-00022                           ball_bonus          .dsb 3   ; decimal bonus points, three bytes (0-9)
-00025                           
-00025                           
-00025                           ;; Ball flags
-00025                           ;; #% c c c l h v n a
-00025                           ;;    | | | | | | | +-- ball is dead (0) or alive (1)
-00025                           ;;    | | | | | | +---- ball is being nudged (1) or not (0)
-00025                           ;;    | | | | | +------ ball moves up (0) or down (1)
-00025                           ;;    | | | | +-------- ball is moving horizontally (1) or not (0)
-00025                           ;;    | | | +---------- ball is moving left (0) or right (1)
-00025                           ;;    +-+-+------------ ball color (1-6)
-00025                           ball_flags          .dsb 1
-00026                           
-00026                           
-00026                           ;; Screen mode
-00026                           ;; #%00000000 = intro screen
-00026                           ;; #%. . . . . . w g
-00026                           ;;   | | | | | | | +--------- game mode (1) or not (0)
-00026                           ;;   | | | | | | +----------- win screen (1) or not (0)
-00026                           ;;   +-+-+-+-+-+------------- unused
-00026                           screen_mode         .dsb 1
-00027                           
-00027                           
-00027                           ;; Start level pointer
-00027                           ;; You can start the game at level 1, 5, 9, 13 or 17.
-00027                           ;; This is the pointer that tells you at which level to start.
-00027                           startlevel_pointer  .dsb 1 
+0001A                           ball_xpos_hi        .dsb 1
+0001B                           ball_xpos_lo        .dsb 1
+0001C                           ball_ypos_hi        .dsb 1
+0001D                           ball_ypos_lo        .dsb 1
+0001E                           ball_lives          .dsb 1   ; number of lives left
+0001F                           ball_score          .dsb 6   ; decimal score, five bytes (0-9)
+00025                           ball_bonus          .dsb 3   ; decimal bonus points, three bytes (0-9)
 00028                           
 00028                           
-00028                           ;; PPU buffer variables
-00028                           ppu_buffer_update   .dsb 1
-00029                           ppu_buffer_pointer  .dsb 1
+00028                           ;; Update-position check
+00028                           ball_update_position   .dsb 1
+00029                           
+00029                           
+00029                           ;; Ball flags
+00029                           ;; #% c c c l h v n a
+00029                           ;;    | | | | | | | +-- ball is dead (0) or alive (1)
+00029                           ;;    | | | | | | +---- ball is being nudged (1) or not (0)
+00029                           ;;    | | | | | +------ ball moves up (0) or down (1)
+00029                           ;;    | | | | +-------- ball is moving horizontally (1) or not (0)
+00029                           ;;    | | | +---------- ball is moving left (0) or right (1)
+00029                           ;;    +-+-+------------ ball color (1-6)
+00029                           ball_flags          .dsb 1
 0002A                           
-0002A                           ;; Pointer to keep track of the number of explosions
-0002A                           explosion_pointer         .dsb 1
+0002A                           
+0002A                           ;; Screen mode
+0002A                           ;; #%00000000 = intro screen
+0002A                           ;; #%. . . . . . w g
+0002A                           ;;   | | | | | | | +--------- game mode (1) or not (0)
+0002A                           ;;   | | | | | | +----------- win screen (1) or not (0)
+0002A                           ;;   +-+-+-+-+-+------------- unused
+0002A                           screen_mode         .dsb 1
 0002B                           
-0002B                           ;; Sprite RAM pointer to keep track of sprites to update
-0002B                           sprite_ram_pointer        .dsb 1
+0002B                           
+0002B                           ;; Start level pointer
+0002B                           ;; You can start the game at level 1, 5, 9, 13 or 17.
+0002B                           ;; This is the pointer that tells you at which level to start.
+0002B                           startlevel_pointer  .dsb 1 
 0002C                           
-0002C                               0002C                           .ende
+0002C                           
+0002C                           ;; PPU buffer variables
+0002C                           ppu_buffer_update   .dsb 1
+0002D                           ppu_buffer_pointer  .dsb 1
+0002E                           
+0002E                           ;; Pointer to keep track of the number of explosions
+0002E                           explosion_pointer         .dsb 1
+0002F                           
+0002F                           ;; Sprite RAM pointer to keep track of sprites to update
+0002F                           sprite_ram_pointer        .dsb 1
+00030                           
+00030                               00030                           .ende
                                 
                                 ;; Other RAM
                                 .enum ADDR_OTHERRAM
@@ -302,7 +314,7 @@
 0C017 2C 02 20                      BIT PPU_STATUS
 0C01A                           
 0C01A                               ;; Wait for vBlank
-0C01A 20 47 C2                      JSR sub_WaitForVBlank
+0C01A 20 94 C2                      JSR sub_WaitForVBlank
 0C01D                           
 0C01D                               ;; Clear memory
 0C01D                               -clrMem:
@@ -325,7 +337,7 @@
 0C039 D0 E2                         BNE -clrMem
 0C03B                           
 0C03B                               ;; Wait for vBlank
-0C03B 20 47 C2                      JSR sub_WaitForVBlank
+0C03B 20 94 C2                      JSR sub_WaitForVBlank
 0C03E                           
 0C03E                           	;; Turn on NMI, set foreground $0000, background $1000
 0C03E A9 90                         LDA #%10010000
@@ -348,7 +360,7 @@
 0C04F A5 12                         LDA soft_ppu_mask
 0C051 29 E7                         AND #%11100111
 0C053 85 12                         STA soft_ppu_mask
-0C055 20 47 C2                      JSR sub_WaitForVBlank
+0C055 20 94 C2                      JSR sub_WaitForVBlank
 0C058                           
 0C058                               ;; Load intro palette
 0C058 2C 02 20                      BIT PPU_STATUS
@@ -358,838 +370,901 @@
 0C062 8D 06 20                      STA PPU_ADDR
 0C065 A2 00                         LDX #$00
 0C067                               -
-0C067 BD 60 C2                          LDA tbl_IntroScreenPalette,x
+0C067 BD AD C2                          LDA tbl_IntroScreenPalette,x
 0C06A 8D 07 20                          STA PPU_DATA
 0C06D E8                                INX
 0C06E E0 20                             CPX #$20
 0C070 D0 F5                         BNE -
-0C072                           
-0C072                               ;; Set up intro screen draw loop
-0C072 A2 00                         LDX #$00
-0C074                           
-0C074                           -loop_IntroScreenData:
-0C074                           
-0C074                               ;; Get current byte from intro screen data
-0C074 BD 88 C2                      LDA tbl_IntroScreenData,x
-0C077                           
-0C077                               ;; If current byte is #$3F, we're done drawing.
-0C077 C9 3F                         CMP #$3F
-0C079 D0 03                         BNE +
-0C07B 4C C8 C0                          JMP +goToEndIntroScreen
-0C07E                               +
-0C07E                           
-0C07E                               ;; If highest bits are %11, draw a plain tile
-0C07E 29 C0                         AND #%11000000
-0C080 D0 03                         BNE +
-0C082 4C A8 C0                          JMP +drawTile
-0C085                               +
-0C085                               
-0C085                               ;; If highest bits are %01, set the PPU address
-0C085                               ;; If not, draw two logo tiles
-0C085 C9 40                         CMP #%01000000
-0C087 D0 03                         BNE +drawLogo
-0C089 4C B2 C0                          JMP +setPpuAddr
-0C08C                           
-0C08C                           +drawLogo:
-0C08C                               ;; Get bits 0-2 and store in a temp variable
-0C08C BD 88 C2                      LDA tbl_IntroScreenData,x
-0C08F 29 07                         AND #%00000111
-0C091 85 00                         STA temp
-0C093                               
-0C093                               ;; Get bits 3-5, shift over to get a value from 0-7
-0C093 BD 88 C2                      LDA tbl_IntroScreenData,x
-0C096 4A                            LSR
-0C097 4A                            LSR
-0C098 4A                            LSR
-0C099 29 07                         AND #%00000111
-0C09B                               
-0C09B                               ;; Draw the tile that corresponds with that value
-0C09B A8                            TAY
-0C09C 20 4D C2                      JSR sub_drawIntroScreenLogoTile
-0C09F                               
-0C09F                               ;; Do the same for the value stored in temp
-0C09F A4 00                         LDY temp
-0C0A1 20 4D C2                      JSR sub_drawIntroScreenLogoTile
-0C0A4                           
-0C0A4                               ;; Next byte please
-0C0A4 E8                            INX
-0C0A5 4C 74 C0                      JMP -loop_IntroScreenData
-0C0A8                           
-0C0A8                           +drawTile:
-0C0A8                               ;; Just draw the tile value on screen
-0C0A8 BD 88 C2                      LDA tbl_IntroScreenData,x
-0C0AB 8D 07 20                      STA PPU_DATA
-0C0AE                               
-0C0AE                               ;; Next byte please
-0C0AE E8                            INX
-0C0AF 4C 74 C0                      JMP -loop_IntroScreenData
-0C0B2                           
-0C0B2                           
-0C0B2                           +setPpuAddr:
-0C0B2                               ;; Reset the PPU latch
-0C0B2 2C 02 20                      BIT PPU_STATUS
-0C0B5                               
-0C0B5                               ;; Sanitize and write the high byte of the PPU address
-0C0B5 BD 88 C2                      LDA tbl_IntroScreenData,x
-0C0B8 29 3F                         AND #%00111111
-0C0BA 8D 06 20                      STA PPU_ADDR
-0C0BD                           
-0C0BD                               ;; Write the low byte of the PPU address
-0C0BD E8                            INX
-0C0BE BD 88 C2                      LDA tbl_IntroScreenData,x
-0C0C1 8D 06 20                      STA PPU_ADDR
-0C0C4                               
-0C0C4                               ;; PPU has been set up to draw tiles at the correct spot now.
-0C0C4                               
-0C0C4                               ;; Next byte please.
-0C0C4 E8                            INX
-0C0C5 4C 74 C0                      JMP -loop_IntroScreenData
-0C0C8                           
-0C0C8                           +goToEndIntroScreen:
-0C0C8                           
-0C0C8                               ;; To color the 1.LEVEL: line green, we need to update two
-0C0C8                               ;; values in the PPU attribute data.
-0C0C8 2C 02 20                      BIT PPU_STATUS
-0C0CB A9 23                         LDA #$23
-0C0CD 8D 06 20                      STA PPU_ADDR
-0C0D0 A9 CB                         LDA #$CB
-0C0D2 8D 06 20                      STA PPU_ADDR
-0C0D5 A9 0A                         LDA #%00001010
-0C0D7 8D 07 20                      STA PPU_DATA
-0C0DA 8D 07 20                      STA PPU_DATA
-0C0DD                           
-0C0DD                               ;; Enable rendering
-0C0DD A5 12                         LDA soft_ppu_mask
-0C0DF 09 1E                         ORA #%00011110
-0C0E1 85 12                         STA soft_ppu_mask
-0C0E3 A9 00                     	LDA #$00
-0C0E5 8D 05 20                  	STA PPU_SCROLL
-0C0E8 8D 05 20                  	STA PPU_SCROLL
-0C0EB 85 14                     	STA force_skip_nmi
-0C0ED 20 47 C2                      JSR sub_WaitForVBlank
-0C0F0                           
-0C0F0                           
-0C0F0                           ;; Main game loop
-0C0F0                           MainGameLoop:
-0C0F0                               .include "game/main.asm"
-0C0F0                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-0C0F0                           ;;
-0C0F0                           ;; game/main.asm
-0C0F0                           ;;
-0C0F0                           ;; The main game loop content.
-0C0F0                           ;;
-0C0F0                           ;;
-0C0F0                           
-0C0F0                               ;; Reset sprite pointer every game loop
-0C0F0 A9 00                         LDA #$00
-0C0F2 85 2B                         STA sprite_ram_pointer
-0C0F4                           
-0C0F4                               ;; Store previous buttons
-0C0F4 A5 0F                         LDA buttons_held
-0C0F6 85 0E                         STA buttons_prev
-0C0F8                           
-0C0F8                               ;; Read controller input
-0C0F8 20 33 C2                      JSR sub_ReadController
+0C072                               
+0C072                               ;; Preset ball x-position for testing
+0C072 A9 30                         LDA #$30
+0C074 85 1A                         STA ball_xpos_hi
+0C076                           
+0C076                               ;; Clear the screen (26 bytes, to be tested)
+0C076 2C 02 20                      BIT PPU_STATUS
+0C079 A9 20                         LDA #$20
+0C07B 8D 06 20                      STA PPU_ADDR
+0C07E A9 00                         LDA #$00
+0C080 8D 06 20                      STA PPU_ADDR
+0C083 AA                            TAX
+0C084 A8                            TAY
+0C085                               -
+0C085 8D 07 20                          STA PPU_DATA
+0C088 E8                                INX
+0C089 D0 FA                             BNE -
+0C08B C8                                INY
+0C08C C0 04                             CPY #$04
+0C08E D0 F5                         BNE -
+0C090                           
+0C090                               ;; Set up intro screen draw loop
+0C090 A2 00                         LDX #$00
+0C092                           
+0C092                           -loop_IntroScreenData:
+0C092                           
+0C092                               ;; Get current byte from intro screen data
+0C092 BD D5 C2                      LDA tbl_IntroScreenData,x
+0C095                           
+0C095                               ;; If current byte is #$3F, we're done drawing.
+0C095 C9 3F                         CMP #$3F
+0C097 D0 03                         BNE +
+0C099 4C E6 C0                          JMP +goToEndIntroScreen
+0C09C                               +
+0C09C                           
+0C09C                               ;; If highest bits are %11, draw a plain tile
+0C09C 29 C0                         AND #%11000000
+0C09E D0 03                         BNE +
+0C0A0 4C C6 C0                          JMP +drawTile
+0C0A3                               +
+0C0A3                               
+0C0A3                               ;; If highest bits are %01, set the PPU address
+0C0A3                               ;; If not, draw two logo tiles
+0C0A3 C9 40                         CMP #%01000000
+0C0A5 D0 03                         BNE +drawLogo
+0C0A7 4C D0 C0                          JMP +setPpuAddr
+0C0AA                           
+0C0AA                           +drawLogo:
+0C0AA                               ;; Get bits 0-2 and store in a temp variable
+0C0AA BD D5 C2                      LDA tbl_IntroScreenData,x
+0C0AD 29 07                         AND #%00000111
+0C0AF 85 00                         STA temp
+0C0B1                               
+0C0B1                               ;; Get bits 3-5, shift over to get a value from 0-7
+0C0B1 BD D5 C2                      LDA tbl_IntroScreenData,x
+0C0B4 4A                            LSR
+0C0B5 4A                            LSR
+0C0B6 4A                            LSR
+0C0B7 29 07                         AND #%00000111
+0C0B9                               
+0C0B9                               ;; Draw the tile that corresponds with that value
+0C0B9 A8                            TAY
+0C0BA 20 9A C2                      JSR sub_drawIntroScreenLogoTile
+0C0BD                               
+0C0BD                               ;; Do the same for the value stored in temp
+0C0BD A4 00                         LDY temp
+0C0BF 20 9A C2                      JSR sub_drawIntroScreenLogoTile
+0C0C2                           
+0C0C2                               ;; Next byte please
+0C0C2 E8                            INX
+0C0C3 4C 92 C0                      JMP -loop_IntroScreenData
+0C0C6                           
+0C0C6                           +drawTile:
+0C0C6                               ;; Just draw the tile value on screen
+0C0C6 BD D5 C2                      LDA tbl_IntroScreenData,x
+0C0C9 8D 07 20                      STA PPU_DATA
+0C0CC                               
+0C0CC                               ;; Next byte please
+0C0CC E8                            INX
+0C0CD 4C 92 C0                      JMP -loop_IntroScreenData
+0C0D0                           
+0C0D0                           
+0C0D0                           +setPpuAddr:
+0C0D0                               ;; Reset the PPU latch
+0C0D0 2C 02 20                      BIT PPU_STATUS
+0C0D3                               
+0C0D3                               ;; Sanitize and write the high byte of the PPU address
+0C0D3 BD D5 C2                      LDA tbl_IntroScreenData,x
+0C0D6 29 3F                         AND #%00111111
+0C0D8 8D 06 20                      STA PPU_ADDR
+0C0DB                           
+0C0DB                               ;; Write the low byte of the PPU address
+0C0DB E8                            INX
+0C0DC BD D5 C2                      LDA tbl_IntroScreenData,x
+0C0DF 8D 06 20                      STA PPU_ADDR
+0C0E2                               
+0C0E2                               ;; PPU has been set up to draw tiles at the correct spot now.
+0C0E2                               
+0C0E2                               ;; Next byte please.
+0C0E2 E8                            INX
+0C0E3 4C 92 C0                      JMP -loop_IntroScreenData
+0C0E6                           
+0C0E6                           +goToEndIntroScreen:
+0C0E6                           
+0C0E6                               ;; To color the 1.LEVEL: line green, we need to update two
+0C0E6                               ;; values in the PPU attribute data.
+0C0E6 2C 02 20                      BIT PPU_STATUS
+0C0E9 A9 23                         LDA #$23
+0C0EB 8D 06 20                      STA PPU_ADDR
+0C0EE A9 CB                         LDA #$CB
+0C0F0 8D 06 20                      STA PPU_ADDR
+0C0F3 A9 0A                         LDA #%00001010
+0C0F5 8D 07 20                      STA PPU_DATA
+0C0F8 8D 07 20                      STA PPU_DATA
 0C0FB                           
-0C0FB                               ;; Get buttons released
-0C0FB A5 0F                         LDA buttons_held
-0C0FD 49 FF                         EOR #$FF
-0C0FF 25 0E                         AND buttons_prev
-0C101 85 11                         STA buttons_released
-0C103                           
-0C103                               ;; Set buttons pressed
-0C103 A5 0E                         LDA buttons_prev
-0C105 49 FF                         EOR #$FF
-0C107 25 0F                         AND buttons_held
-0C109 85 10                         STA buttons_pressed
-0C10B                           
-0C10B                           .include "game/test/tile_update.asm"
-0C10B                               ;; If START button is pressed
-0C10B A5 10                         LDA buttons_pressed
-0C10D 29 10                         AND #BUTTON_START
-0C10F D0 03                         BNE +
-0C111 4C 39 C1                          JMP +end
-0C114                               +
-0C114                               
-0C114                               ;; Prevent updating until full 3-byte buffer is filled,
-0C114                               ;; so that graphics won't glitch out if NMI happens during
-0C114                               ;; updating the buffer
-0C114 A9 00                         LDA #$00
-0C116 85 28                         STA ppu_buffer_update
-0C118                           
-0C118                               ;; Check if buffer full; if so, wait a frame and force update
-0C118 A4 29                         LDY ppu_buffer_pointer
-0C11A C0 30                         CPY #$30
-0C11C D0 05                         BNE +
-0C11E E6 28                             INC ppu_buffer_update
-0C120 20 47 C2                          JSR sub_WaitForVBlank
-0C123                               +
-0C123                           
-0C123                               ;; Add ppu_addr high byte to buffer
-0C123 A9 21                         LDA #$21
-0C125 99 00 03                      STA ppu_buffer,y
-0C128                           
-0C128                               ;; Add ppu_addr low byte to buffer
-0C128 C8                            INY
-0C129 A9 E0                         LDA #$E0
-0C12B 99 00 03                      STA ppu_buffer,y
-0C12E                           
-0C12E                               ;; Add ppu_data (in this case, chr tile id $3C) to buffer
-0C12E C8                            INY
-0C12F A9 28                         LDA #$28
-0C131 99 00 03                      STA ppu_buffer,y
-0C134                           
-0C134                               ;; Update buffer pointer
-0C134 C8                            INY
-0C135 84 29                         STY ppu_buffer_pointer
-0C137                           
-0C137                               ;; Tell NMI to update next round
-0C137 E6 28                         INC ppu_buffer_update
-0C139                           
-0C139                              
-0C139                           +end:0C139                           
-0C139                           .include "game/test/show_animation.asm"
-0C139                               ;; If A button is pressed, initiate explosion
-0C139 A5 10                         LDA buttons_pressed
-0C13B 29 80                         AND #BUTTON_A
-0C13D D0 03                         BNE +
-0C13F 4C 6F C1                          JMP +end
-0C142                               +
-0C142                           
-0C142                               ;; Get most recent slot for explosion
-0C142 A6 2A                         LDX explosion_pointer
-0C144                           
-0C144                               ;; If 0, use max pointer value
-0C144 D0 02                         BNE +
-0C146 A2 04                             LDX #MAX_ANIMATIONS
-0C148                               +
-0C148                           
-0C148                               ;; Decrease pointer by one
-0C148 CA                            DEX
-0C149 86 2A                         STX explosion_pointer
-0C14B                           
-0C14B                               ;; Load explosion data into RAM
-0C14B A9 00                         LDA #$00
-0C14D 9D 34 03                      STA explosion_currentframe,x
-0C150 A9 04                         LDA #ANIMATION_SPEED
-0C152 9D 30 03                      STA explosion_framecounter,x
-0C155 20 25 C2                      JSR sub_GetRandomNumber
-0C158 29 F0                         AND #%11110000
-0C15A 9D 3C 03                      STA explosion_x,x
-0C15D 20 25 C2                      JSR sub_GetRandomNumber
-0C160 29 F0                         AND #%11110000
-0C162 9D 40 03                      STA explosion_y,x
-0C165 A9 01                         LDA #%00000001
-0C167 9D 38 03                      STA explosion_attributes,x
-0C16A A9 01                         LDA #$01
-0C16C 9D 44 03                      STA explosion_active,x
-0C16F                           
-0C16F                           +end:
-0C16F                           
-0C16F                               ;; Set up loop
-0C16F A2 00                         LDX #$00
-0C171                               -loop_load_animation:
-0C171                                   ;; Check if current animation is active. If not, goto next
-0C171 BD 44 03                          LDA explosion_active,x
-0C174 D0 03                             BNE +
-0C176 4C 10 C2                              JMP +next
-0C179                                   +
-0C179                           
-0C179                                   ;; Check the explosion framecounter
-0C179 BD 30 03                          LDA explosion_framecounter,x
-0C17C D0 26                             BNE +
-0C17E                                       ;; Framecounter is 0
-0C17E                                       ;; Reset to animation speed
-0C17E A9 04                                 LDA #ANIMATION_SPEED
-0C180 9D 30 03                              STA explosion_framecounter,x
-0C183                           
-0C183                                       ;; Set next animation frame, and check if we're done yet
-0C183 FE 34 03                              INC explosion_currentframe,x
-0C186 BD 34 03                              LDA explosion_currentframe,x
-0C189 C9 0A                                 CMP #ANIM_SLIDES
-0C18B D0 17                                 BNE +
+0C0FB                               ;; Enable rendering
+0C0FB A5 12                         LDA soft_ppu_mask
+0C0FD 09 1E                         ORA #%00011110
+0C0FF 85 12                         STA soft_ppu_mask
+0C101 A9 00                     	LDA #$00
+0C103 8D 05 20                  	STA PPU_SCROLL
+0C106 8D 05 20                  	STA PPU_SCROLL
+0C109 85 14                     	STA force_skip_nmi
+0C10B 20 94 C2                      JSR sub_WaitForVBlank
+0C10E                           
+0C10E                           
+0C10E                           ;; Main game loop
+0C10E                           MainGameLoop:
+0C10E                               .include "game/main.asm"
+0C10E                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+0C10E                           ;;
+0C10E                           ;; game/main.asm
+0C10E                           ;;
+0C10E                           ;; The main game loop content.
+0C10E                           ;;
+0C10E                           ;;
+0C10E                           
+0C10E                               ;; Reset sprite pointer every game loop
+0C10E A9 00                         LDA #$00
+0C110 85 2F                         STA sprite_ram_pointer
+0C112                           
+0C112                               ;; Store previous buttons
+0C112 A5 0F                         LDA buttons_held
+0C114 85 0E                         STA buttons_prev
+0C116                           
+0C116                               ;; Read controller input
+0C116 20 80 C2                      JSR sub_ReadController
+0C119                           
+0C119                               ;; Get buttons released
+0C119 A5 0F                         LDA buttons_held
+0C11B 49 FF                         EOR #$FF
+0C11D 25 0E                         AND buttons_prev
+0C11F 85 11                         STA buttons_released
+0C121                           
+0C121                               ;; Set buttons pressed
+0C121 A5 0E                         LDA buttons_prev
+0C123 49 FF                         EOR #$FF
+0C125 25 0F                         AND buttons_held
+0C127 85 10                         STA buttons_pressed
+0C129                           
+0C129                           
+0C129                           ;; Testing my concept scripts
+0C129                           .include "game/test/tile_update.asm"
+0C129                               ;; If START button is pressed
+0C129 A5 10                         LDA buttons_pressed
+0C12B 29 10                         AND #BUTTON_START
+0C12D D0 03                         BNE +
+0C12F 4C 57 C1                          JMP +end
+0C132                               +
+0C132                               
+0C132                               ;; Prevent updating until full 3-byte buffer is filled,
+0C132                               ;; so that graphics won't glitch out if NMI happens during
+0C132                               ;; updating the buffer
+0C132 A9 00                         LDA #$00
+0C134 85 2C                         STA ppu_buffer_update
+0C136                           
+0C136                               ;; Check if buffer full; if so, wait a frame and force update
+0C136 A4 2D                         LDY ppu_buffer_pointer
+0C138 C0 30                         CPY #$30
+0C13A D0 05                         BNE +
+0C13C E6 2C                             INC ppu_buffer_update
+0C13E 20 94 C2                          JSR sub_WaitForVBlank
+0C141                               +
+0C141                           
+0C141                               ;; Add ppu_addr high byte to buffer
+0C141 A9 21                         LDA #$21
+0C143 99 00 03                      STA ppu_buffer,y
+0C146                           
+0C146                               ;; Add ppu_addr low byte to buffer
+0C146 C8                            INY
+0C147 A9 E0                         LDA #$E0
+0C149 99 00 03                      STA ppu_buffer,y
+0C14C                           
+0C14C                               ;; Add ppu_data (in this case, chr tile id $3C) to buffer
+0C14C C8                            INY
+0C14D A9 28                         LDA #$28
+0C14F 99 00 03                      STA ppu_buffer,y
+0C152                           
+0C152                               ;; Update buffer pointer
+0C152 C8                            INY
+0C153 84 2D                         STY ppu_buffer_pointer
+0C155                           
+0C155                               ;; Tell NMI to update next round
+0C155 E6 2C                         INC ppu_buffer_update
+0C157                           
+0C157                              
+0C157                           +end:0C157                           .include "game/test/show_animation.asm"
+0C157                               ;; If A button is pressed, initiate explosion
+0C157 A5 10                         LDA buttons_pressed
+0C159 29 80                         AND #BUTTON_A
+0C15B D0 03                         BNE +
+0C15D 4C 8D C1                          JMP +end
+0C160                               +
+0C160                           
+0C160                               ;; Get most recent slot for explosion
+0C160 A6 2E                         LDX explosion_pointer
+0C162                           
+0C162                               ;; If 0, use max pointer value
+0C162 D0 02                         BNE +
+0C164 A2 04                             LDX #MAX_ANIMATIONS
+0C166                               +
+0C166                           
+0C166                               ;; Decrease pointer by one
+0C166 CA                            DEX
+0C167 86 2E                         STX explosion_pointer
+0C169                           
+0C169                               ;; Load explosion data into RAM
+0C169 A9 00                         LDA #$00
+0C16B 9D 34 03                      STA explosion_currentframe,x
+0C16E A9 04                         LDA #ANIMATION_SPEED
+0C170 9D 30 03                      STA explosion_framecounter,x
+0C173 20 72 C2                      JSR sub_GetRandomNumber
+0C176 29 F0                         AND #%11110000
+0C178 9D 3C 03                      STA explosion_x,x
+0C17B 20 72 C2                      JSR sub_GetRandomNumber
+0C17E 29 F0                         AND #%11110000
+0C180 9D 40 03                      STA explosion_y,x
+0C183 A9 01                         LDA #%00000001
+0C185 9D 38 03                      STA explosion_attributes,x
+0C188 A9 01                         LDA #$01
+0C18A 9D 44 03                      STA explosion_active,x
 0C18D                           
-0C18D                                       ;; If we're done, inactivate current explosion, clean
-0C18D                                       ;; up sprite RAM and go to the next one
-0C18D A9 00                                 LDA #$00
-0C18F 9D 44 03                              STA explosion_active,x
-0C192                                       
-0C192 A9 09                                 LDA #SLIDE_SIZE
-0C194 0A                                    ASL
-0C195 0A                                    ASL
-0C196 A8                                    TAY
-0C197 A9 EF                                 LDA #$EF
-0C199                                       -
-0C199 88                                        DEY
-0C19A 99 00 02                                  STA SPRITE_RAM,y
-0C19D C0 00                                     CPY #00
-0C19F D0 F8                                 BNE -
-0C1A1                                       
-0C1A1 4C 10 C2                              JMP +next
-0C1A4                                   +
-0C1A4                           
-0C1A4                                   ;; Load (x,y) position in temp variables
-0C1A4 BD 3C 03                          LDA explosion_x,x
-0C1A7 85 01                             STA temp+1
-0C1A9 85 03                             STA temp+3
-0C1AB BD 40 03                          LDA explosion_y,x
-0C1AE 85 02                             STA temp+2
-0C1B0                           
-0C1B0                                   ;; Load attribute in temp variable
-0C1B0 BD 38 03                          LDA explosion_attributes,x
-0C1B3 85 04                             STA temp+4
-0C1B5                           
-0C1B5                                   ;; Load current frame into Y-register
-0C1B5 BC 34 03                          LDY explosion_currentframe,x
-0C1B8                           
-0C1B8                                   ;; Load current frame ROM address from table
-0C1B8 B9 8E C3                          LDA explosion_anim_lo,y
-0C1BB 85 0C                             STA pointer
-0C1BD B9 84 C3                          LDA explosion_anim_hi,y
-0C1C0 85 0D                             STA pointer+1
+0C18D                           +end:
+0C18D                           
+0C18D                               ;; Set up loop
+0C18D A2 00                         LDX #$00
+0C18F                               -loop_load_animation:
+0C18F                                   ;; Check if current animation is active. If not, goto next
+0C18F BD 44 03                          LDA explosion_active,x
+0C192 D0 03                             BNE +
+0C194 4C 2E C2                              JMP +next
+0C197                                   +
+0C197                           
+0C197                                   ;; Check the explosion framecounter
+0C197 BD 30 03                          LDA explosion_framecounter,x
+0C19A D0 26                             BNE +
+0C19C                                       ;; Framecounter is 0
+0C19C                                       ;; Reset to animation speed
+0C19C A9 04                                 LDA #ANIMATION_SPEED
+0C19E 9D 30 03                              STA explosion_framecounter,x
+0C1A1                           
+0C1A1                                       ;; Set next animation frame, and check if we're done yet
+0C1A1 FE 34 03                              INC explosion_currentframe,x
+0C1A4 BD 34 03                              LDA explosion_currentframe,x
+0C1A7 C9 0A                                 CMP #ANIM_SLIDES
+0C1A9 D0 17                                 BNE +
+0C1AB                           
+0C1AB                                       ;; If we're done, inactivate current explosion, clean
+0C1AB                                       ;; up sprite RAM and go to the next one
+0C1AB A9 00                                 LDA #$00
+0C1AD 9D 44 03                              STA explosion_active,x
+0C1B0                                       
+0C1B0 A9 09                                 LDA #SLIDE_SIZE
+0C1B2 0A                                    ASL
+0C1B3 0A                                    ASL
+0C1B4 A8                                    TAY
+0C1B5 A9 EF                                 LDA #$EF
+0C1B7                                       -
+0C1B7 88                                        DEY
+0C1B8 99 00 02                                  STA SPRITE_RAM,y
+0C1BB C0 00                                     CPY #00
+0C1BD D0 F8                                 BNE -
+0C1BF                                       
+0C1BF 4C 2E C2                              JMP +next
+0C1C2                                   +
 0C1C2                           
-0C1C2                                   ;; Save x-register on stack
-0C1C2 8A                                TXA
-0C1C3 48                                PHA
-0C1C4                           
-0C1C4                                   ;; Load sprites into sprite RAM
-0C1C4 A6 2B                             LDX sprite_ram_pointer
-0C1C6 A0 00                             LDY #$00
-0C1C8                           
-0C1C8                                   ;; Prepare (x,y) offset for loop
-0C1C8 84 00                             STY temp
-0C1CA                           
-0C1CA                                   -loop_load_sprite:
-0C1CA                                   
-0C1CA                                       ;; Do not draw empty sprites
-0C1CA B1 0C                                 LDA (pointer),y
-0C1CC F0 18                                 BEQ +nextSprite
-0C1CE                                   
-0C1CE                                           ;; Add y-position to sprite ram buffer
-0C1CE A5 02                                     LDA temp+2
-0C1D0 9D 00 02                                  STA SPRITE_RAM,x
-0C1D3 E8                                        INX
-0C1D4                           
-0C1D4                                           ;; Get tile number from frame ROM address, and
-0C1D4                                           ;; add it to sprite ram buffer
-0C1D4 B1 0C                                     LDA (pointer),y
-0C1D6 9D 00 02                                  STA SPRITE_RAM,x
-0C1D9 E8                                        INX
-0C1DA                           
-0C1DA                                           ;; Add attribute data to sprite ram buffer
-0C1DA A5 04                                     LDA temp+4
-0C1DC 9D 00 02                                  STA SPRITE_RAM,x
-0C1DF E8                                        INX
+0C1C2                                   ;; Load (x,y) position in temp variables
+0C1C2 BD 3C 03                          LDA explosion_x,x
+0C1C5 85 01                             STA temp+1
+0C1C7 85 03                             STA temp+3
+0C1C9 BD 40 03                          LDA explosion_y,x
+0C1CC 85 02                             STA temp+2
+0C1CE                           
+0C1CE                                   ;; Load attribute in temp variable
+0C1CE BD 38 03                          LDA explosion_attributes,x
+0C1D1 85 04                             STA temp+4
+0C1D3                           
+0C1D3                                   ;; Load current frame into Y-register
+0C1D3 BC 34 03                          LDY explosion_currentframe,x
+0C1D6                           
+0C1D6                                   ;; Load current frame ROM address from table
+0C1D6 B9 DB C3                          LDA explosion_anim_lo,y
+0C1D9 85 0C                             STA pointer
+0C1DB B9 D1 C3                          LDA explosion_anim_hi,y
+0C1DE 85 0D                             STA pointer+1
 0C1E0                           
-0C1E0                                           ;; Add x-position to sprite ram buffer
-0C1E0 A5 03                                     LDA temp+3
-0C1E2 9D 00 02                                  STA SPRITE_RAM,x
-0C1E5 E8                                        INX
+0C1E0                                   ;; Save x-register on stack
+0C1E0 8A                                TXA
+0C1E1 48                                PHA
+0C1E2                           
+0C1E2                                   ;; Load sprites into sprite RAM
+0C1E2 A6 2F                             LDX sprite_ram_pointer
+0C1E4 A0 00                             LDY #$00
 0C1E6                           
-0C1E6                                       +nextSprite:
-0C1E6                           
-0C1E6                                       ;; Check if all sprites are done
-0C1E6 C8                                    INY
-0C1E7 C0 09                                 CPY #SLIDE_SIZE
-0C1E9 F0 21                                 BEQ +done
-0C1EB                           
-0C1EB                                       ;; Update x value
-0C1EB A5 03                                 LDA temp+3
-0C1ED 18                                    CLC
-0C1EE 69 08                                 ADC #$08
-0C1F0 85 03                                 STA temp+3
+0C1E6                                   ;; Prepare (x,y) offset for loop
+0C1E6 84 00                             STY temp
+0C1E8                           
+0C1E8                                   -loop_load_sprite:
+0C1E8                                   
+0C1E8                                       ;; Do not draw empty sprites
+0C1E8 B1 0C                                 LDA (pointer),y
+0C1EA F0 18                                 BEQ +nextSprite
+0C1EC                                   
+0C1EC                                           ;; Add y-position to sprite ram buffer
+0C1EC A5 02                                     LDA temp+2
+0C1EE 9D 00 02                                  STA SPRITE_RAM,x
+0C1F1 E8                                        INX
 0C1F2                           
-0C1F2                                       ;; Update temp for x,y position
-0C1F2 E6 00                                 INC temp
-0C1F4 A5 00                                 LDA temp
-0C1F6 C9 03                                 CMP #SLIDE_WIDTH
-0C1F8 D0 0F                                 BNE +
-0C1FA                                           ;; Row is done; reset x-position
-0C1FA A5 01                                     LDA temp+1
-0C1FC 85 03                                     STA temp+3
+0C1F2                                           ;; Get tile number from frame ROM address, and
+0C1F2                                           ;; add it to sprite ram buffer
+0C1F2 B1 0C                                     LDA (pointer),y
+0C1F4 9D 00 02                                  STA SPRITE_RAM,x
+0C1F7 E8                                        INX
+0C1F8                           
+0C1F8                                           ;; Add attribute data to sprite ram buffer
+0C1F8 A5 04                                     LDA temp+4
+0C1FA 9D 00 02                                  STA SPRITE_RAM,x
+0C1FD E8                                        INX
 0C1FE                           
-0C1FE                                           ;; Update y-position
-0C1FE A5 02                                     LDA temp+2
-0C200 18                                        CLC
-0C201 69 08                                     ADC #$08
-0C203 85 02                                     STA temp+2
-0C205                           
-0C205                                           ;; Reset row counter
-0C205 A9 00                                     LDA #$00
-0C207 85 00                                     STA temp
-0C209                                       +
+0C1FE                                           ;; Add x-position to sprite ram buffer
+0C1FE A5 03                                     LDA temp+3
+0C200 9D 00 02                                  STA SPRITE_RAM,x
+0C203 E8                                        INX
+0C204                           
+0C204                                       +nextSprite:
+0C204                           
+0C204                                       ;; Check if all sprites are done
+0C204 C8                                    INY
+0C205 C0 09                                 CPY #SLIDE_SIZE
+0C207 F0 21                                 BEQ +done
 0C209                           
-0C209 4C CA C1                          JMP -loop_load_sprite
-0C20C                           
-0C20C                               +done:
-0C20C 86 2B                             STX sprite_ram_pointer
-0C20E                           
-0C20E                                   ;; Retrieve x-register from stack
-0C20E 68                                PLA
-0C20F AA                                TAX
+0C209                                       ;; Update x value
+0C209 A5 03                                 LDA temp+3
+0C20B 18                                    CLC
+0C20C 69 08                                 ADC #$08
+0C20E 85 03                                 STA temp+3
 0C210                           
-0C210                               +next:
-0C210                                   ;; Check if all animations have been updated
-0C210 E8                                INX
-0C211 E0 04                             CPX #MAX_ANIMATIONS
-0C213 F0 03                             BEQ +done
-0C215                           
-0C215 4C 71 C1                      JMP -loop_load_animation
-0C218                           +done:
-0C218                           
-0C218                               ;; Sprite clean-up
-0C218 A6 2B                         LDX sprite_ram_pointer
-0C21A A9 EF                         LDA #$EF
-0C21C                               -
-0C21C 9D 00 02                          STA SPRITE_RAM,x
-0C21F E8                                INX
-0C220 D0 FA                         BNE -
-0C222 4C F0 C0                      JMP MainGameLoop
-0C225                           
-0C225                           ;; Subroutines
-0C225                           .include "include/subroutines.asm"
-0C225                           
-0C225                           ;; RNG
-0C225                           .include "subroutine/GetRandomNumber.asm"
-0C225                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-0C225                           ;;
-0C225                           ;; subroutine/GetRandomNumber.asm
-0C225                           ;;
-0C225                           ;; Simple and fast random number generator by White Flame.
-0C225                           ;;
-0C225                           ;; Set random_seed to an arbitrary number to randomize between
-0C225                           ;; gaming sessions, for instance using the frame counter upon
-0C225                           ;; pressing START on the intro screen.
-0C225                           ;;
-0C225                           ;;     ;; IF START PRESSED:
-0C225                           ;;     LDA frame_counter
-0C225                           ;;     STA random_seed
-0C225                           ;;
-0C225                           ;; Source:
-0C225                           ;; codebase64.org/doku.php?id=base:small_fast_8-bit_prng
-0C225                           ;;
-0C225                           ;;
-0C225                           
-0C225                           sub_GetRandomNumber:
-0C225                               ;; Force EOR if random_seed is zero
-0C225 A5 19                         LDA random_seed
-0C227 F0 05                         BEQ +doEor
-0C229                           
-0C229                               ;; Shift left, and EOR if the high bit is set
-0C229 0A                            ASL
-0C22A F0 04                         BEQ +noEor
-0C22C 90 02                         BCC +noEor
+0C210                                       ;; Update temp for x,y position
+0C210 E6 00                                 INC temp
+0C212 A5 00                                 LDA temp
+0C214 C9 03                                 CMP #SLIDE_WIDTH
+0C216 D0 0F                                 BNE +
+0C218                                           ;; Row is done; reset x-position
+0C218 A5 01                                     LDA temp+1
+0C21A 85 03                                     STA temp+3
+0C21C                           
+0C21C                                           ;; Update y-position
+0C21C A5 02                                     LDA temp+2
+0C21E 18                                        CLC
+0C21F 69 08                                     ADC #$08
+0C221 85 02                                     STA temp+2
+0C223                           
+0C223                                           ;; Reset row counter
+0C223 A9 00                                     LDA #$00
+0C225 85 00                                     STA temp
+0C227                                       +
+0C227                           
+0C227 4C E8 C1                          JMP -loop_load_sprite
+0C22A                           
+0C22A                               +done:
+0C22A 86 2F                             STX sprite_ram_pointer
+0C22C                           
+0C22C                                   ;; Retrieve x-register from stack
+0C22C 68                                PLA
+0C22D AA                                TAX
 0C22E                           
-0C22E                           +doEor:
-0C22E 49 1D                         EOR #$1D
-0C230                           
-0C230                           +noEor:
-0C230 85 19                         STA random_seed
-0C232                           
-0C232 60                            RTS
+0C22E                               +next:
+0C22E                                   ;; Check if all animations have been updated
+0C22E E8                                INX
+0C22F E0 04                             CPX #MAX_ANIMATIONS
+0C231 F0 03                             BEQ +done
 0C233                           
-0C233                           
-0C233                           ;; Read controller input
-0C233                           .include "subroutine/ReadController.asm"
-0C233                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-0C233                           ;;
-0C233                           ;; subroutine/ReadController.asm
-0C233                           ;;
-0C233                           ;; Subroutine that polls the controller and stores the input
-0C233                           ;; buttons in a variable. This version only handles controller
-0C233                           ;; 1. Expects "buttons" variable to be declared in RAM.
-0C233                           ;;
-0C233                           ;;
-0C233                           
-0C233                           sub_ReadController:
-0C233                           
-0C233                               ;; Set strobe bit
-0C233 A9 01                         LDA #$01
-0C235 8D 16 40                      STA JOYPAD_1
-0C238                           
-0C238                               ;; Set up ring counter
-0C238 85 0F                         STA buttons_held
+0C233 4C 8F C1                      JMP -loop_load_animation
+0C236                           +done:
+0C236                           .include "game/test/move_ball.asm"
+0C236                           
+0C236                               ;; check if position should be updated (ie. has nmi happened yet)
+0C236 A5 28                         LDA ball_update_position
+0C238 D0 0F                         BNE +
 0C23A                           
-0C23A                               ;; Clear strobe bit
-0C23A 4A                            LSR
-0C23B 8D 16 40                      STA JOYPAD_1
-0C23E                           
-0C23E                               ;; Loop through button presses
-0C23E                               -
-0C23E AD 16 40                          LDA JOYPAD_1
-0C241 4A                                LSR
-0C242 26 0F                             ROL buttons_held
-0C244                           
-0C244                               ;; Check if ring counter is done
-0C244 90 F8                         BCC -
-0C246                           
-0C246                               ;; Return from subroutine
-0C246 60                            RTS
+0C23A                                   ;; update the low byte
+0C23A A5 1D                             LDA ball_ypos_lo
+0C23C 18                                CLC
+0C23D 69 C0                             ADC #BALL_SPEED_LO
+0C23F 85 1D                             STA ball_ypos_lo
+0C241                           
+0C241                                   ;; update the high byte with carry
+0C241 A5 1C                             LDA ball_ypos_hi
+0C243 69 02                             ADC #BALL_SPEED_HI
+0C245 85 1C                             STA ball_ypos_hi
 0C247                           
-0C247                           
-0C247                           ;; vBlank wait
-0C247                           .include "subroutine/WaitForVBlank.asm"
-0C247                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-0C247                           ;;
-0C247                           ;; subroutine/WaitForVBlank.asm
-0C247                           ;;
-0C247                           ;; Subroutine that essentially pauses script execution until
-0C247                           ;; vBlank happens.
-0C247                           ;;
-0C247                           ;;
-0C247                           
-0C247                           sub_WaitForVBlank:
-0C247 2C 02 20                      BIT $2002
-0C24A 10 FB                         BPL sub_WaitForVBlank
-0C24C 60                            RTS
-0C24D                           
-0C24D                           
-0C24D                           ;; Game specific subroutines
-0C24D                           .include "game/include/subroutines.asm"
-0C24D                           ;; additional game-specific subroutines go here
-0C24D                           
-0C24D                           sub_drawIntroScreenLogoTile:
-0C24D B9 80 C2                      LDA tbl_IntroScreenLogoChr,y
-0C250 C9 60                         CMP #$60
-0C252 D0 08                         BNE +
-0C254 20 25 C2                          JSR sub_GetRandomNumber
-0C257 29 07                             AND #$07
-0C259 18                                CLC
-0C25A 69 60                             ADC #$60
-0C25C                               +
-0C25C 8D 07 20                      STA PPU_DATA
-0C25F 60                            RTS
-0C260                           
-0C260                           ;; LUTs
-0C260                           .include "game/include/tables.asm"
-0C260                           
-0C260                           ;; Intro screen palette
-0C260                           tbl_IntroScreenPalette:
-0C260 0F 2C 12 30                   .db #$0F, #$2C, #$12, #$30
-0C264 0F 16 38 30                   .db #$0F, #$16, #$38, #$30
-0C268 0F 29 14 30                   .db #$0F, #$29, #$14, #$30
-0C26C 0F 00 10 30                   .db #$0F, #$00, #$10, #$30
-0C270                           
-0C270 0F 2C 12 30                   .db #$0F, #$2C, #$12, #$30
-0C274 0F 16 38 30                   .db #$0F, #$16, #$38, #$30
-0C278 0F 29 14 30                   .db #$0F, #$29, #$14, #$30
-0C27C 0F 00 10 30                   .db #$0F, #$00, #$10, #$30
+0C247                                   ;; Don't update position again until next frame
+0C247 E6 28                             INC ball_update_position
+0C249                               +
+0C249                           
+0C249                               ;; Add to sprite buffer
+0C249 A6 2F                         LDX sprite_ram_pointer
+0C24B A5 1C                         LDA ball_ypos_hi
+0C24D 9D 00 02                      STA SPRITE_RAM,x
+0C250 E8                            INX
+0C251 A9 01                         LDA #BALL_TILE_CHR
+0C253 9D 00 02                      STA SPRITE_RAM,x
+0C256 E8                            INX
+0C257 A9 00                         LDA #BALL_ATTR
+0C259 9D 00 02                      STA SPRITE_RAM,x
+0C25C E8                            INX
+0C25D A5 1A                         LDA ball_xpos_hi
+0C25F 9D 00 02                      STA SPRITE_RAM,x
+0C262 E8                            INX
+0C263 86 2F                         STX sprite_ram_pointer
+0C265                           
+0C265                           
+0C265                           
+0C265                               ;; Sprite clean-up
+0C265 A6 2F                         LDX sprite_ram_pointer
+0C267 A9 EF                         LDA #$EF
+0C269                               -
+0C269 9D 00 02                          STA SPRITE_RAM,x
+0C26C E8                                INX
+0C26D D0 FA                         BNE -
+0C26F 4C 0E C1                      JMP MainGameLoop
+0C272                           
+0C272                           ;; Subroutines
+0C272                           .include "include/subroutines.asm"
+0C272                           
+0C272                           ;; RNG
+0C272                           .include "subroutine/GetRandomNumber.asm"
+0C272                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+0C272                           ;;
+0C272                           ;; subroutine/GetRandomNumber.asm
+0C272                           ;;
+0C272                           ;; Simple and fast random number generator by White Flame.
+0C272                           ;;
+0C272                           ;; Set random_seed to an arbitrary number to randomize between
+0C272                           ;; gaming sessions, for instance using the frame counter upon
+0C272                           ;; pressing START on the intro screen.
+0C272                           ;;
+0C272                           ;;     ;; IF START PRESSED:
+0C272                           ;;     LDA frame_counter
+0C272                           ;;     STA random_seed
+0C272                           ;;
+0C272                           ;; Source:
+0C272                           ;; codebase64.org/doku.php?id=base:small_fast_8-bit_prng
+0C272                           ;;
+0C272                           ;;
+0C272                           
+0C272                           sub_GetRandomNumber:
+0C272                               ;; Force EOR if random_seed is zero
+0C272 A5 19                         LDA random_seed
+0C274 F0 05                         BEQ +doEor
+0C276                           
+0C276                               ;; Shift left, and EOR if the high bit is set
+0C276 0A                            ASL
+0C277 F0 04                         BEQ +noEor
+0C279 90 02                         BCC +noEor
+0C27B                           
+0C27B                           +doEor:
+0C27B 49 1D                         EOR #$1D
+0C27D                           
+0C27D                           +noEor:
+0C27D 85 19                         STA random_seed
+0C27F                           
+0C27F 60                            RTS
 0C280                           
 0C280                           
-0C280                           ;; Intro: mapping logo index to chr tile
-0C280                           tbl_IntroScreenLogoChr:
-0C280 00 31 33 60 30 32 34 36       .db #$00, #$31, #$33, #$60, #$30, #$32, #$34, #$36
-0C288                           
-0C288                           
-0C288                           ;; Intro screen data
-0C288                           tbl_IntroScreenData:
-0C288                           
-0C288                               ;; Set PPU address $20AC
-0C288 60 AC                         .db #$60, #$AC
-0C28A                               
-0C28A                               ;; Draw
-0C28A 02 26 16 0F 20 0F 16 27       .db #$02, #$26, #$16, #$0F, #$20, #$0F, #$16, #$27 ; 1.LEVEL:
-0C292                           
-0C292                               ;; Set PPU address $20CF
-0C292 60 CF                         .db #$60, #$CF
-0C294                               
-0C294                               ;; Draw
-0C294 01 02                         .db #$01, #$02                                     ; 01
-0C296                               
-0C296                               ;; Set PPU address $2122
-0C296 61 22                         .db #$61, #$22
-0C298                               
-0C298                               ;; Draw
-0C298 0E 0F 1D 13 11 18 25          .db #$0E, #$0F, #$1D, #$13, #$11, #$18, #$25       ; DESIGN,
-0C29F 1D 19 1F 18 0E 25             .db #$1D, #$19, #$1F, #$18, #$0E, #$25             ; SOUND,
-0C2A5 11 1C 0B 1A 12 13 0D 1D       .db #$11, #$1C, #$0B, #$1A, #$12, #$13, #$0D, #$1D ; GRAPHICS
-0C2AD 00 0B 18 0E 00                .db #$00, #$0B, #$18, #$0E, #$00                   ; _AND_
-0C2B2                               
-0C2B2                               ;; Set PPU address $2147
-0C2B2 61 47                         .db #$61, #$47
-0C2B4                               
-0C2B4                               ;; Draw
-0C2B4 1A 1C 19 11 1C 0B 17          .db #$1A, #$1C, #$19, #$11, #$1C, #$0B, #$17       ; PROGRAM
-0C2BB 00 0C 23 00                   .db #$00, #$0C, #$23, #$00                         ; _BY_
-0C2BF 19 16 13 20 0F 1C             .db #$19, #$16, #$13, #$20, #$0F, #$1C             ; OLIVER
-0C2C5 00 15 13 1C 21 0B             .db #$00, #$15, #$13, #$1C, #$21, #$0B             ; _KIRWA
-0C2CB                               
-0C2CB                               ;; Set PPU address $218B
-0C2CB 61 8B                         .db #$61, #$8B
-0C2CD                               
-0C2CD                               ;; Draw
-0C2CD 28 00 02 0A 09 08             .db #$28, #$00, #$02, #$0A, #$09, #$08             ; C_1987
-0C2D3 25 02 0A 09 09                .db #$25, #$02, #$0A, #$09, #$09                   ; ,1988
-0C2D8                               
-0C2D8                               ;; Set PPU address $21E6
-0C2D8 61 E6                         .db #$61, #$E6
-0C2DA                               
-0C2DA                               ;; Draw
-0C2DA 18 0F 1D 00 1A 19 1C 1E       .db #$18, #$0F, #$1D, #$00, #$1A, #$19, #$1C, #$1E ; NES_PORT
-0C2E2 00 0C 23 00                   .db #$00, #$0C, #$23, #$00                         ; _BY_
-0C2E6 15 0F 20 13 18 09 02          .db #$15, #$0F, #$20, #$13, #$18, #$09, #$02       ; KEVIN81
-0C2ED                               
-0C2ED                               ;; Set PPU address $222D
-0C2ED 62 2D                         .db #$62, #$2D
-0C2EF                               
-0C2EF                               ;; Draw
-0C2EF 28 00 03 01 03 04             .db #$28, #$00, #$03, #$01, #$03, #$04             ; C_2023
-0C2F5                               
-0C2F5                               ;; Set PPU address $2281
-0C2F5 62 81                         .db #$62, #$81
-0C2F7                               
-0C2F7                               ;; Draw the Crillion logo
-0C2F7 E1 C8 E1 E8                   .db #%11100001, #%11001000, #%11100001, #%11101000
-0C2FB C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
-0C2FF C0 C2 C4 C9                   .db #%11000000, #%11000010, #%11000100, #%11001001
-0C303 E8 E1 CD C0                   .db #%11101000, #%11100001, #%11001101, #%11000000
-0C307                               
-0C307 D0 C0 D3 D0                   .db #%11010000, #%11000000, #%11010011, #%11010000
-0C30B C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
-0C30F C0 C2 C2 DB                   .db #%11000000, #%11000010, #%11000010, #%11011011
-0C313 D0 D0 C2 C0                   .db #%11010000, #%11010000, #%11000010, #%11000000
-0C317                               
-0C317 D0 C0 D1 CD                   .db #%11010000, #%11000000, #%11010001, #%11001101
-0C31B C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
-0C31F C0 C2 C2 DB                   .db #%11000000, #%11000010, #%11000010, #%11011011
-0C323 D0 D0 C2 C0                   .db #%11010000, #%11010000, #%11000010, #%11000000
-0C327                           
-0C327 D0 C0 D0 C2                   .db #%11010000, #%11000000, #%11010000, #%11000010
-0C32B C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
-0C32F C0 C2 C2 DB                   .db #%11000000, #%11000010, #%11000010, #%11011011
-0C333 D0 D0 C2 C0                   .db #%11010000, #%11010000, #%11000010, #%11000000
-0C337                               
-0C337 D0 C0 D0 C2                   .db #%11010000, #%11000000, #%11010000, #%11000010
-0C33B C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
-0C33F C0 C2 C2 DB                   .db #%11000000, #%11000010, #%11000010, #%11011011
-0C343 D0 D0 C2 C0                   .db #%11010000, #%11010000, #%11000010, #%11000000
-0C347                           
-0C347 F9 C8 D0 C2                   .db #%11111001, #%11001000, #%11010000, #%11000010
-0C34B C2 C7 C9 C7                   .db #%11000010, #%11000111, #%11001001, #%11000111
-0C34F C9 C2 C7 C9                   .db #%11001001, #%11000010, #%11000111, #%11001001
-0C353 F0 D0 C2                      .db #%11110000, #%11010000, #%11000010
-0C356                           
-0C356                               ;; End of intro
-0C356 3F                            .db #$3F
-0C357                           
-0C357                           ;; test animation table
-0C357                           .include "game/test/show_animation_table.asm"0C357                           ;; CHR tile-id's per slide of explosion
-0C357                           explosion_slide0:
-0C357 00 00 00                      .db #$00, #$00, #$00
-0C35A 2C 2D 2E                      .db #$2C, #$2D, #$2E
-0C35D 3C 3D 3E                      .db #$3C, #$3D, #$3E
-0C360                           
-0C360                           explosion_slide1:
-0C360 00 00 00                      .db #$00, #$00, #$00
-0C363 29 2A 2B                      .db #$29, #$2A, #$2B
-0C366 39 3A 3B                      .db #$39, #$3A, #$3B
-0C369                           
-0C369                           explosion_slide2:
-0C369 16 00 00                      .db #$16, #$00, #$00
-0C36C 26 27 28                      .db #$26, #$27, #$28
-0C36F 36 37 38                      .db #$36, #$37, #$38
-0C372                           
-0C372                           explosion_slide3:
-0C372 00 14 15                      .db #$00, #$14, #$15
-0C375 23 24 25                      .db #$23, #$24, #$25
-0C378 33 34 35                      .db #$33, #$34, #$35
-0C37B                           
-0C37B                           explosion_slide4:
-0C37B 10 11 12                      .db #$10, #$11, #$12
-0C37E 20 21 22                      .db #$20, #$21, #$22
-0C381 30 31 32                      .db #$30, #$31, #$32
-0C384                           
-0C384                           ;; High and low bytes of animation slides
-0C384                           explosion_anim_hi:
-0C384 C3                            .db >#explosion_slide0
-0C385 C3                            .db >#explosion_slide1
-0C386 C3                            .db >#explosion_slide2
-0C387 C3                            .db >#explosion_slide3
-0C388 C3                            .db >#explosion_slide4
-0C389 C3                            .db >#explosion_slide4
-0C38A C3                            .db >#explosion_slide3
-0C38B C3                            .db >#explosion_slide2
-0C38C C3                            .db >#explosion_slide1
-0C38D C3                            .db >#explosion_slide0
-0C38E                           
-0C38E                           explosion_anim_lo:
-0C38E 57                            .db <#explosion_slide0
-0C38F 60                            .db <#explosion_slide1
-0C390 69                            .db <#explosion_slide2
-0C391 72                            .db <#explosion_slide3
-0C392 7B                            .db <#explosion_slide4
-0C393 7B                            .db <#explosion_slide4
-0C394 72                            .db <#explosion_slide3
-0C395 69                            .db <#explosion_slide2
-0C396 60                            .db <#explosion_slide1
-0C397 57                            .db <#explosion_slide0
-0C398                           
-0C398                           
-0C398                           ;; NMI handler
-0C398                           NMI:
-0C398                               .include "interrupt/nmi.asm"
-0C398                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-0C398                           ;;
-0C398                           ;; include/nmi.asm
-0C398                           ;;
-0C398                           ;; Non-maskable interrupt script. This script is being executed
-0C398                           ;; when vBlank hits.
-0C398                           ;;
-0C398                           ;;
-0C398                           
-0C398                               ;; Preserve accumulator through stack
-0C398 48                            PHA
-0C399                           
-0C399                               ;; Should NMI be skipped?
-0C399 A5 13                         LDA skip_nmi
-0C39B F0 03                         BEQ +
-0C39D 4C 31 C4                          JMP +skip_nmi
-0C3A0                               +
-0C3A0                           
-0C3A0                               ;; When in NMI, skip additional NMI requests
-0C3A0 A9 01                         LDA #$01
-0C3A2 85 13                         STA skip_nmi
+0C280                           ;; Read controller input
+0C280                           .include "subroutine/ReadController.asm"
+0C280                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+0C280                           ;;
+0C280                           ;; subroutine/ReadController.asm
+0C280                           ;;
+0C280                           ;; Subroutine that polls the controller and stores the input
+0C280                           ;; buttons in a variable. This version only handles controller
+0C280                           ;; 1. Expects "buttons" variable to be declared in RAM.
+0C280                           ;;
+0C280                           ;;
+0C280                           
+0C280                           sub_ReadController:
+0C280                           
+0C280                               ;; Set strobe bit
+0C280 A9 01                         LDA #$01
+0C282 8D 16 40                      STA JOYPAD_1
+0C285                           
+0C285                               ;; Set up ring counter
+0C285 85 0F                         STA buttons_held
+0C287                           
+0C287                               ;; Clear strobe bit
+0C287 4A                            LSR
+0C288 8D 16 40                      STA JOYPAD_1
+0C28B                           
+0C28B                               ;; Loop through button presses
+0C28B                               -
+0C28B AD 16 40                          LDA JOYPAD_1
+0C28E 4A                                LSR
+0C28F 26 0F                             ROL buttons_held
+0C291                           
+0C291                               ;; Check if ring counter is done
+0C291 90 F8                         BCC -
+0C293                           
+0C293                               ;; Return from subroutine
+0C293 60                            RTS
+0C294                           
+0C294                           
+0C294                           ;; vBlank wait
+0C294                           .include "subroutine/WaitForVBlank.asm"
+0C294                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+0C294                           ;;
+0C294                           ;; subroutine/WaitForVBlank.asm
+0C294                           ;;
+0C294                           ;; Subroutine that essentially pauses script execution until
+0C294                           ;; vBlank happens.
+0C294                           ;;
+0C294                           ;;
+0C294                           
+0C294                           sub_WaitForVBlank:
+0C294 2C 02 20                      BIT $2002
+0C297 10 FB                         BPL sub_WaitForVBlank
+0C299 60                            RTS
+0C29A                           
+0C29A                           
+0C29A                           ;; Game specific subroutines
+0C29A                           .include "game/include/subroutines.asm"
+0C29A                           ;; additional game-specific subroutines go here
+0C29A                           
+0C29A                           sub_drawIntroScreenLogoTile:
+0C29A B9 CD C2                      LDA tbl_IntroScreenLogoChr,y
+0C29D C9 60                         CMP #$60
+0C29F D0 08                         BNE +
+0C2A1 20 72 C2                          JSR sub_GetRandomNumber
+0C2A4 29 07                             AND #$07
+0C2A6 18                                CLC
+0C2A7 69 60                             ADC #$60
+0C2A9                               +
+0C2A9 8D 07 20                      STA PPU_DATA
+0C2AC 60                            RTS
+0C2AD                           
+0C2AD                           ;; LUTs
+0C2AD                           .include "game/include/tables.asm"
+0C2AD                           
+0C2AD                           ;; Intro screen palette
+0C2AD                           tbl_IntroScreenPalette:
+0C2AD 0F 2C 12 30                   .db #$0F, #$2C, #$12, #$30
+0C2B1 0F 16 38 30                   .db #$0F, #$16, #$38, #$30
+0C2B5 0F 29 14 30                   .db #$0F, #$29, #$14, #$30
+0C2B9 0F 00 10 30                   .db #$0F, #$00, #$10, #$30
+0C2BD                           
+0C2BD 0F 2C 12 30                   .db #$0F, #$2C, #$12, #$30
+0C2C1 0F 16 38 30                   .db #$0F, #$16, #$38, #$30
+0C2C5 0F 29 14 30                   .db #$0F, #$29, #$14, #$30
+0C2C9 0F 00 10 30                   .db #$0F, #$00, #$10, #$30
+0C2CD                           
+0C2CD                           
+0C2CD                           ;; Intro: mapping logo index to chr tile
+0C2CD                           tbl_IntroScreenLogoChr:
+0C2CD 00 31 33 60 30 32 34 36       .db #$00, #$31, #$33, #$60, #$30, #$32, #$34, #$36
+0C2D5                           
+0C2D5                           
+0C2D5                           ;; Intro screen data
+0C2D5                           tbl_IntroScreenData:
+0C2D5                           
+0C2D5                               ;; Set PPU address $20AC
+0C2D5 60 AC                         .db #$60, #$AC
+0C2D7                               
+0C2D7                               ;; Draw
+0C2D7 02 26 16 0F 20 0F 16 27       .db #$02, #$26, #$16, #$0F, #$20, #$0F, #$16, #$27 ; 1.LEVEL:
+0C2DF                           
+0C2DF                               ;; Set PPU address $20CF
+0C2DF 60 CF                         .db #$60, #$CF
+0C2E1                               
+0C2E1                               ;; Draw
+0C2E1 01 02                         .db #$01, #$02                                     ; 01
+0C2E3                               
+0C2E3                               ;; Set PPU address $2122
+0C2E3 61 22                         .db #$61, #$22
+0C2E5                               
+0C2E5                               ;; Draw
+0C2E5 0E 0F 1D 13 11 18 25          .db #$0E, #$0F, #$1D, #$13, #$11, #$18, #$25       ; DESIGN,
+0C2EC 1D 19 1F 18 0E 25             .db #$1D, #$19, #$1F, #$18, #$0E, #$25             ; SOUND,
+0C2F2 11 1C 0B 1A 12 13 0D 1D       .db #$11, #$1C, #$0B, #$1A, #$12, #$13, #$0D, #$1D ; GRAPHICS
+0C2FA 00 0B 18 0E 00                .db #$00, #$0B, #$18, #$0E, #$00                   ; _AND_
+0C2FF                               
+0C2FF                               ;; Set PPU address $2147
+0C2FF 61 47                         .db #$61, #$47
+0C301                               
+0C301                               ;; Draw
+0C301 1A 1C 19 11 1C 0B 17          .db #$1A, #$1C, #$19, #$11, #$1C, #$0B, #$17       ; PROGRAM
+0C308 00 0C 23 00                   .db #$00, #$0C, #$23, #$00                         ; _BY_
+0C30C 19 16 13 20 0F 1C             .db #$19, #$16, #$13, #$20, #$0F, #$1C             ; OLIVER
+0C312 00 15 13 1C 21 0B             .db #$00, #$15, #$13, #$1C, #$21, #$0B             ; _KIRWA
+0C318                               
+0C318                               ;; Set PPU address $218B
+0C318 61 8B                         .db #$61, #$8B
+0C31A                               
+0C31A                               ;; Draw
+0C31A 28 00 02 0A 09 08             .db #$28, #$00, #$02, #$0A, #$09, #$08             ; C_1987
+0C320 25 02 0A 09 09                .db #$25, #$02, #$0A, #$09, #$09                   ; ,1988
+0C325                               
+0C325                               ;; Set PPU address $21E6
+0C325 61 E6                         .db #$61, #$E6
+0C327                               
+0C327                               ;; Draw
+0C327 18 0F 1D 00 1A 19 1C 1E       .db #$18, #$0F, #$1D, #$00, #$1A, #$19, #$1C, #$1E ; NES_PORT
+0C32F 00 0C 23 00                   .db #$00, #$0C, #$23, #$00                         ; _BY_
+0C333 15 0F 20 13 18 09 02          .db #$15, #$0F, #$20, #$13, #$18, #$09, #$02       ; KEVIN81
+0C33A                               
+0C33A                               ;; Set PPU address $222D
+0C33A 62 2D                         .db #$62, #$2D
+0C33C                               
+0C33C                               ;; Draw
+0C33C 28 00 03 01 03 04             .db #$28, #$00, #$03, #$01, #$03, #$04             ; C_2023
+0C342                               
+0C342                               ;; Set PPU address $2281
+0C342 62 81                         .db #$62, #$81
+0C344                               
+0C344                               ;; Draw the Crillion logo
+0C344 E1 C8 E1 E8                   .db #%11100001, #%11001000, #%11100001, #%11101000
+0C348 C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
+0C34C C0 C2 C4 C9                   .db #%11000000, #%11000010, #%11000100, #%11001001
+0C350 E8 E1 CD C0                   .db #%11101000, #%11100001, #%11001101, #%11000000
+0C354                               
+0C354 D0 C0 D3 D0                   .db #%11010000, #%11000000, #%11010011, #%11010000
+0C358 C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
+0C35C C0 C2 C2 DB                   .db #%11000000, #%11000010, #%11000010, #%11011011
+0C360 D0 D0 C2 C0                   .db #%11010000, #%11010000, #%11000010, #%11000000
+0C364                               
+0C364 D0 C0 D1 CD                   .db #%11010000, #%11000000, #%11010001, #%11001101
+0C368 C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
+0C36C C0 C2 C2 DB                   .db #%11000000, #%11000010, #%11000010, #%11011011
+0C370 D0 D0 C2 C0                   .db #%11010000, #%11010000, #%11000010, #%11000000
+0C374                           
+0C374 D0 C0 D0 C2                   .db #%11010000, #%11000000, #%11010000, #%11000010
+0C378 C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
+0C37C C0 C2 C2 DB                   .db #%11000000, #%11000010, #%11000010, #%11011011
+0C380 D0 D0 C2 C0                   .db #%11010000, #%11010000, #%11000010, #%11000000
+0C384                               
+0C384 D0 C0 D0 C2                   .db #%11010000, #%11000000, #%11010000, #%11000010
+0C388 C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
+0C38C C0 C2 C2 DB                   .db #%11000000, #%11000010, #%11000010, #%11011011
+0C390 D0 D0 C2 C0                   .db #%11010000, #%11010000, #%11000010, #%11000000
+0C394                           
+0C394 F9 C8 D0 C2                   .db #%11111001, #%11001000, #%11010000, #%11000010
+0C398 C2 C7 C9 C7                   .db #%11000010, #%11000111, #%11001001, #%11000111
+0C39C C9 C2 C7 C9                   .db #%11001001, #%11000010, #%11000111, #%11001001
+0C3A0 F0 D0 C2                      .db #%11110000, #%11010000, #%11000010
+0C3A3                           
+0C3A3                               ;; End of intro
+0C3A3 3F                            .db #$3F
 0C3A4                           
-0C3A4                               ;; Preserve X, Y, and PC through stack
-0C3A4 8A                            TXA
-0C3A5 48                            PHA
-0C3A6 98                            TYA
-0C3A7 48                            PHA
-0C3A8 08                            PHP
-0C3A9                               
-0C3A9                               ;; Check forced NMI skip
-0C3A9 A5 14                         LDA force_skip_nmi
-0C3AB F0 03                         BEQ +
-0C3AD 4C 14 C4                          JMP +force_skip_nmi
-0C3B0                               +
-0C3B0                           
-0C3B0                               ;; Update PPU mask
-0C3B0                               ;LDA #$00
-0C3B0                               ;STA PPU_CTRL
-0C3B0 A5 12                         LDA soft_ppu_mask
-0C3B2 8D 01 20                      STA PPU_MASK
-0C3B5                               
-0C3B5                               
-0C3B5                               ;; Additional PPU updates go here
-0C3B5                               .include "game/test/tile_update_nmi.asm"
-0C3B5                           
-0C3B5                               ;; Check if ppu_buffer needs updating
-0C3B5 A5 28                         LDA ppu_buffer_update
-0C3B7 D0 03                         BNE +
-0C3B9 4C F9 C3                          JMP +no_ppu_buffer_update
-0C3BC                               +
-0C3BC                           
-0C3BC                               ;; Reset ppu control register, mask and scrolling position
-0C3BC A2 00                         LDX #$00
-0C3BE 8E 00 20                      STX PPU_CTRL
-0C3C1 8E 01 20                      STX PPU_MASK
-0C3C4                           
-0C3C4                               ;; Set up loop
-0C3C4                               -
-0C3C4                                   ;; Reset hi/lo latch
-0C3C4 2C 02 20                          BIT PPU_STATUS
-0C3C7                           
-0C3C7                                   ;; Write ppu_buffer hi and lo addresss to PPU_ADDR
-0C3C7 BD 00 03                          LDA ppu_buffer,x
-0C3CA 8D 06 20                          STA PPU_ADDR
-0C3CD E8                                INX
-0C3CE BD 00 03                          LDA ppu_buffer,x
-0C3D1 8D 06 20                          STA PPU_ADDR
-0C3D4                           
-0C3D4                                   ;; Write ppu_buffer data to PPU_ADDR
-0C3D4 E8                                INX
-0C3D5 BD 00 03                          LDA ppu_buffer,x
-0C3D8 8D 07 20                          STA PPU_DATA
+0C3A4                           ;; test animation table
+0C3A4                           .include "game/test/show_animation_table.asm"0C3A4                           ;; CHR tile-id's per slide of explosion
+0C3A4                           explosion_slide0:
+0C3A4 00 00 00                      .db #$00, #$00, #$00
+0C3A7 2C 2D 2E                      .db #$2C, #$2D, #$2E
+0C3AA 3C 3D 3E                      .db #$3C, #$3D, #$3E
+0C3AD                           
+0C3AD                           explosion_slide1:
+0C3AD 00 00 00                      .db #$00, #$00, #$00
+0C3B0 29 2A 2B                      .db #$29, #$2A, #$2B
+0C3B3 39 3A 3B                      .db #$39, #$3A, #$3B
+0C3B6                           
+0C3B6                           explosion_slide2:
+0C3B6 16 00 00                      .db #$16, #$00, #$00
+0C3B9 26 27 28                      .db #$26, #$27, #$28
+0C3BC 36 37 38                      .db #$36, #$37, #$38
+0C3BF                           
+0C3BF                           explosion_slide3:
+0C3BF 00 14 15                      .db #$00, #$14, #$15
+0C3C2 23 24 25                      .db #$23, #$24, #$25
+0C3C5 33 34 35                      .db #$33, #$34, #$35
+0C3C8                           
+0C3C8                           explosion_slide4:
+0C3C8 10 11 12                      .db #$10, #$11, #$12
+0C3CB 20 21 22                      .db #$20, #$21, #$22
+0C3CE 30 31 32                      .db #$30, #$31, #$32
+0C3D1                           
+0C3D1                           ;; High and low bytes of animation slides
+0C3D1                           explosion_anim_hi:
+0C3D1 C3                            .db >#explosion_slide0
+0C3D2 C3                            .db >#explosion_slide1
+0C3D3 C3                            .db >#explosion_slide2
+0C3D4 C3                            .db >#explosion_slide3
+0C3D5 C3                            .db >#explosion_slide4
+0C3D6 C3                            .db >#explosion_slide4
+0C3D7 C3                            .db >#explosion_slide3
+0C3D8 C3                            .db >#explosion_slide2
+0C3D9 C3                            .db >#explosion_slide1
+0C3DA C3                            .db >#explosion_slide0
 0C3DB                           
-0C3DB                                   ;; Check if updating is done (eg. X is at pointer)
-0C3DB E8                                INX
-0C3DC E4 29                             CPX ppu_buffer_pointer
-0C3DE F0 03                             BEQ +
-0C3E0 4C C4 C3                      JMP -
-0C3E3                           +
-0C3E3                           
-0C3E3                               ;; Reset ppu buffer update and pointer
-0C3E3 A9 00                         LDA #$00
-0C3E5 85 28                         STA ppu_buffer_update
-0C3E7 85 29                         STA ppu_buffer_pointer
-0C3E9                               
-0C3E9                               ;; Reset scrolling position
-0C3E9 8D 05 20                      STA PPU_SCROLL
-0C3EC 8D 05 20                      STA PPU_SCROLL
-0C3EF                           
-0C3EF                               ;; Restore ppu control register and mask
-0C3EF A9 90                         LDA #%10010000
-0C3F1 8D 00 20                      STA PPU_CTRL
-0C3F4 A5 12                         LDA soft_ppu_mask
-0C3F6 8D 01 20                      STA PPU_MASK
-0C3F9                           
-0C3F9                           ;; Continue other NMI stuff
-0C3F9                           +no_ppu_buffer_update:
-0C3F9                               .include "game/test/show_animation_nmi.asm"
-0C3F9                               ;; Reset sprite RAM, draw sprites
-0C3F9 8D 03 20                      STA OAM_ADDR
-0C3FC A9 02                         LDA #$02
-0C3FE 8D 14 40                      STA OAM_DMA
-0C401                           
-0C401 A0 04                         LDY #MAX_ANIMATIONS
-0C403 A2 00                         LDX #$00
-0C405                               -
-0C405 BD 30 03                          LDA explosion_framecounter,x
-0C408 F0 03                             BEQ +
-0C40A DE 30 03                              DEC explosion_framecounter,x
-0C40D                                   +
-0C40D E8                                INX
-0C40E 88                                DEY
-0C40F F0 03                             BEQ +done        
-0C411 4C 05 C4                      JMP -
-0C414                           +done:
+0C3DB                           explosion_anim_lo:
+0C3DB A4                            .db <#explosion_slide0
+0C3DC AD                            .db <#explosion_slide1
+0C3DD B6                            .db <#explosion_slide2
+0C3DE BF                            .db <#explosion_slide3
+0C3DF C8                            .db <#explosion_slide4
+0C3E0 C8                            .db <#explosion_slide4
+0C3E1 BF                            .db <#explosion_slide3
+0C3E2 B6                            .db <#explosion_slide2
+0C3E3 AD                            .db <#explosion_slide1
+0C3E4 A4                            .db <#explosion_slide0
+0C3E5                           
+0C3E5                           
+0C3E5                           ;; NMI handler
+0C3E5                           NMI:
+0C3E5                               .include "interrupt/nmi.asm"
+0C3E5                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+0C3E5                           ;;
+0C3E5                           ;; include/nmi.asm
+0C3E5                           ;;
+0C3E5                           ;; Non-maskable interrupt script. This script is being executed
+0C3E5                           ;; when vBlank hits.
+0C3E5                           ;;
+0C3E5                           ;;
+0C3E5                           
+0C3E5                               ;; Preserve accumulator through stack
+0C3E5 48                            PHA
+0C3E6                           
+0C3E6                               ;; Should NMI be skipped?
+0C3E6 A5 13                         LDA skip_nmi
+0C3E8 F0 03                         BEQ +
+0C3EA 4C 82 C4                          JMP +skip_nmi
+0C3ED                               +
+0C3ED                           
+0C3ED                               ;; When in NMI, skip additional NMI requests
+0C3ED A9 01                         LDA #$01
+0C3EF 85 13                         STA skip_nmi
+0C3F1                           
+0C3F1                               ;; Preserve X, Y, and PC through stack
+0C3F1 8A                            TXA
+0C3F2 48                            PHA
+0C3F3 98                            TYA
+0C3F4 48                            PHA
+0C3F5 08                            PHP
+0C3F6                               
+0C3F6                               ;; Check forced NMI skip
+0C3F6 A5 14                         LDA force_skip_nmi
+0C3F8 F0 03                         BEQ +
+0C3FA 4C 61 C4                          JMP +force_skip_nmi
+0C3FD                               +
+0C3FD                           
+0C3FD                               ;; Update PPU mask
+0C3FD                               ;LDA #$00
+0C3FD                               ;STA PPU_CTRL
+0C3FD A5 12                         LDA soft_ppu_mask
+0C3FF 8D 01 20                      STA PPU_MASK
+0C402                               
+0C402                               
+0C402                               ;; Additional PPU updates go here
+0C402                               .include "game/test/tile_update_nmi.asm"
+0C402                           
+0C402                               ;; Check if ppu_buffer needs updating
+0C402 A5 2C                         LDA ppu_buffer_update
+0C404 D0 03                         BNE +
+0C406 4C 46 C4                          JMP +no_ppu_buffer_update
+0C409                               +
+0C409                           
+0C409                               ;; Reset ppu control register, mask and scrolling position
+0C409 A2 00                         LDX #$00
+0C40B 8E 00 20                      STX PPU_CTRL
+0C40E 8E 01 20                      STX PPU_MASK
+0C411                           
+0C411                               ;; Set up loop
+0C411                               -
+0C411                                   ;; Reset hi/lo latch
+0C411 2C 02 20                          BIT PPU_STATUS
 0C414                           
-0C414                           ;; This is what happens when we forced nmi skip
-0C414                           +force_skip_nmi:
-0C414                           
-0C414                               ;; Increase frame counters
-0C414 E6 15                         INC frame_counter
-0C416 E6 16                         INC frame_counter_60
-0C418                               
-0C418                               ;; Increase second counter (if 60 frames have passed)
-0C418 A5 16                         LDA frame_counter_60
-0C41A C9 3C                         CMP #60
-0C41C D0 0A                         BNE +
-0C41E E6 18                             INC second_counter+1
-0C420 D0 02                             BNE ++
-0C422 E6 17                                 INC second_counter
-0C424                                   ++
-0C424 A9 00                             LDA #$00
-0C426 85 16                             STA frame_counter_60
-0C428                               +
+0C414                                   ;; Write ppu_buffer hi and lo addresss to PPU_ADDR
+0C414 BD 00 03                          LDA ppu_buffer,x
+0C417 8D 06 20                          STA PPU_ADDR
+0C41A E8                                INX
+0C41B BD 00 03                          LDA ppu_buffer,x
+0C41E 8D 06 20                          STA PPU_ADDR
+0C421                           
+0C421                                   ;; Write ppu_buffer data to PPU_ADDR
+0C421 E8                                INX
+0C422 BD 00 03                          LDA ppu_buffer,x
+0C425 8D 07 20                          STA PPU_DATA
 0C428                           
-0C428                               ;; Don't skip next NMI request
-0C428 A9 00                         LDA #$00
-0C42A 85 13                         STA skip_nmi
-0C42C                           
-0C42C                               ;; Restore X, Y and PC from stack
-0C42C 28                            PLP
-0C42D 68                            PLA
-0C42E A8                            TAY
-0C42F 68                            PLA
-0C430 AA                            TAX
-0C431                           
-0C431                           +skip_nmi:
-0C431                               ;; Restore accumulator from stack
-0C431 68                            PLA
-0C432                           
-0C432                               ;; Return
-0C432 40                            RTI
-0C433                           
-0C433                           ;; IRQ handler (empty)
-0C433                           IRQ:
-0C433                               .include "interrupt/irq.asm"
-0C433 40                            RTI0C434                           
-0C434                           ;; Interrupt vectors
-0C434 00 00 00 00 00 00 00 00.. .org ADDR_VECTORS
-0FFFA 98 C3                         .dw NMI
+0C428                                   ;; Check if updating is done (eg. X is at pointer)
+0C428 E8                                INX
+0C429 E4 2D                             CPX ppu_buffer_pointer
+0C42B F0 03                             BEQ +
+0C42D 4C 11 C4                      JMP -
+0C430                           +
+0C430                           
+0C430                               ;; Reset ppu buffer update and pointer
+0C430 A9 00                         LDA #$00
+0C432 85 2C                         STA ppu_buffer_update
+0C434 85 2D                         STA ppu_buffer_pointer
+0C436                               
+0C436                               ;; Reset scrolling position
+0C436 8D 05 20                      STA PPU_SCROLL
+0C439 8D 05 20                      STA PPU_SCROLL
+0C43C                           
+0C43C                               ;; Restore ppu control register and mask
+0C43C A9 90                         LDA #%10010000
+0C43E 8D 00 20                      STA PPU_CTRL
+0C441 A5 12                         LDA soft_ppu_mask
+0C443 8D 01 20                      STA PPU_MASK
+0C446                           
+0C446                           ;; Continue other NMI stuff
+0C446                           +no_ppu_buffer_update:
+0C446                               .include "game/test/show_animation_nmi.asm"
+0C446                               ;; Reset sprite RAM, draw sprites
+0C446 8D 03 20                      STA OAM_ADDR
+0C449 A9 02                         LDA #$02
+0C44B 8D 14 40                      STA OAM_DMA
+0C44E                           
+0C44E A0 04                         LDY #MAX_ANIMATIONS
+0C450 A2 00                         LDX #$00
+0C452                               -
+0C452 BD 30 03                          LDA explosion_framecounter,x
+0C455 F0 03                             BEQ +
+0C457 DE 30 03                              DEC explosion_framecounter,x
+0C45A                                   +
+0C45A E8                                INX
+0C45B 88                                DEY
+0C45C F0 03                             BEQ +done        
+0C45E 4C 52 C4                      JMP -
+0C461                           +done:
+0C461                           
+0C461                           ;; This is what happens when we forced nmi skip
+0C461                           +force_skip_nmi:
+0C461                           
+0C461                               ;; Increase frame counters
+0C461 E6 15                         INC frame_counter
+0C463 E6 16                         INC frame_counter_60
+0C465                               
+0C465                               ;; Increase second counter (if 60 frames have passed)
+0C465 A5 16                         LDA frame_counter_60
+0C467 C9 3C                         CMP #60
+0C469 D0 0A                         BNE +
+0C46B E6 18                             INC second_counter+1
+0C46D D0 02                             BNE ++
+0C46F E6 17                                 INC second_counter
+0C471                                   ++
+0C471 A9 00                             LDA #$00
+0C473 85 16                             STA frame_counter_60
+0C475                               +
+0C475                           
+0C475                               ;; reset ball_update_position
+0C475 A9 00                         LDA #$00
+0C477 85 28                         STA ball_update_position
+0C479                           
+0C479                               ;; Don't skip next NMI request
+0C479 A9 00                         LDA #$00
+0C47B 85 13                         STA skip_nmi
+0C47D                           
+0C47D                               ;; Restore X, Y and PC from stack
+0C47D 28                            PLP
+0C47E 68                            PLA
+0C47F A8                            TAY
+0C480 68                            PLA
+0C481 AA                            TAX
+0C482                           
+0C482                           +skip_nmi:
+0C482                               ;; Restore accumulator from stack
+0C482 68                            PLA
+0C483                           
+0C483                               ;; Return
+0C483 40                            RTI
+0C484                           
+0C484                           ;; IRQ handler (empty)
+0C484                           IRQ:
+0C484                               .include "interrupt/irq.asm"
+0C484 40                            RTI0C485                           
+0C485                           ;; Interrupt vectors
+0C485 00 00 00 00 00 00 00 00.. .org ADDR_VECTORS
+0FFFA E5 C3                         .dw NMI
 0FFFC 00 C0                         .dw RESET
-0FFFE 33 C4                         .dw IRQ
+0FFFE 84 C4                         .dw IRQ
 10000                           
 10000                           ;; CHR data (if any)
 10000 00 00 00 00 00 00 00 00.. .incbin "game/graphics/sprites.chr"

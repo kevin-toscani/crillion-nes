@@ -1,9 +1,15 @@
 ;; Ball variables
-ball_xpos           .dsb 1   ; left pixel x-position on screen
-ball_ypos           .dsb 1   ; top pixel y-position on screen
+ball_xpos_hi        .dsb 1
+ball_xpos_lo        .dsb 1
+ball_ypos_hi        .dsb 1
+ball_ypos_lo        .dsb 1
 ball_lives          .dsb 1   ; number of lives left
-ball_score          .dsb 5   ; decimal score, five bytes (0-9)
+ball_score          .dsb 6   ; decimal score, five bytes (0-9)
 ball_bonus          .dsb 3   ; decimal bonus points, three bytes (0-9)
+
+
+;; Update-position check
+ball_update_position   .dsb 1
 
 
 ;; Ball flags

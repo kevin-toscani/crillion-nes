@@ -185,11 +185,3 @@
 
     JMP -loop_load_animation
 +done:
-
-    ;; Sprite clean-up
-    LDX sprite_ram_pointer
-    LDA #$EF
-    -
-        STA SPRITE_RAM,x
-        INX
-    BNE -

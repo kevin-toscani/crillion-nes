@@ -4,6 +4,12 @@ BALL_WIDTH   = #$08  ; Width of the ball graphic within the sprite(s)
 BALL_TOP     = #$04  ; Top offset of the ball graphic
 BALL_LEFT    = #$04  ; Left offset of the ball graphic
 
+;; Ball speed (high/low byte), tile and attribute
+BALL_SPEED_HI = #$02
+BALL_SPEED_LO = #$C0
+BALL_TILE_CHR = #$01
+BALL_ATTR     = #%00000000
+
 ;; Max number of animations on screen
 MAX_ANIMATIONS  = #$04
 

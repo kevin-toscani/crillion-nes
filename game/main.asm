@@ -29,6 +29,17 @@
     AND buttons_held
     STA buttons_pressed
 
-.include "game/test/tile_update.asm"
 
+;; Testing my concept scripts
+.include "game/test/tile_update.asm"
 .include "game/test/show_animation.asm"
+.include "game/test/move_ball.asm"
+
+
+    ;; Sprite clean-up
+    LDX sprite_ram_pointer
+    LDA #$EF
+    -
+        STA SPRITE_RAM,x
+        INX
+    BNE -
