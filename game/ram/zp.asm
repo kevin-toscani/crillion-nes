@@ -13,12 +13,12 @@ ball_update_position   .dsb 1
 
 
 ;; Ball flags
-;; #% c c c l h v n a
+;; #% c c c f . v n a
 ;;    | | | | | | | +-- ball is dead (0) or alive (1)
 ;;    | | | | | | +---- ball is being nudged (1) or not (0)
 ;;    | | | | | +------ ball moves up (0) or down (1)
-;;    | | | | +-------- ball is moving horizontally (1) or not (0)
-;;    | | | +---------- ball is moving left (0) or right (1)
+;;    | | | | +-------- (unused for now)
+;;    | | | +---------- ball is frozen (not moving)
 ;;    +-+-+------------ ball color (1-6)
 ball_flags          .dsb 1
 

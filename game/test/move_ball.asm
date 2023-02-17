@@ -1,23 +1,112 @@
 
     ;; check if position should be updated (ie. has nmi happened yet)
     LDA ball_update_position
-    BNE +
-
-        ;; update the low byte
-        LDA ball_ypos_lo
-        CLC
-        ADC #BALL_SPEED_LO
-        STA ball_ypos_lo
-
-        ;; update the high byte with carry
-        LDA ball_ypos_hi
-        ADC #BALL_SPEED_HI
-        STA ball_ypos_hi
-
-        ;; Don't update position again until next frame
-        INC ball_update_position
+    BEQ +
+        JMP +skipBallMovement
     +
 
+    ;; Check if ball goes up or down
+    LDA ball_flags
+    AND #BALL_MOVES_DOWN
+    BEQ +moveBallUp
+
+
++moveBallDown:
+    ;; update the low byte
+    LDA ball_ypos_lo
+    CLC
+    ADC #BALL_SPEED_LO
+    STA ball_ypos_lo
+
+    ;; update the high byte with carry
+    LDA ball_ypos_hi
+    ADC #BALL_SPEED_HI
+    STA ball_ypos_hi
+    
+    ;; Check bottom bound
+    CMP #BOUND_BOTTOM
+    BCC +checkHorizontalMovement
+    BEQ +checkHorizontalMovement
+
+    ;; Change ball direction to "up"
+    LDA #BOUND_BOTTOM
+    STA ball_ypos_hi
+    LDA #$00
+    STA ball_ypos_lo
+    LDA ball_flags
+    AND #MOVE_BALL_UP
+    STA ball_flags
+    JMP +checkHorizontalMovement
+
+
++moveBallUp:
+    ;; update the low byte
+    LDA ball_ypos_lo
+    SEC
+    SBC #BALL_SPEED_LO
+    STA ball_ypos_lo
+
+    ;; update the high byte with carry
+    LDA ball_ypos_hi
+    SBC #BALL_SPEED_HI
+    STA ball_ypos_hi
+    
+    ;; Check top bound
+    CMP #BOUND_TOP
+    BCS +checkHorizontalMovement
+
+    ;; Change ball direction to "down"
+    LDA #BOUND_TOP
+    STA ball_ypos_hi
+    LDA #$00
+    STA ball_ypos_lo
+    LDA ball_flags
+    ORA #MOVE_BALL_DOWN
+    STA ball_flags
+
+
++checkHorizontalMovement:
+    ;; Check if left button is held
+    LDA buttons_held
+    AND #BUTTON_LEFT
+    BEQ +
+        ;; update the low byte
+        LDA ball_xpos_lo
+        SEC
+        SBC #BALL_SPEED_LO
+        STA ball_xpos_lo
+
+        ;; update the high byte
+        LDA ball_xpos_hi
+        SBC #BALL_SPEED_HI
+        STA ball_xpos_hi
+
+        JMP +doneBallMovement        
+    +
+
+    ;; Check if right button is held
+    LDA buttons_held
+    AND #BUTTON_RIGHT
+    BEQ +
+        ;; update the low byte
+        LDA ball_xpos_lo
+        CLC
+        ADC #BALL_SPEED_LO
+        STA ball_xpos_lo
+
+        ;; update the high byte
+        LDA ball_xpos_hi
+        ADC #BALL_SPEED_HI
+        STA ball_xpos_hi     
+    +
+
+
++doneBallMovement:
+    ;; Don't update position again until next frame
+    INC ball_update_position
+
+
++skipBallMovement:
     ;; Add to sprite buffer
     LDX sprite_ram_pointer
     LDA ball_ypos_hi

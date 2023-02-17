@@ -23,15 +23,19 @@
     LDA #ANIMATION_SPEED
     STA explosion_framecounter,x
     JSR sub_GetRandomNumber
-    AND #%11110000
+    ;AND #%11110000
     STA explosion_x,x
     JSR sub_GetRandomNumber
-    AND #%11110000
+    ;AND #%11110000
     STA explosion_y,x
-    LDA #%00000001
+    JSR sub_GetRandomNumber
+    AND #%00000010
+    CLC
+    ADC #$01
     STA explosion_attributes,x
     LDA #$01
     STA explosion_active,x
+
 
 +end:
 

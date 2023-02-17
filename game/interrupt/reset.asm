@@ -24,11 +24,12 @@
         CPX #$20
     BNE -
     
-    ;; Preset ball x-position for testing
-    LDA #$30
+    ;; Put ball in the middle
+    LDA #$7C
     STA ball_xpos_hi
+    STA ball_ypos_hi
 
-    ;; Clear the screen (26 bytes, to be tested)
+    ;; Clear the screen)
     BIT PPU_STATUS
     LDA #$20
     STA PPU_ADDR
