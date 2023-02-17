@@ -23,6 +23,22 @@
         INX
         CPX #$20
     BNE -
+    
+    ;; Clear the screen (26 bytes, to be tested)
+    BIT PPU_STATUS
+    LDA #$20
+    STA PPU_ADDR
+    LDA #$00
+    STA PPU_ADDR
+    TAX
+    TAY
+    -
+        STA PPU_DATA
+        INX
+        BNE -
+        INY
+        CPY #$04
+    BNE -
 
     ;; Set up intro screen draw loop
     LDX #$00
