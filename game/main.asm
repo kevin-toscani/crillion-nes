@@ -40,6 +40,6 @@
     LDX sprite_ram_pointer
     LDA #$EF
     -
-        STA SPRITE_RAM,x
+        STA ADDR_SPRITERAM,x
         INX
     BNE -

@@ -114,16 +114,16 @@
     ;; Add to sprite buffer
     LDX sprite_ram_pointer
     LDA ball_ypos_hi
-    STA SPRITE_RAM,x
+    STA ADDR_SPRITERAM,x
     INX
     LDA #BALL_TILE_CHR
-    STA SPRITE_RAM,x
+    STA ADDR_SPRITERAM,x
     INX
     LDA #BALL_ATTR
-    STA SPRITE_RAM,x
+    STA ADDR_SPRITERAM,x
     INX
     LDA ball_xpos_hi
-    STA SPRITE_RAM,x
+    STA ADDR_SPRITERAM,x
     INX
     STX sprite_ram_pointer
 

@@ -47,7 +47,3 @@ ANIM_SLIDES     = #$0A ; number of slides in an animation
 SLIDE_WIDTH     = #$03 ; slide width in tiles
 SLIDE_SIZE      = #$09 ; total number of tiles in slide
 
-
-;; Sprite RAM address
-SPRITE_RAM      = $0200
-

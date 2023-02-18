@@ -74,7 +74,7 @@
             LDA #$EF
             -
                 DEY
-                STA SPRITE_RAM,y
+                STA ADDR_SPRITERAM,y
                 CPY #00
             BNE -
             
@@ -120,23 +120,23 @@
         
                 ;; Add y-position to sprite ram buffer
                 LDA temp+2
-                STA SPRITE_RAM,x
+                STA ADDR_SPRITERAM,x
                 INX
 
                 ;; Get tile number from frame ROM address, and
                 ;; add it to sprite ram buffer
                 LDA (pointer),y
-                STA SPRITE_RAM,x
+                STA ADDR_SPRITERAM,x
                 INX
 
                 ;; Add attribute data to sprite ram buffer
                 LDA temp+4
-                STA SPRITE_RAM,x
+                STA ADDR_SPRITERAM,x
                 INX
 
                 ;; Add x-position to sprite ram buffer
                 LDA temp+3
-                STA SPRITE_RAM,x
+                STA ADDR_SPRITERAM,x
                 INX
 
             +nextSprite:

@@ -120,10 +120,6 @@
                                 SLIDE_WIDTH     = #$03 ; slide width in tiles
                                 SLIDE_SIZE      = #$09 ; total number of tiles in slide
                                 
-                                
-                                ;; Sprite RAM address
-                                SPRITE_RAM      = $0200
-                                
                                 .include "include/macros.asm"
                                 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
                                 ;;
@@ -659,7 +655,7 @@
 0C1A3 A9 EF                                 LDA #$EF
 0C1A5                                       -
 0C1A5 88                                        DEY
-0C1A6 99 00 02                                  STA SPRITE_RAM,y
+0C1A6 99 00 02                                  STA ADDR_SPRITERAM,y
 0C1A9 C0 00                                     CPY #00
 0C1AB D0 F8                                 BNE -
 0C1AD                                       
@@ -705,23 +701,23 @@
 0C1DA                                   
 0C1DA                                           ;; Add y-position to sprite ram buffer
 0C1DA A5 02                                     LDA temp+2
-0C1DC 9D 00 02                                  STA SPRITE_RAM,x
+0C1DC 9D 00 02                                  STA ADDR_SPRITERAM,x
 0C1DF E8                                        INX
 0C1E0                           
 0C1E0                                           ;; Get tile number from frame ROM address, and
 0C1E0                                           ;; add it to sprite ram buffer
 0C1E0 B1 0C                                     LDA (pointer),y
-0C1E2 9D 00 02                                  STA SPRITE_RAM,x
+0C1E2 9D 00 02                                  STA ADDR_SPRITERAM,x
 0C1E5 E8                                        INX
 0C1E6                           
 0C1E6                                           ;; Add attribute data to sprite ram buffer
 0C1E6 A5 04                                     LDA temp+4
-0C1E8 9D 00 02                                  STA SPRITE_RAM,x
+0C1E8 9D 00 02                                  STA ADDR_SPRITERAM,x
 0C1EB E8                                        INX
 0C1EC                           
 0C1EC                                           ;; Add x-position to sprite ram buffer
 0C1EC A5 03                                     LDA temp+3
-0C1EE 9D 00 02                                  STA SPRITE_RAM,x
+0C1EE 9D 00 02                                  STA ADDR_SPRITERAM,x
 0C1F1 E8                                        INX
 0C1F2                           
 0C1F2                                       +nextSprite:
@@ -891,16 +887,16 @@
 0C2A5                               ;; Add to sprite buffer
 0C2A5 A6 2F                         LDX sprite_ram_pointer
 0C2A7 A5 1C                         LDA ball_ypos_hi
-0C2A9 9D 00 02                      STA SPRITE_RAM,x
+0C2A9 9D 00 02                      STA ADDR_SPRITERAM,x
 0C2AC E8                            INX
 0C2AD A9 01                         LDA #BALL_TILE_CHR
-0C2AF 9D 00 02                      STA SPRITE_RAM,x
+0C2AF 9D 00 02                      STA ADDR_SPRITERAM,x
 0C2B2 E8                            INX
 0C2B3 A9 00                         LDA #BALL_ATTR
-0C2B5 9D 00 02                      STA SPRITE_RAM,x
+0C2B5 9D 00 02                      STA ADDR_SPRITERAM,x
 0C2B8 E8                            INX
 0C2B9 A5 1A                         LDA ball_xpos_hi
-0C2BB 9D 00 02                      STA SPRITE_RAM,x
+0C2BB 9D 00 02                      STA ADDR_SPRITERAM,x
 0C2BE E8                            INX
 0C2BF 86 2F                         STX sprite_ram_pointer
 0C2C1                           
@@ -910,7 +906,7 @@
 0C2C1 A6 2F                         LDX sprite_ram_pointer
 0C2C3 A9 EF                         LDA #$EF
 0C2C5                               -
-0C2C5 9D 00 02                          STA SPRITE_RAM,x
+0C2C5 9D 00 02                          STA ADDR_SPRITERAM,x
 0C2C8 E8                                INX
 0C2C9 D0 FA                         BNE -
 0C2CB 4C 10 C1                      JMP MainGameLoop
