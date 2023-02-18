@@ -110,3 +110,10 @@ tbl_IntroScreenData:
 
 ;; test animation table
 .include "game/test/show_animation_table.asm"
+
+    ;; Ball palette color cycle
+tbl_BallColorDark:
+    .db #$12, #$14, #$16, #$27, #$28, #$19
+ 
+tbl_BallColorLight:
+    .db #$2C, #$24, #$25, #$37, #$20, #$2B

@@ -28,6 +28,9 @@
     BCC +checkHorizontalMovement
     BEQ +checkHorizontalMovement
 
+    ;; Update ball color (test)
+    JSR sub_ColorizeBall
+
     ;; Change ball direction to "up"
     LDA #BOUND_BOTTOM
     STA ball_ypos_hi
@@ -56,6 +59,7 @@
     BCS +checkHorizontalMovement
 
     ;; Change ball direction to "down"
+    JSR sub_ColorizeBall
     LDA #BOUND_TOP
     STA ball_ypos_hi
     LDA #$00
