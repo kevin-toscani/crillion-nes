@@ -1303,7 +1303,7 @@
 0C4AF                               ;; Should NMI be skipped?
 0C4AF A5 13                         LDA skip_nmi
 0C4B1 F0 03                         BEQ +
-0C4B3 4C 4B C5                          JMP +skip_nmi
+0C4B3 4C 4D C5                          JMP +skip_nmi
 0C4B6                               +
 0C4B6                           
 0C4B6                               ;; When in NMI, skip additional NMI requests
@@ -1320,7 +1320,7 @@
 0C4BF                               ;; Check forced NMI skip
 0C4BF A5 14                         LDA force_skip_nmi
 0C4C1 F0 03                         BEQ +
-0C4C3 4C 2A C5                          JMP +force_skip_nmi
+0C4C3 4C 2C C5                          JMP +force_skip_nmi
 0C4C6                               +
 0C4C6                           
 0C4C6                               ;; Update PPU mask
@@ -1336,10 +1336,10 @@
 0C4CB                               ;; Check if ppu_buffer needs updating
 0C4CB A5 2C                         LDA ppu_buffer_update
 0C4CD D0 03                         BNE +
-0C4CF 4C 0F C5                          JMP +no_ppu_buffer_update
+0C4CF 4C 11 C5                          JMP +no_ppu_buffer_update
 0C4D2                               +
 0C4D2                           
-0C4D2                               ;; Reset ppu control register, mask and scrolling position
+0C4D2                               ;; Reset ppu control register and mask
 0C4D2 A2 00                         LDX #$00
 0C4D4 8E 00 20                      STX PPU_CTRL
 0C4D7 8E 01 20                      STX PPU_MASK
@@ -1382,78 +1382,79 @@
 0C507 8D 00 20                      STA PPU_CTRL
 0C50A A5 12                         LDA soft_ppu_mask
 0C50C 8D 01 20                      STA PPU_MASK
-0C50F                           
-0C50F                           ;; Continue other NMI stuff
-0C50F                           +no_ppu_buffer_update:
-0C50F                               .include "game/test/show_animation_nmi.asm"
-0C50F                               ;; Reset sprite RAM, draw sprites
-0C50F 8D 03 20                      STA OAM_ADDR
-0C512 A9 02                         LDA #$02
-0C514 8D 14 40                      STA OAM_DMA
-0C517                           
-0C517 A0 04                         LDY #MAX_ANIMATIONS
-0C519 A2 00                         LDX #$00
-0C51B                               -
-0C51B BD 30 03                          LDA explosion_framecounter,x
-0C51E F0 03                             BEQ +
-0C520 DE 30 03                              DEC explosion_framecounter,x
-0C523                                   +
-0C523 E8                                INX
-0C524 88                                DEY
-0C525 F0 03                             BEQ +done        
-0C527 4C 1B C5                      JMP -
-0C52A                           +done:
-0C52A                           
-0C52A                           ;; This is what happens when we forced nmi skip
-0C52A                           +force_skip_nmi:
-0C52A                           
-0C52A                               ;; Increase frame counters
-0C52A E6 15                         INC frame_counter
-0C52C E6 16                         INC frame_counter_60
-0C52E                               
-0C52E                               ;; Increase second counter (if 60 frames have passed)
-0C52E A5 16                         LDA frame_counter_60
-0C530 C9 3C                         CMP #60
-0C532 D0 0A                         BNE +
-0C534 E6 18                             INC second_counter+1
-0C536 D0 02                             BNE ++
-0C538 E6 17                                 INC second_counter
-0C53A                                   ++
-0C53A A9 00                             LDA #$00
-0C53C 85 16                             STA frame_counter_60
-0C53E                               +
-0C53E                           
-0C53E                               ;; reset ball_update_position
-0C53E A9 00                         LDA #$00
-0C540 85 28                         STA ball_update_position
-0C542                           
-0C542                               ;; Don't skip next NMI request
-0C542 A9 00                         LDA #$00
-0C544 85 13                         STA skip_nmi
-0C546                           
-0C546                               ;; Restore X, Y and PC from stack
-0C546 28                            PLP
-0C547 68                            PLA
-0C548 A8                            TAY
+0C50F A9 00                         LDA #$00
+0C511                           
+0C511                           ;; Continue other NMI stuff
+0C511                           +no_ppu_buffer_update:
+0C511                               .include "game/test/show_animation_nmi.asm"
+0C511                               ;; Reset sprite RAM, draw sprites
+0C511 8D 03 20                      STA OAM_ADDR
+0C514 A9 02                         LDA #$02
+0C516 8D 14 40                      STA OAM_DMA
+0C519                           
+0C519 A0 04                         LDY #MAX_ANIMATIONS
+0C51B A2 00                         LDX #$00
+0C51D                               -
+0C51D BD 30 03                          LDA explosion_framecounter,x
+0C520 F0 03                             BEQ +
+0C522 DE 30 03                              DEC explosion_framecounter,x
+0C525                                   +
+0C525 E8                                INX
+0C526 88                                DEY
+0C527 F0 03                             BEQ +done        
+0C529 4C 1D C5                      JMP -
+0C52C                           +done:
+0C52C                           
+0C52C                           ;; This is what happens when we forced nmi skip
+0C52C                           +force_skip_nmi:
+0C52C                           
+0C52C                               ;; Increase frame counters
+0C52C E6 15                         INC frame_counter
+0C52E E6 16                         INC frame_counter_60
+0C530                               
+0C530                               ;; Increase second counter (if 60 frames have passed)
+0C530 A5 16                         LDA frame_counter_60
+0C532 C9 3C                         CMP #60
+0C534 D0 0A                         BNE +
+0C536 E6 18                             INC second_counter+1
+0C538 D0 02                             BNE ++
+0C53A E6 17                                 INC second_counter
+0C53C                                   ++
+0C53C A9 00                             LDA #$00
+0C53E 85 16                             STA frame_counter_60
+0C540                               +
+0C540                           
+0C540                               ;; reset ball_update_position
+0C540 A9 00                         LDA #$00
+0C542 85 28                         STA ball_update_position
+0C544                           
+0C544                               ;; Don't skip next NMI request
+0C544 A9 00                         LDA #$00
+0C546 85 13                         STA skip_nmi
+0C548                           
+0C548                               ;; Restore X, Y and PC from stack
+0C548 28                            PLP
 0C549 68                            PLA
-0C54A AA                            TAX
-0C54B                           
-0C54B                           +skip_nmi:
-0C54B                               ;; Restore accumulator from stack
+0C54A A8                            TAY
 0C54B 68                            PLA
-0C54C                           
-0C54C                               ;; Return
-0C54C 40                            RTI
+0C54C AA                            TAX
 0C54D                           
-0C54D                           ;; IRQ handler (empty)
-0C54D                           IRQ:
-0C54D                               .include "interrupt/irq.asm"
-0C54D 40                            RTI0C54E                           
-0C54E                           ;; Interrupt vectors
-0C54E 00 00 00 00 00 00 00 00.. .org ADDR_VECTORS
+0C54D                           +skip_nmi:
+0C54D                               ;; Restore accumulator from stack
+0C54D 68                            PLA
+0C54E                           
+0C54E                               ;; Return
+0C54E 40                            RTI
+0C54F                           
+0C54F                           ;; IRQ handler (empty)
+0C54F                           IRQ:
+0C54F                               .include "interrupt/irq.asm"
+0C54F 40                            RTI0C550                           
+0C550                           ;; Interrupt vectors
+0C550 00 00 00 00 00 00 00 00.. .org ADDR_VECTORS
 0FFFA AE C4                         .dw NMI
 0FFFC 00 C0                         .dw RESET
-0FFFE 4D C5                         .dw IRQ
+0FFFE 4F C5                         .dw IRQ
 10000                           
 10000                           ;; CHR data (if any)
 10000 00 00 00 00 00 00 00 00.. .incbin "game/graphics/sprites.chr"

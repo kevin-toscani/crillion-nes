@@ -5,7 +5,7 @@
         JMP +no_ppu_buffer_update
     +
 
-    ;; Reset ppu control register, mask and scrolling position
+    ;; Reset ppu control register and mask
     LDX #$00
     STX PPU_CTRL
     STX PPU_MASK
@@ -48,6 +48,7 @@
     STA PPU_CTRL
     LDA soft_ppu_mask
     STA PPU_MASK
+    LDA #$00
 
 ;; Continue other NMI stuff
 +no_ppu_buffer_update:
