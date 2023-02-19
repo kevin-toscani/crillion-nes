@@ -49,19 +49,6 @@
 
     ;; Increase frame counters
     INC frame_counter
-    INC frame_counter_60
-    
-    ;; Increase second counter (if 60 frames have passed)
-    LDA frame_counter_60
-    CMP #60
-    BNE +
-        INC second_counter+1
-        BNE ++
-            INC second_counter
-        ++
-        LDA #$00
-        STA frame_counter_60
-    +
 
     ;; reset ball_update_position
     LDA #$00

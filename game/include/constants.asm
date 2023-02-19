@@ -27,6 +27,11 @@ FREEZE_BALL     = #%00010000
 UNFREEZE_BALL   = #%11101111
 
 
+;; Screen load helpers
+LOAD_INTRO_SCREEN = #%10000100
+LOAD_GAME_SCREEN  = #%10000010
+LOAD_WIN_SCREEN   = #%10000001
+
 ;; Game area bounds
 BOUND_TOP       = #$10
 BOUND_BOTTOM    = #$98

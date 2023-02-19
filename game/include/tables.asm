@@ -108,12 +108,23 @@ tbl_IntroScreenData:
     ;; End of intro
     .db #$3F
 
+
 ;; test animation table
 .include "game/test/show_animation_table.asm"
 
-    ;; Ball palette color cycle
+
+;; Ball palette color cycle
 tbl_BallColorDark:
     .db #$12, #$14, #$16, #$27, #$28, #$19
  
 tbl_BallColorLight:
     .db #$2C, #$24, #$25, #$37, #$20, #$2B
+
+    
+;; Screen mode drawing routine addresses
+tbl_LoadScreenHi:
+    .db >#sub_LoadIntroScreen, >#sub_LoadGameScreen, >#sub_LoadWinScreen
+
+tbl_LoadScreenLo:
+    .db <#sub_LoadIntroScreen, <#sub_LoadGameScreen, <#sub_LoadWinScreen
+

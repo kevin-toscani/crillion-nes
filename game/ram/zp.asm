@@ -24,11 +24,10 @@ ball_flags          .dsb 1
 
 
 ;; Screen mode
-;; #%00000000 = intro screen
-;; #%. . . . . . w g
-;;   | | | | | | | +--------- game mode (1) or not (0)
-;;   | | | | | | +----------- win screen (1) or not (0)
-;;   +-+-+-+-+-+------------- unused
+;; #% u . . . . . t t
+;;    | | | | | | +-+--------- screen type (00 = intro, 01 = game, 10 = win)
+;;    | +-+-+-+-+------------- unused
+;;    +----------------------- should the screen update
 screen_mode         .dsb 1
 
 

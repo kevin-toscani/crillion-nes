@@ -36,8 +36,6 @@
 
     ;; Counters and seeds
     frame_counter     .dsb 1
-    frame_counter_60  .dsb 1
-    second_counter    .dsb 2
     random_seed       .dsb 1
 
     ;; Game specific variables

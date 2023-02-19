@@ -29,11 +29,38 @@
     AND buttons_held
     STA buttons_pressed
 
+    ;; Load screen?
+    LDA screen_mode
+    AND #%10000000
+    BEQ +screenLoaded
 
-;; Testing my concept scripts
-.include "game/test/tile_update.asm"
-.include "game/test/show_animation.asm"
-.include "game/test/move_ball.asm"
+    ;; Get screen type to load
+    LDA screen_mode
+    AND #%00000011
+    TAY
+    
+    ;; Get address to load screen type from
+    LDA tbl_LoadScreenLo,y
+    STA pointer
+    LDA tbl_LoadScreenHi,y
+    STA pointer+1
+
+    ;; Load screen
+    JSR sub_DisableRendering
+    JSR sub_JumpToPointer
+    JSR sub_EnableRendering
+    
+    ;; Don't load screen anymore next loop
+    LDA screen_mode
+    AND #%01111111
+    STA screen_mode
+    
+
++screenLoaded:
+    ;; Testing my concept scripts
+    .include "game/test/tile_update.asm"
+    .include "game/test/show_animation.asm"
+    .include "game/test/move_ball.asm"
 
 
     ;; Sprite clean-up
