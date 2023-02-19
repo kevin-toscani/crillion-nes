@@ -13,18 +13,17 @@ BALL_ATTR     = #%00000000
 
 
 ;; Ball flag helpers
-BALL_IS_DEAD    = #%00000001
-KILL_BALL       = #%00000001
-REVIVE_BALL     = #%11111110
-BALL_IS_NUDGED  = #%00000010
-NUDGE_BALL      = #%00000010
-STOP_NUDGE_BALL = #%11111101
-BALL_MOVES_DOWN = #%00000100
-MOVE_BALL_DOWN  = #%00000100
-MOVE_BALL_UP    = #%11111011
-BALL_IS_FROZEN  = #%00010000
-FREEZE_BALL     = #%00010000
-UNFREEZE_BALL   = #%11101111
+BALL_IS_DEAD     = #%00000001
+KILL_BALL        = #%00000001
+REVIVE_BALL      = #%11111110
+NUDGE_BALL_RIGHT = #%00000010
+NUDGE_BALL_LEFT  = #%11111101
+BALL_MOVES_DOWN  = #%00000100
+MOVE_BALL_DOWN   = #%00000100
+MOVE_BALL_UP     = #%11111011
+BALL_IS_FROZEN   = #%00010000
+FREEZE_BALL      = #%00010000
+UNFREEZE_BALL    = #%11101111
 
 
 ;; Screen load helpers
@@ -32,11 +31,12 @@ LOAD_INTRO_SCREEN = #%10000100
 LOAD_GAME_SCREEN  = #%10000010
 LOAD_WIN_SCREEN   = #%10000001
 
+
 ;; Game area bounds
 BOUND_TOP       = #$10
 BOUND_BOTTOM    = #$98
-BOUND_LEFT      = #$10
-BOUND_RIGHT     = #$E8
+BOUND_LEFT      = #$20
+BOUND_RIGHT     = #$D0
 
 
 ;; Max number of animations on screen
@@ -52,3 +52,6 @@ ANIM_SLIDES     = #$0A ; number of slides in an animation
 SLIDE_WIDTH     = #$03 ; slide width in tiles
 SLIDE_SIZE      = #$09 ; total number of tiles in slide
 
+
+;; Max number of nudge frames
+NUDGE_FRAMES    = #$04

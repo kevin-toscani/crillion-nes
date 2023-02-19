@@ -70,6 +70,11 @@
 
 
 +checkHorizontalMovement:
+
+    ;; Check if ball is being nudged
+    LDA nudge_counter
+    BNE +doneBallMovement
+
     ;; Check if left button is held
     LDA buttons_held
     AND #BUTTON_LEFT
@@ -84,6 +89,20 @@
         LDA ball_xpos_hi
         SBC #BALL_SPEED_HI
         STA ball_xpos_hi
+        
+        ;; Check left bound
+        CMP #BOUND_LEFT
+        BCS +doneBallMovement
+        
+        ;; Set flag to nudge right
+        LDA ball_flags
+        ORA #NUDGE_BALL_RIGHT
+        STA ball_flags
+        
+        ;; Set nudge timer
+        LDA #NUDGE_FRAMES
+        STA nudge_counter
+        
 
         JMP +doneBallMovement        
     +
@@ -102,12 +121,60 @@
         LDA ball_xpos_hi
         ADC #BALL_SPEED_HI
         STA ball_xpos_hi     
+
+       ;; Check right bound
+        CMP #BOUND_RIGHT
+        BCC +doneBallMovement
+        BEQ +doneBallMovement
+        
+        ;; Set flag to nudge right
+        LDA ball_flags
+        AND #NUDGE_BALL_LEFT
+        STA ball_flags
+        
+        ;; Set nudge timer
+        LDA #NUDGE_FRAMES
+        STA nudge_counter
     +
 
 
 +doneBallMovement:
+
+    ;; Check nudge
+    LDA nudge_counter
+    BEQ +doneBallNudging
+        LDA ball_flags
+        AND NUDGE_BALL_RIGHT
+        BEQ +nudgeBallLeft
+        
+            ;; update the low byte
+            LDA ball_xpos_lo
+            CLC
+            ADC #BALL_SPEED_LO
+            STA ball_xpos_lo
+
+            ;; update the high byte
+            LDA ball_xpos_hi
+            ADC #BALL_SPEED_HI
+            STA ball_xpos_hi  
+            JMP +doneBallNudging
+        +nudgeBallLeft:
+        
+        ;; update the low byte
+        LDA ball_xpos_lo
+        SEC
+        SBC #BALL_SPEED_LO
+        STA ball_xpos_lo
+
+        ;; update the high byte
+        LDA ball_xpos_hi
+        SBC #BALL_SPEED_HI
+        STA ball_xpos_hi
+    +doneBallNudging:
+
     ;; Don't update position again until next frame
     INC ball_update_position
+
 
 
 +skipBallMovement:

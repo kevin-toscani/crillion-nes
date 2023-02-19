@@ -15,3 +15,8 @@
         BEQ +done        
     JMP -
 +done:
+    
+    LDA nudge_counter
+    BEQ +
+        DEC nudge_counter
+    +
