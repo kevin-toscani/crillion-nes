@@ -144,7 +144,7 @@
     LDA nudge_counter
     BEQ +doneBallNudging
         LDA ball_flags
-        AND NUDGE_BALL_RIGHT
+        AND #NUDGE_BALL_RIGHT
         BEQ +nudgeBallLeft
         
             ;; update the low byte

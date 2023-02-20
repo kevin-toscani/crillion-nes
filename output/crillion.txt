@@ -806,7 +806,7 @@
 0C228 A5 2D                         LDA nudge_counter
 0C22A F0 23                         BEQ +doneBallNudging
 0C22C A5 26                             LDA ball_flags
-0C22E 25 02                             AND NUDGE_BALL_RIGHT
+0C22E 29 02                             AND #NUDGE_BALL_RIGHT
 0C230 F0 10                             BEQ +nudgeBallLeft
 0C232                                   
 0C232                                       ;; update the low byte
