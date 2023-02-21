@@ -34,12 +34,12 @@ sub_ColorizeBall:
     STA temp+1
     LDA tbl_BallColorLight,x
     STA temp+2
-    JSR sub_WriteByteToPPU
+    JSR sub_WriteByteToPPUBuffer
     
     ;; Add new dark color of ball to PPU palette
     INC temp+1
     LDA tbl_BallColorDark,x
     STA temp+2
-    JSR sub_WriteByteToPPU
+    JSR sub_WriteByteToPPUBuffer
     
     RTS

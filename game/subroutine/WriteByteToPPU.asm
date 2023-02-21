@@ -1,4 +1,4 @@
-sub_WriteByteToPPU:
+sub_WriteByteToPPUBuffer:
 
     ;; Prevent updating until full 3-byte buffer is filled,
     ;; so that graphics won't glitch out if NMI happens during

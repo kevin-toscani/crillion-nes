@@ -2,8 +2,10 @@ sub_DisableRendering:
     ;; Force NMI skip, disable rendering
 	LDA #$01
 	STA force_skip_nmi
+    JSR sub_WaitForVBlank
     LDA soft_ppu_mask
     AND #%11100111
+    STA PPU_MASK
     STA soft_ppu_mask
     JSR sub_WaitForVBlank
     RTS
@@ -11,8 +13,9 @@ sub_DisableRendering:
 sub_EnableRendering:
     ;; Enable rendering
     LDA soft_ppu_mask
-    ORA #%00011110
+    ORA #%00011000
     STA soft_ppu_mask
+    STA PPU_MASK
 	LDA #$00
 	STA PPU_SCROLL
 	STA PPU_SCROLL

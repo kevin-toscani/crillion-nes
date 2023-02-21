@@ -1,0 +1,3 @@
+sub_LoadWinScreen:
+    RTS
+

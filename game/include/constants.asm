@@ -1,3 +1,7 @@
+;; Starting address for screen tile RAM
+ADDR_SCREENTILERAM  = $0400
+
+
 ;; Ball bounding box constants
 BALL_HEIGHT  = #$08  ; Height of the ball graphic within the sprite(s)
 BALL_WIDTH   = #$08  ; Width of the ball graphic within the sprite(s)
@@ -27,16 +31,19 @@ UNFREEZE_BALL    = #%11101111
 
 
 ;; Screen load helpers
-LOAD_INTRO_SCREEN = #%10000100
-LOAD_GAME_SCREEN  = #%10000010
-LOAD_WIN_SCREEN   = #%10000001
+LOAD_INTRO_SCREEN = #%10000000
+LOAD_GAME_SCREEN  = #%10000001
+LOAD_WIN_SCREEN   = #%10000010
+IS_INTRO_SCREEN   = #%00000000
+IS_GAME_SCREEN    = #%00000001
+IS_WIN_SCREEN     = #%00000010
 
 
 ;; Game area bounds
-BOUND_TOP       = #$10
-BOUND_BOTTOM    = #$98
-BOUND_LEFT      = #$20
-BOUND_RIGHT     = #$D0
+BOUND_TOP       = #$30
+BOUND_BOTTOM    = #$C8
+BOUND_LEFT      = #$10
+BOUND_RIGHT     = #$E8
 
 
 ;; Max number of animations on screen
@@ -55,3 +62,8 @@ SLIDE_SIZE      = #$09 ; total number of tiles in slide
 
 ;; Max number of nudge frames
 NUDGE_FRAMES    = #$04
+
+
+;; Helper constant for when a level is done loading
+LEVEL_END       = #$FF
+

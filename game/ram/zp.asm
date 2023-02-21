@@ -49,3 +49,6 @@ sprite_ram_pointer     .dsb 1
 
 ;; Nudge counter
 nudge_counter          .dsb 1
+
+;; Current level
+current_level          .dsb 1

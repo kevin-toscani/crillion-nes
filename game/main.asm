@@ -57,10 +57,24 @@
     
 
 +screenLoaded:
-    ;; Testing my concept scripts
-    .include "game/test/tile_update.asm"
+
+    ;; CONCEPT SCRIPTS
+    
+    ;; Upon pressing A, an explosion will happen on screen
     .include "game/test/show_animation.asm"
+
+    ;; On the game screen, the ball should move
+    LDA screen_mode
+    CMP #IS_GAME_SCREEN
+    BEQ +
+        JMP ++
+    +
     .include "game/test/move_ball.asm"
+    ++
+    
+    ;; Upon pressing START, level 3 design will be drawn
+    .include "game/test/load_level_three.asm"
+
 
 
     ;; Sprite clean-up

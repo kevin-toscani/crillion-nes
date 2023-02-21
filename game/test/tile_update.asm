@@ -11,6 +11,6 @@
     STA temp+1
     LDA #$28
     STA temp+2
-    JSR sub_WriteByteToPPU
+    JSR sub_WriteByteToPPUBuffer
 
 +end:

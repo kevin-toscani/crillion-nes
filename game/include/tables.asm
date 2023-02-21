@@ -128,3 +128,25 @@ tbl_LoadScreenHi:
 tbl_LoadScreenLo:
     .db <#sub_LoadIntroScreen, <#sub_LoadGameScreen, <#sub_LoadWinScreen
 
+
+;; Test level data
+.include "game/test/level_data.asm"
+
+
+;; Helper table to multiply values by 64
+tbl_times64:
+    .db #$00, #$40, #$80, #$C0
+
+
+;; Metatile ID to CHR data mapper
+tbl_gametile_top_left:
+    .db #$40, #$42, #$46, #$44, #$48, #$4A, #$4E, #$4C
+
+tbl_gametile_top_right:
+    .db #$41, #$43, #$47, #$45, #$49, #$4B, #$4F, #$4D
+
+tbl_gametile_bottom_left:
+    .db #$50, #$52, #$56, #$54, #$58, #$5A, #$5E, #$5C
+
+tbl_gametile_bottom_right:
+    .db #$51, #$53, #$57, #$55, #$59, #$5B, #$5F, #$5D

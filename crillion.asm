@@ -28,10 +28,8 @@
     .include "ram/zp.asm"
 .ende
 
-;; Other RAM
-.enum ADDR_OTHERRAM
-    .include "ram/misc.asm"
-.ende
+;; Other RAM (must be ENUM'd within)
+.include "ram/misc.asm"
 
 ;; Instantly go to the static bank
 .org ADDR_ENDBANK
