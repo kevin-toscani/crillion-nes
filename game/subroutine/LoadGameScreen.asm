@@ -69,21 +69,35 @@ sub_LoadGameScreen:
     ;; temp+4 = color
     LDA temp+1
     AND #%00000111
-    STA temp+4
     
-    ;; temp+7 = first or second set in CHR
-    AND #%00000001
-    BEQ +
-        LDA #$04
-    +
+    ;; If color = 7, this is a wall
+    CMP #%00000111
+    BEQ +wallHack
+        STA temp+4
+        
+        ;; temp+7 = first or second set in CHR (add 5 to offset)
+        AND #%00000001
+        BEQ +
+            LDA #$05
+        +
+        STA temp+7
+     
+        ;; temp+5 = tile type
+        LDA temp+1
+        LSR
+        LSR
+        LSR
+        AND #%00000011
+        JMP +setTileType
+    +wallHack:
+    
+    ;; It's a wall! Set color and CHR offset to 0, and tile type to 4.
+    LDA #$00
+    STA temp+4
     STA temp+7
- 
-    ;; temp+5 = tile type
-    LDA temp+1
-    LSR
-    LSR
-    LSR
-    AND #%00000011
+    LDA #$04
+
++setTileType:    
     STA temp+5
     
     ;; X = tile offset

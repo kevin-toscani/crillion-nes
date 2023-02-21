@@ -7,12 +7,13 @@
 ;;  that unoptimized level storage would take about 3.5kB of data.
 ;;  Let's find a way to shave a few bytes off.
 ;;
-;;  There are 20 types of metatiles (called blocks):
+;;  There are 21 types of metatiles (called blocks):
 ;;  - 6 color blocks (Cx*)
 ;;  - 6 move blocks (Mx*)
 ;;  - 6 paint blocks (Px*)
 ;;  - 1 death block (DB*)
 ;;  - 1 idle block (..)
+;;  - 1 wall block (WL)
 ;;  * x = color number from 0-5
 ;;
 ;;  So we would need at least 5 bits to store each block in a tile.
@@ -28,13 +29,14 @@
 ;;  follows:
 ;;
 ;;  #% xxxx yyyy   #% d nn tt ccc
-;;     |||| ||||      | || || +++- color of tile (0-5)
-;;     |||| ||||      | || ++----- tile type (0=C 1=M 2=P 3=D)
+;;     |||| ||||      | || || +++- color of tile (0-5); 7 is wall!
+;;     |||| ||||      | || ++----- tile type (0=C/W* 1=M 2=P 3=D)
 ;;     |||| ||||      | ++-------- number of tiles, minus one
 ;;     |||| ||||      +----------- direction: row (0) or column (1)
 ;;     |||| ++++------------------ y-position in grid (0-9)
 ;;     ++++----------------------- x-position in grid (0-13)
 ;;
+;;  * Wall block if ccc = 7, Color block if not
 ;;  If the first of those two bytes is #$FF, it indicates the end of
 ;;  the level.
 ;;
