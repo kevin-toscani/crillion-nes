@@ -53,11 +53,11 @@ sub_ClearScreen:
         +
         BCS +nextTileInRow
         
-        ;; Load a random noise tile
+        ;; Load a random noise tile (tiles $68-$6F in CHR ROM)
         JSR sub_GetRandomNumber
-        AND #%00001111
+        AND #%00000111
         CLC
-        ADC #$60
+        ADC #$68
         STA temp
 
 +nextTileInRow:

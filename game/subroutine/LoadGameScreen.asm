@@ -3,6 +3,14 @@ sub_LoadGameScreen:
     ;; Clear the screen
     JSR sub_ClearScreen
     
+    ;; Clear collision data
+    LDX #$00
+    TXA
+    -
+        STA ADDR_SCREENTILERAM,x
+        INX
+    BNE -
+    
     ;; Get pointer from current level
     LDX current_level
     LDA tbl_lvl_layout_lo,x
@@ -111,6 +119,21 @@ sub_LoadGameScreen:
     LSR
     STA temp+6
     
+    ;; Translate (x,y) to (y,x) for tile RAM
+    LDA temp
+    ASL
+    ASL
+    ASL
+    ASL
+    STA temp+8
+    LDA temp
+    LSR
+    LSR
+    LSR
+    LSR
+    ORA temp+8
+    STA temp
+    
     ;; Set up loop
     TYA
     PHA
@@ -135,6 +158,7 @@ sub_LoadGameScreen:
         LDA temp+2
         STA PPU_ADDR
         LDA temp+3
+        CLC
         ADC #$20
         STA PPU_ADDR
         
@@ -143,11 +167,72 @@ sub_LoadGameScreen:
         STA PPU_DATA
         LDA tbl_GametileBottomRight,x
         STA PPU_DATA
+
+        ;; Update tile RAM (aka colission table)
+        ;; @TODO: further implement collision table
+        TXA
+        PHA
         
-        ;;
-        ;; @TODO: draw shades
-        ;; @TODO: implement collision table
-        ;;
+        LDX temp
+        LDA #%00000001
+        STA ADDR_SCREENTILERAM,x
+
+        ;; Check if shade 1 should be drawn
+        INX
+        LDA ADDR_SCREENTILERAM,x
+        BNE +
+            LDA #$00
+            STA PPU_DATA
+        +
+        
+        ;; Check if shade 2 should be drawn
+        LDA temp+3
+        CLC
+        ADC #$41
+        STA temp+3
+        LDA temp+2
+        ADC #$00
+        STA temp+2
+        
+        TXA
+        CLC
+        ADC #$10
+        TAX
+        
+        LDA ADDR_SCREENTILERAM,x
+        BNE +
+            LDA temp+2
+            STA PPU_ADDR
+            LDA temp+3
+            STA PPU_ADDR
+            LDA #$00
+            STA PPU_DATA
+        +
+
+        ;; Check if shade 3 should be drawn
+        INX
+        INC temp+3
+        LDA ADDR_SCREENTILERAM,x
+        BNE +
+            LDA temp+2
+            STA PPU_ADDR
+            LDA temp+3
+            STA PPU_ADDR
+            LDA #$00
+            STA PPU_DATA
+        +
+        
+        PLA
+        TAX
+        
+        ;; Reset pointer for next tile
+        LDA temp+3
+        SEC
+        SBC #$42
+        STA temp+3
+        LDA temp+2
+        SBC #$00
+        STA temp+2
         
         ;; Draw next metatile in this loop (if any left)
         DEY
@@ -164,15 +249,24 @@ sub_LoadGameScreen:
             LDA temp+2
             ADC #$00
             STA temp+2
+            
+            ;; Add 16 to temp (as a tile RAM pointer)
+            LDA temp
+            CLC
+            ADC #$10
+            STA temp
             JMP +drawNextTile
         +
         
-        ;; It is a column: move pointer right (+$02)
+        ;; It is a row: move pointer right (+$02)
         LDA temp+3
         CLC
         ADC #$02
         STA temp+3
         
+        ;; Add 1 to temp (as a tile RAM pointer)
+        INC temp
+
     
     ;; Next tile in the row/column
         +drawNextTile:
