@@ -12,13 +12,14 @@ sub_DisableRendering:
 
 sub_EnableRendering:
     ;; Enable rendering
+	LDA #$00
+	STA PPU_SCROLL
+	STA PPU_SCROLL
+    JSR sub_WaitForVBlank
+	STA force_skip_nmi
     LDA soft_ppu_mask
     ORA #%00011000
     STA soft_ppu_mask
     STA PPU_MASK
-	LDA #$00
-	STA PPU_SCROLL
-	STA PPU_SCROLL
-	STA force_skip_nmi
     JSR sub_WaitForVBlank
     RTS
