@@ -1238,9 +1238,9 @@
 0C38A                               
 0C38A                               ;; Get pointer from current level
 0C38A A6 2E                         LDX current_level
-0C38C BD ED C7                      LDA tbl_lvl_layout_lo,x
+0C38C BD 3B C8                      LDA tbl_lvl_layout_lo,x
 0C38F 85 0C                         STA pointer
-0C391 BD E8 C7                      LDA tbl_lvl_layout_hi,x
+0C391 BD 36 C8                      LDA tbl_lvl_layout_hi,x
 0C394 85 0D                         STA pointer+1
 0C396                           
 0C396                               ;; Set up the loop
@@ -1282,7 +1282,7 @@
 0C3BB A5 00                         LDA temp
 0C3BD 29 03                         AND #%00000011
 0C3BF AA                            TAX
-0C3C0 BD F2 C7                      LDA tbl_Times64,x
+0C3C0 BD 40 C8                      LDA tbl_Times64,x
 0C3C3 18                            CLC
 0C3C4 65 03                         ADC temp+3
 0C3C6 18                            CLC
@@ -1358,9 +1358,9 @@
 0C414 8D 06 20                          STA PPU_ADDR
 0C417                                   
 0C417                                   ;; Write first and second tile
-0C417 BD F6 C7                          LDA tbl_GametileTopLeft,x
+0C417 BD 44 C8                          LDA tbl_GametileTopLeft,x
 0C41A 8D 07 20                          STA PPU_DATA
-0C41D BD 00 C8                          LDA tbl_GametileTopRight,x
+0C41D BD 4E C8                          LDA tbl_GametileTopRight,x
 0C420 8D 07 20                          STA PPU_DATA
 0C423                                   
 0C423                                   ;; Update PPU address
@@ -1372,9 +1372,9 @@
 0C42F 8D 06 20                          STA PPU_ADDR
 0C432                                   
 0C432                                   ;; Write third and fourth tile
-0C432 BD 0A C8                          LDA tbl_GametileBottomLeft,x
+0C432 BD 58 C8                          LDA tbl_GametileBottomLeft,x
 0C435 8D 07 20                          STA PPU_DATA
-0C438 BD 14 C8                          LDA tbl_GametileBottomRight,x
+0C438 BD 62 C8                          LDA tbl_GametileBottomRight,x
 0C43B 8D 07 20                          STA PPU_DATA
 0C43E                                   
 0C43E                                   ;;
@@ -1526,7 +1526,7 @@
 0C508 8D 06 20                      STA PPU_ADDR
 0C50B A2 00                         LDX #$00
 0C50D                               -
-0C50D BD 1E C8                          LDA tbl_HudText,x
+0C50D BD 6C C8                          LDA tbl_HudText,x
 0C510 8D 07 20                          STA PPU_DATA
 0C513 E8                                INX
 0C514 E0 1C                             CPX #28
@@ -1979,233 +1979,272 @@
 0C7AD                           ;; Test level data
 0C7AD                           .include "game/test/level_data.asm"
 0C7AD                           lvl_layout_1:
-0C7AD FF                            .db #LEVEL_END
-0C7AE                           
-0C7AE                           lvl_layout_2:
-0C7AE FF                            .db #LEVEL_END
-0C7AF                           
-0C7AF                           lvl_layout_3:
-0C7AF                               ; one row of death blocks
-0C7AF 00 78 40 78 80 78 C0 38       .db #$00, #%01111000, #$40, #%01111000, #$80, #%01111000, #$C0, #%00111000
-0C7B7                           
-0C7B7                               ; four sets of color blocks at the 2nd grid column
-0C7B7 10 A0 13 E0 16 C0 19 00       .db #$10, #%10100000, #$13, #%11100000, #$16, #%11000000, #$19, #%00000000
-0C7BF                           
-0C7BF                               ; three sets of color blocks at the 4th grid column
-0C7BF 30 C0 34 C0 38 A0             .db #$30, #%11000000, #$34, #%11000000, #$38, #%10100000
-0C7C5                           
-0C7C5                               ; also for grid columns 6, 8, 10, 12 and 14
-0C7C5 50 E0 55 00 57 C0             .db #$50, #%11100000, #$55, #%00000000, #$57, #%11000000
-0C7CB 70 E0 74 00 76 E0             .db #$70, #%11100000, #$74, #%00000000, #$76, #%11100000
-0C7D1 90 E0 95 00 97 C0             .db #$90, #%11100000, #$95, #%00000000, #$97, #%11000000
-0C7D7 B0 C0 B4 C0 B8 A0             .db #$B0, #%11000000, #$B4, #%11000000, #$B8, #%10100000
-0C7DD D0 A0 D3 E0 D6 C0 D9 00       .db #$D0, #%10100000, #$D3, #%11100000, #$D6, #%11000000, #$D9, #%00000000
-0C7E5                               
-0C7E5                               ;; end of level
-0C7E5 FF                            .db #LEVEL_END
-0C7E6                           
-0C7E6                           lvl_layout_4:
-0C7E6 FF                            .db #LEVEL_END
-0C7E7                           
-0C7E7                           lvl_layout_5:
-0C7E7 FF                            .db #LEVEL_END
-0C7E8                           
-0C7E8                           ;; Level layout address pointers
-0C7E8                           tbl_lvl_layout_hi:
-0C7E8 C7 C7 C7 C7 C7                .db >#lvl_layout_1, >#lvl_layout_2, >#lvl_layout_3, >#lvl_layout_4, >#lvl_layout_5
-0C7ED                           
-0C7ED                           tbl_lvl_layout_lo:
-0C7ED AD AE AF E6 E7                .db <#lvl_layout_1, <#lvl_layout_2, <#lvl_layout_3, <#lvl_layout_4, <#lvl_layout_5
-0C7F2                           
-0C7F2                           
-0C7F2                           
-0C7F2                           ;; Helper table to multiply values by 64
-0C7F2                           tbl_Times64:
-0C7F2 00 40 80 C0                   .db #$00, #$40, #$80, #$C0
-0C7F6                           
-0C7F6                           
-0C7F6                           ;; Metatile ID to CHR data mapper
-0C7F6                           tbl_GametileTopLeft:
-0C7F6 40 42 46 44 38 48 4A 4E..     .db #$40, #$42, #$46, #$44, #$38, #$48, #$4A, #$4E, #$4C, #$38
-0C800                           
-0C800                           tbl_GametileTopRight:
-0C800 41 43 47 45 38 49 4B 4F..     .db #$41, #$43, #$47, #$45, #$38, #$49, #$4B, #$4F, #$4D, #$38
-0C80A                           
-0C80A                           tbl_GametileBottomLeft:
-0C80A 50 52 56 54 38 58 5A 5E..     .db #$50, #$52, #$56, #$54, #$38, #$58, #$5A, #$5E, #$5C, #$38
-0C814                           
-0C814                           tbl_GametileBottomRight:
-0C814 51 53 57 55 38 59 5B 5F..     .db #$51, #$53, #$57, #$55, #$38, #$59, #$5B, #$5F, #$5D, #$38
-0C81E                           
-0C81E                           
-0C81E                           ;; HUD text data
-0C81E                           tbl_HudText:
-0C81E 1D 0D 19 1C 0F 00 00 00       .db #_S, #_C, #_O, #_R, #_E, #_SPACE, #_SPACE, #_SPACE
-0C826 16 0F 20 0F 16 00 00          .db #_L, #_E, #_V, #_E, #_L, #_SPACE, #_SPACE
-0C82D 16 13 20 0F 1D 00 00 00       .db #_L, #_I, #_V, #_E, #_S, #_SPACE, #_SPACE, #_SPACE
-0C835 0C 19 18 1F 1D                .db #_B, #_O, #_N, #_U, #_S0C83A                           
-0C83A                           ;; NMI handler
-0C83A                           NMI:
-0C83A                               .include "interrupt/nmi.asm"
-0C83A                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-0C83A                           ;;
-0C83A                           ;; include/nmi.asm
-0C83A                           ;;
-0C83A                           ;; Non-maskable interrupt script. This script is being executed
-0C83A                           ;; when vBlank hits.
-0C83A                           ;;
-0C83A                           ;;
-0C83A                           
-0C83A                               ;; Preserve accumulator through stack
-0C83A 48                            PHA
+0C7AD 61 21                         .db #$61, #%00100001
+0C7AF 52 61                         .db #$52, #%01100001
+0C7B1 43 62                         .db #$43, #%01100010
+0C7B3 83 02                         .db #$83, #%00000010
+0C7B5 93 12                         .db #$93, #%00010010
+0C7B7 34 78                         .db #$34, #%01111000
+0C7B9 74 78                         .db #$74, #%01111000
+0C7BB 35 78                         .db #$35, #%01111000
+0C7BD 75 78                         .db #$75, #%01111000
+0C7BF 46 62                         .db #$46, #%01100010
+0C7C1 86 22                         .db #$86, #%00100010
+0C7C3 57 61                         .db #$57, #%01100001
+0C7C5 68 21                         .db #$68, #%00100001
+0C7C7 FF                            .db #LEVEL_END
+0C7C8                           
+0C7C8                           lvl_layout_2:
+0C7C8 C0 09                         .db #$C0, #%00001001
+0C7CA 11 12                         .db #$11, #%00010010
+0C7CC 21 61                         .db #$21, #%01100001
+0C7CE 61 61                         .db #$61, #%01100001
+0C7D0 A1 41                         .db #$A1, #%01000001
+0C7D2 12 67                         .db #$12, #%01100111
+0C7D4 52 67                         .db #$52, #%01100111
+0C7D6 92 67                         .db #$92, #%01100111
+0C7D8 C3 0A                         .db #$C3, #%00001010
+0C7DA 14 13                         .db #$14, #%00010011
+0C7DC 24 62                         .db #$24, #%01100010
+0C7DE 64 62                         .db #$64, #%01100010
+0C7E0 A4 42                         .db #$A4, #%01000010
+0C7E2 15 67                         .db #$15, #%01100111
+0C7E4 55 67                         .db #$55, #%01100111
+0C7E6 95 67                         .db #$95, #%01100111
+0C7E8 17 11                         .db #$17, #%00010001
+0C7EA 27 63                         .db #$27, #%01100011
+0C7EC 67 63                         .db #$67, #%01100011
+0C7EE A7 43                         .db #$A7, #%01000011
+0C7F0 38 78                         .db #$38, #%01111000
+0C7F2 98 58                         .db #$98, #%01011000
+0C7F4 18 27                         .db #$18, #%00100111
+0C7F6 48 27                         .db #$48, #%00100111
+0C7F8 78 27                         .db #$78, #%00100111
+0C7FA C8 07                         .db #$C8, #%00000111
+0C7FC FF                            .db #LEVEL_END
+0C7FD                           
+0C7FD                           lvl_layout_3:
+0C7FD                               ; one row of death blocks
+0C7FD 00 78 40 78 80 78 C0 38       .db #$00, #%01111000, #$40, #%01111000, #$80, #%01111000, #$C0, #%00111000
+0C805                           
+0C805                               ; four sets of color blocks at the 2nd grid column
+0C805 10 A0 13 E0 16 C0 19 00       .db #$10, #%10100000, #$13, #%11100000, #$16, #%11000000, #$19, #%00000000
+0C80D                           
+0C80D                               ; three sets of color blocks at the 4th grid column
+0C80D 30 C0 34 C0 38 A0             .db #$30, #%11000000, #$34, #%11000000, #$38, #%10100000
+0C813                           
+0C813                               ; also for grid columns 6, 8, 10, 12 and 14
+0C813 50 E0 55 00 57 C0             .db #$50, #%11100000, #$55, #%00000000, #$57, #%11000000
+0C819 70 E0 74 00 76 E0             .db #$70, #%11100000, #$74, #%00000000, #$76, #%11100000
+0C81F 90 E0 95 00 97 C0             .db #$90, #%11100000, #$95, #%00000000, #$97, #%11000000
+0C825 B0 C0 B4 C0 B8 A0             .db #$B0, #%11000000, #$B4, #%11000000, #$B8, #%10100000
+0C82B D0 A0 D3 E0 D6 C0 D9 00       .db #$D0, #%10100000, #$D3, #%11100000, #$D6, #%11000000, #$D9, #%00000000
+0C833                               
+0C833                               ;; end of level
+0C833 FF                            .db #LEVEL_END
+0C834                           
+0C834                           lvl_layout_4:
+0C834 FF                            .db #LEVEL_END
+0C835                           
+0C835                           lvl_layout_5:
+0C835 FF                            .db #LEVEL_END
+0C836                           
+0C836                           ;; Level layout address pointers
+0C836                           tbl_lvl_layout_hi:
+0C836 C7 C7 C7 C8 C8                .db >#lvl_layout_1, >#lvl_layout_2, >#lvl_layout_3, >#lvl_layout_4, >#lvl_layout_5
 0C83B                           
-0C83B                               ;; Should NMI be skipped?
-0C83B A5 13                         LDA skip_nmi
-0C83D F0 03                         BEQ +
-0C83F 4C CD C8                          JMP +skip_nmi
-0C842                               +
-0C842                           
-0C842                               ;; When in NMI, skip additional NMI requests
-0C842 A9 01                         LDA #$01
-0C844 85 13                         STA skip_nmi
-0C846                           
-0C846                               ;; Preserve X, Y, and PC through stack
-0C846 8A                            TXA
-0C847 48                            PHA
-0C848 98                            TYA
-0C849 48                            PHA
-0C84A 08                            PHP
-0C84B                               
-0C84B                               ;; Check forced NMI skip
-0C84B A5 14                         LDA force_skip_nmi
-0C84D F0 03                         BEQ +
-0C84F 4C BE C8                          JMP +force_skip_nmi
-0C852                               +
-0C852                           
-0C852                               ;; Update PPU mask
-0C852                               ;LDA #$00
-0C852                               ;STA PPU_CTRL
-0C852 A5 12                         LDA soft_ppu_mask
-0C854 8D 01 20                      STA PPU_MASK
-0C857                               
-0C857                               
-0C857                               ;; Additional PPU updates go here
-0C857                               .include "game/test/tile_update_nmi.asm"
-0C857                           
-0C857                               ;; Check if ppu_buffer needs updating
-0C857 A5 29                         LDA ppu_buffer_update
-0C859 D0 03                         BNE +
-0C85B 4C 9D C8                          JMP +no_ppu_buffer_update
-0C85E                               +
-0C85E                           
-0C85E                               ;; Reset ppu control register and mask
-0C85E A2 00                         LDX #$00
-0C860 8E 00 20                      STX PPU_CTRL
-0C863 8E 01 20                      STX PPU_MASK
-0C866                           
-0C866                               ;; Set up loop
-0C866                               -
-0C866                                   ;; Reset hi/lo latch
-0C866 2C 02 20                          BIT PPU_STATUS
-0C869                           
-0C869                                   ;; Write ppu_buffer hi and lo addresss to PPU_ADDR
-0C869 BD 00 03                          LDA ppu_buffer,x
-0C86C 8D 06 20                          STA PPU_ADDR
-0C86F E8                                INX
-0C870 BD 00 03                          LDA ppu_buffer,x
-0C873 8D 06 20                          STA PPU_ADDR
-0C876                           
-0C876                                   ;; Write ppu_buffer data to PPU_ADDR
-0C876 E8                                INX
-0C877 BD 00 03                          LDA ppu_buffer,x
-0C87A 8D 07 20                          STA PPU_DATA
-0C87D                           
-0C87D                                   ;; Check if updating is done (eg. X is at pointer)
-0C87D E8                                INX
-0C87E E4 2A                             CPX ppu_buffer_pointer
-0C880 F0 03                             BEQ +
-0C882 4C 66 C8                      JMP -
-0C885                           +
-0C885                           
-0C885                               ;; Reset ppu buffer update and pointer
-0C885 A9 00                         LDA #$00
-0C887 85 29                         STA ppu_buffer_update
-0C889 85 2A                         STA ppu_buffer_pointer
-0C88B                               
-0C88B                               ;; Reset scrolling position
-0C88B 8D 05 20                      STA PPU_SCROLL
-0C88E 8D 05 20                      STA PPU_SCROLL
-0C891                           
-0C891                               ;; Restore ppu control register and mask
-0C891 A9 90                         LDA #%10010000
-0C893 8D 00 20                      STA PPU_CTRL
-0C896 A5 12                         LDA soft_ppu_mask
-0C898 8D 01 20                      STA PPU_MASK
-0C89B A9 00                         LDA #$00
-0C89D                           
-0C89D                           ;; Continue other NMI stuff
-0C89D                           +no_ppu_buffer_update:
-0C89D                               .include "game/test/show_animation_nmi.asm"
-0C89D                               ;; Reset sprite RAM, draw sprites
-0C89D 8D 03 20                      STA OAM_ADDR
-0C8A0 A9 02                         LDA #$02
-0C8A2 8D 14 40                      STA OAM_DMA
+0C83B                           tbl_lvl_layout_lo:
+0C83B AD C8 FD 34 35                .db <#lvl_layout_1, <#lvl_layout_2, <#lvl_layout_3, <#lvl_layout_4, <#lvl_layout_5
+0C840                           
+0C840                           
+0C840                           
+0C840                           ;; Helper table to multiply values by 64
+0C840                           tbl_Times64:
+0C840 00 40 80 C0                   .db #$00, #$40, #$80, #$C0
+0C844                           
+0C844                           
+0C844                           ;; Metatile ID to CHR data mapper
+0C844                           tbl_GametileTopLeft:
+0C844 40 42 46 44 38 48 4A 4E..     .db #$40, #$42, #$46, #$44, #$38, #$48, #$4A, #$4E, #$4C, #$38
+0C84E                           
+0C84E                           tbl_GametileTopRight:
+0C84E 41 43 47 45 38 49 4B 4F..     .db #$41, #$43, #$47, #$45, #$38, #$49, #$4B, #$4F, #$4D, #$38
+0C858                           
+0C858                           tbl_GametileBottomLeft:
+0C858 50 52 56 54 38 58 5A 5E..     .db #$50, #$52, #$56, #$54, #$38, #$58, #$5A, #$5E, #$5C, #$38
+0C862                           
+0C862                           tbl_GametileBottomRight:
+0C862 51 53 57 55 38 59 5B 5F..     .db #$51, #$53, #$57, #$55, #$38, #$59, #$5B, #$5F, #$5D, #$38
+0C86C                           
+0C86C                           
+0C86C                           ;; HUD text data
+0C86C                           tbl_HudText:
+0C86C 1D 0D 19 1C 0F 00 00 00       .db #_S, #_C, #_O, #_R, #_E, #_SPACE, #_SPACE, #_SPACE
+0C874 16 0F 20 0F 16 00 00          .db #_L, #_E, #_V, #_E, #_L, #_SPACE, #_SPACE
+0C87B 16 13 20 0F 1D 00 00 00       .db #_L, #_I, #_V, #_E, #_S, #_SPACE, #_SPACE, #_SPACE
+0C883 0C 19 18 1F 1D                .db #_B, #_O, #_N, #_U, #_S0C888                           
+0C888                           ;; NMI handler
+0C888                           NMI:
+0C888                               .include "interrupt/nmi.asm"
+0C888                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+0C888                           ;;
+0C888                           ;; include/nmi.asm
+0C888                           ;;
+0C888                           ;; Non-maskable interrupt script. This script is being executed
+0C888                           ;; when vBlank hits.
+0C888                           ;;
+0C888                           ;;
+0C888                           
+0C888                               ;; Preserve accumulator through stack
+0C888 48                            PHA
+0C889                           
+0C889                               ;; Should NMI be skipped?
+0C889 A5 13                         LDA skip_nmi
+0C88B F0 03                         BEQ +
+0C88D 4C 1B C9                          JMP +skip_nmi
+0C890                               +
+0C890                           
+0C890                               ;; When in NMI, skip additional NMI requests
+0C890 A9 01                         LDA #$01
+0C892 85 13                         STA skip_nmi
+0C894                           
+0C894                               ;; Preserve X, Y, and PC through stack
+0C894 8A                            TXA
+0C895 48                            PHA
+0C896 98                            TYA
+0C897 48                            PHA
+0C898 08                            PHP
+0C899                               
+0C899                               ;; Check forced NMI skip
+0C899 A5 14                         LDA force_skip_nmi
+0C89B F0 03                         BEQ +
+0C89D 4C 0C C9                          JMP +force_skip_nmi
+0C8A0                               +
+0C8A0                           
+0C8A0                               ;; Update PPU mask
+0C8A0                               ;LDA #$00
+0C8A0                               ;STA PPU_CTRL
+0C8A0 A5 12                         LDA soft_ppu_mask
+0C8A2 8D 01 20                      STA PPU_MASK
+0C8A5                               
+0C8A5                               
+0C8A5                               ;; Additional PPU updates go here
+0C8A5                               .include "game/test/tile_update_nmi.asm"
 0C8A5                           
-0C8A5 A0 04                         LDY #MAX_ANIMATIONS
-0C8A7 A2 00                         LDX #$00
-0C8A9                               -
-0C8A9 BD 30 03                          LDA explosion_framecounter,x
-0C8AC F0 03                             BEQ +
-0C8AE DE 30 03                              DEC explosion_framecounter,x
-0C8B1                                   +
-0C8B1 E8                                INX
-0C8B2 88                                DEY
-0C8B3 F0 03                             BEQ +done        
-0C8B5 4C A9 C8                      JMP -
-0C8B8                           +done:
-0C8B8                               
-0C8B8 A5 2D                         LDA nudge_counter
-0C8BA F0 02                         BEQ +
-0C8BC C6 2D                             DEC nudge_counter
-0C8BE                               +
-0C8BE                           
-0C8BE                           ;; This is what happens when we forced nmi skip
-0C8BE                           +force_skip_nmi:
-0C8BE                           
-0C8BE                               ;; Increase frame counters
-0C8BE E6 15                         INC frame_counter
-0C8C0                           
-0C8C0                               ;; reset ball_update_position
-0C8C0 A9 00                         LDA #$00
-0C8C2 85 25                         STA ball_update_position
+0C8A5                               ;; Check if ppu_buffer needs updating
+0C8A5 A5 29                         LDA ppu_buffer_update
+0C8A7 D0 03                         BNE +
+0C8A9 4C EB C8                          JMP +no_ppu_buffer_update
+0C8AC                               +
+0C8AC                           
+0C8AC                               ;; Reset ppu control register and mask
+0C8AC A2 00                         LDX #$00
+0C8AE 8E 00 20                      STX PPU_CTRL
+0C8B1 8E 01 20                      STX PPU_MASK
+0C8B4                           
+0C8B4                               ;; Set up loop
+0C8B4                               -
+0C8B4                                   ;; Reset hi/lo latch
+0C8B4 2C 02 20                          BIT PPU_STATUS
+0C8B7                           
+0C8B7                                   ;; Write ppu_buffer hi and lo addresss to PPU_ADDR
+0C8B7 BD 00 03                          LDA ppu_buffer,x
+0C8BA 8D 06 20                          STA PPU_ADDR
+0C8BD E8                                INX
+0C8BE BD 00 03                          LDA ppu_buffer,x
+0C8C1 8D 06 20                          STA PPU_ADDR
 0C8C4                           
-0C8C4                               ;; Don't skip next NMI request
-0C8C4 A9 00                         LDA #$00
-0C8C6 85 13                         STA skip_nmi
-0C8C8                           
-0C8C8                               ;; Restore X, Y and PC from stack
-0C8C8 28                            PLP
-0C8C9 68                            PLA
-0C8CA A8                            TAY
-0C8CB 68                            PLA
-0C8CC AA                            TAX
-0C8CD                           
-0C8CD                           +skip_nmi:
-0C8CD                               ;; Restore accumulator from stack
-0C8CD 68                            PLA
-0C8CE                           
-0C8CE                               ;; Return
-0C8CE 40                            RTI
-0C8CF                           
-0C8CF                           ;; IRQ handler (empty)
-0C8CF                           IRQ:
-0C8CF                               .include "interrupt/irq.asm"
-0C8CF 40                            RTI0C8D0                           
-0C8D0                           ;; Interrupt vectors
-0C8D0 00 00 00 00 00 00 00 00.. .org ADDR_VECTORS
-0FFFA 3A C8                         .dw NMI
+0C8C4                                   ;; Write ppu_buffer data to PPU_ADDR
+0C8C4 E8                                INX
+0C8C5 BD 00 03                          LDA ppu_buffer,x
+0C8C8 8D 07 20                          STA PPU_DATA
+0C8CB                           
+0C8CB                                   ;; Check if updating is done (eg. X is at pointer)
+0C8CB E8                                INX
+0C8CC E4 2A                             CPX ppu_buffer_pointer
+0C8CE F0 03                             BEQ +
+0C8D0 4C B4 C8                      JMP -
+0C8D3                           +
+0C8D3                           
+0C8D3                               ;; Reset ppu buffer update and pointer
+0C8D3 A9 00                         LDA #$00
+0C8D5 85 29                         STA ppu_buffer_update
+0C8D7 85 2A                         STA ppu_buffer_pointer
+0C8D9                               
+0C8D9                               ;; Reset scrolling position
+0C8D9 8D 05 20                      STA PPU_SCROLL
+0C8DC 8D 05 20                      STA PPU_SCROLL
+0C8DF                           
+0C8DF                               ;; Restore ppu control register and mask
+0C8DF A9 90                         LDA #%10010000
+0C8E1 8D 00 20                      STA PPU_CTRL
+0C8E4 A5 12                         LDA soft_ppu_mask
+0C8E6 8D 01 20                      STA PPU_MASK
+0C8E9 A9 00                         LDA #$00
+0C8EB                           
+0C8EB                           ;; Continue other NMI stuff
+0C8EB                           +no_ppu_buffer_update:
+0C8EB                               .include "game/test/show_animation_nmi.asm"
+0C8EB                               ;; Reset sprite RAM, draw sprites
+0C8EB 8D 03 20                      STA OAM_ADDR
+0C8EE A9 02                         LDA #$02
+0C8F0 8D 14 40                      STA OAM_DMA
+0C8F3                           
+0C8F3 A0 04                         LDY #MAX_ANIMATIONS
+0C8F5 A2 00                         LDX #$00
+0C8F7                               -
+0C8F7 BD 30 03                          LDA explosion_framecounter,x
+0C8FA F0 03                             BEQ +
+0C8FC DE 30 03                              DEC explosion_framecounter,x
+0C8FF                                   +
+0C8FF E8                                INX
+0C900 88                                DEY
+0C901 F0 03                             BEQ +done        
+0C903 4C F7 C8                      JMP -
+0C906                           +done:
+0C906                               
+0C906 A5 2D                         LDA nudge_counter
+0C908 F0 02                         BEQ +
+0C90A C6 2D                             DEC nudge_counter
+0C90C                               +
+0C90C                           
+0C90C                           ;; This is what happens when we forced nmi skip
+0C90C                           +force_skip_nmi:
+0C90C                           
+0C90C                               ;; Increase frame counters
+0C90C E6 15                         INC frame_counter
+0C90E                           
+0C90E                               ;; reset ball_update_position
+0C90E A9 00                         LDA #$00
+0C910 85 25                         STA ball_update_position
+0C912                           
+0C912                               ;; Don't skip next NMI request
+0C912 A9 00                         LDA #$00
+0C914 85 13                         STA skip_nmi
+0C916                           
+0C916                               ;; Restore X, Y and PC from stack
+0C916 28                            PLP
+0C917 68                            PLA
+0C918 A8                            TAY
+0C919 68                            PLA
+0C91A AA                            TAX
+0C91B                           
+0C91B                           +skip_nmi:
+0C91B                               ;; Restore accumulator from stack
+0C91B 68                            PLA
+0C91C                           
+0C91C                               ;; Return
+0C91C 40                            RTI
+0C91D                           
+0C91D                           ;; IRQ handler (empty)
+0C91D                           IRQ:
+0C91D                               .include "interrupt/irq.asm"
+0C91D 40                            RTI0C91E                           
+0C91E                           ;; Interrupt vectors
+0C91E 00 00 00 00 00 00 00 00.. .org ADDR_VECTORS
+0FFFA 88 C8                         .dw NMI
 0FFFC 00 C0                         .dw RESET
-0FFFE CF C8                         .dw IRQ
+0FFFE 1D C9                         .dw IRQ
 10000                           
 10000                           ;; CHR data (if any)
 10000 00 00 00 00 00 00 00 00.. .incbin "game/graphics/sprites.chr"
