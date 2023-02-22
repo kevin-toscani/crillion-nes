@@ -72,8 +72,8 @@
     .include "game/test/move_ball.asm"
     ++
     
-    ;; Upon pressing START, level 3 design will be drawn
-    .include "game/test/load_level_three.asm"
+    ;; Upon pressing START, (next level) design will be drawn
+    .include "game/test/load_next_level.asm"
 
 
 
