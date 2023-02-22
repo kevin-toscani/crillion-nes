@@ -2,10 +2,7 @@ sub_LoadGameScreen:
 
     ;; Clear the screen
     JSR sub_ClearScreen
-
-    ;;
-    ;; @TODO: draw background pixels
-    ;;
+    
     
     ;; Get pointer from current level
     LDX current_level
