@@ -3,7 +3,6 @@ sub_LoadGameScreen:
     ;; Clear the screen
     JSR sub_ClearScreen
     
-    
     ;; Get pointer from current level
     LDX current_level
     LDA tbl_lvl_layout_lo,x
@@ -147,6 +146,7 @@ sub_LoadGameScreen:
         
         ;;
         ;; @TODO: draw shades
+        ;; @TODO: implement collision table
         ;;
         
         ;; Draw next metatile in this loop (if any left)
@@ -188,9 +188,115 @@ sub_LoadGameScreen:
 ;; Level loading is done
 +doneLevelLoad:
 
-    ;;
-    ;; @TODO: draw hud and game bounds
-    ;;
+    ;; Top game bound: set PPU_ADDR offset and draw 28 tiles
+    LDA #$20
+    STA PPU_ADDR
+    LDA #$A2
+    STA PPU_ADDR
+    LDA #$35
+    JSR sub_Draw28HorizontalTiles
 
+    ;; Bottom game bound: set PPU_ADDR offset and draw 28 tiles
+    LDA #$23
+    STA PPU_ADDR
+    LDA #$42
+    STA PPU_ADDR
+    LDA #$31
+    JSR sub_Draw28HorizontalTiles
+
+    ;; Left & right game bounds
+    ;; Set PPU_ADDR and store in temp variables
+    LDA #$20
+    STA temp
+    STA PPU_ADDR
+    LDA #$C1
+    STA temp+1
+    STA PPU_ADDR
+    
+    ;; Set vertical bound tile and set up loop
+    LDY #$33
+    LDX #20
+    -
+        ;; Show left tile
+        STY PPU_DATA
+        
+        ;; Set PPU_ADDR to right bound by adding 29 (tiles) to low byte
+        LDA temp
+        STA PPU_ADDR
+        LDA temp+1
+        CLC
+        ADC #29
+        STA temp+1
+        STA PPU_ADDR
+
+        ;; Show right tile
+        STY PPU_DATA
+
+        ;; Check if we're done yet
+        DEX
+        BEQ +drawCorners
+        
+        ;; Not done yet: add 3 to low byte for next left bound
+        LDA temp+1
+        CLC
+        ADC #3
+        STA temp+1
+        
+        ;; Apply carry to high byte
+        LDA temp
+        ADC #$00
+        STA temp
+        
+        ;; Store next PPU_ADDR to draw at
+        STA PPU_ADDR
+        LDA temp+1
+        STA PPU_ADDR
+    JMP -
+    
++drawCorners:
+    LDA #$20
+    STA PPU_ADDR
+    LDA #$A1
+    STA PPU_ADDR
+    LDA #$39
+    STA PPU_DATA
+
+    LDA #$20
+    STA PPU_ADDR
+    LDA #$BE
+    STA PPU_ADDR
+    LDA #$3A
+    STA PPU_DATA
+
+    LDA #$23
+    STA PPU_ADDR
+    LDA #$41
+    STA PPU_ADDR
+    LDA #$36
+    STA PPU_DATA
+
+    LDA #$23
+    STA PPU_ADDR
+    LDA #$5E
+    STA PPU_ADDR
+    LDA #$34
+    STA PPU_DATA
+
+
+
+    ;;
+    ;; @TODO: draw hud
+    ;;
+    
+    ;; Return
     RTS
 
+
+;; Subroutine: draw 28 tiles in a row
+sub_Draw28HorizontalTiles:
+    LDX #28
+    -
+        STA PPU_DATA
+        DEX
+    BNE -
+    RTS
