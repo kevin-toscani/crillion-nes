@@ -20,56 +20,42 @@ tbl_IntroScreenLogoChr:
 ;; Intro screen data
 tbl_IntroScreenData:
 
-    ;; Set PPU address $20AC
+    ;; Set PPU address $20AC and draw
     .db #$60, #$AC
-    
-    ;; Draw
-    .db #$02, #$26, #$16, #$0F, #$20, #$0F, #$16, #$27 ; 1.LEVEL:
+    .db #_1, #_DOT, #_L, #_E, #_V, #_E, #_L, #_COLON
 
-    ;; Set PPU address $20CF
+    ;; Set PPU address $20CF and draw
     .db #$60, #$CF
+    .db #_0, #_1
     
-    ;; Draw
-    .db #$01, #$02                                     ; 01
-    
-    ;; Set PPU address $2122
+    ;; Set PPU address $2122 and draw
     .db #$61, #$22
+    .db #_D, #_E, #_S, #_I, #_G, #_N, #_COMMA
+    .db #_S, #_O, #_U, #_N, #_D, #_COMMA
+    .db #_G, #_R, #_A, #_P, #_H, #_I, #_C, #_S
+    .db #_SPACE, #_A, #_N, #_D, #_SPACE
     
-    ;; Draw
-    .db #$0E, #$0F, #$1D, #$13, #$11, #$18, #$25       ; DESIGN,
-    .db #$1D, #$19, #$1F, #$18, #$0E, #$25             ; SOUND,
-    .db #$11, #$1C, #$0B, #$1A, #$12, #$13, #$0D, #$1D ; GRAPHICS
-    .db #$00, #$0B, #$18, #$0E, #$00                   ; _AND_
-    
-    ;; Set PPU address $2147
+    ;; Set PPU address $2147 and draw
     .db #$61, #$47
+    .db #_P, #_R, #_O, #_G, #_R, #_A, #_M
+    .db #_SPACE, #_B, #_Y, #_SPACE
+    .db #_O, #_L, #_I, #_V, #_E, #_R
+    .db #_SPACE, #_K, #_I, #_R, #_W, #_A
     
-    ;; Draw
-    .db #$1A, #$1C, #$19, #$11, #$1C, #$0B, #$17       ; PROGRAM
-    .db #$00, #$0C, #$23, #$00                         ; _BY_
-    .db #$19, #$16, #$13, #$20, #$0F, #$1C             ; OLIVER
-    .db #$00, #$15, #$13, #$1C, #$21, #$0B             ; _KIRWA
-    
-    ;; Set PPU address $218B
+    ;; Set PPU address $218B and draw
     .db #$61, #$8B
+    .db #_COPY, #_SPACE, #_1, #_9, #_8, #_7
+    .db #_COMMA, #_1, #_9, #_8, #_8
     
-    ;; Draw
-    .db #$28, #$00, #$02, #$0A, #$09, #$08             ; C_1987
-    .db #$25, #$02, #$0A, #$09, #$09                   ; ,1988
-    
-    ;; Set PPU address $21E6
+    ;; Set PPU address $21E6 and draw
     .db #$61, #$E6
+    .db #_N, #_E, #_S, #_SPACE, #_P, #_O, #_R, #_T
+    .db #_SPACE, #_B, #_Y, #_SPACE
+    .db #_K, #_E, #_V, #_I, #_N, #_8, #_1
     
-    ;; Draw
-    .db #$18, #$0F, #$1D, #$00, #$1A, #$19, #$1C, #$1E ; NES_PORT
-    .db #$00, #$0C, #$23, #$00                         ; _BY_
-    .db #$15, #$0F, #$20, #$13, #$18, #$09, #$02       ; KEVIN81
-    
-    ;; Set PPU address $222D
+    ;; Set PPU address $222D and draw
     .db #$62, #$2D
-    
-    ;; Draw
-    .db #$28, #$00, #$03, #$01, #$03, #$04             ; C_2023
+    .db #_COPY, #_SPACE, #_2, #_0, #_2, #_3
     
     ;; Set PPU address $2281
     .db #$62, #$81
@@ -150,3 +136,11 @@ tbl_gametile_bottom_left:
 
 tbl_gametile_bottom_right:
     .db #$51, #$53, #$57, #$55, #$38, #$59, #$5B, #$5F, #$5D, #$38
+
+
+;; HUD text data
+tbl_hud_text:
+    .db #_S, #_C, #_O, #_R, #_E, #_SPACE, #_SPACE
+    .db #_L, #_E, #_V, #_E, #_L, #_SPACE, #_SPACE
+    .db #_L, #_I, #_V, #_E, #_S, #_SPACE, #_SPACE
+    .db #_B, #_O, #_N, #_U, #_S
