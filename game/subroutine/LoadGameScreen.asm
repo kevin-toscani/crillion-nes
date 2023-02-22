@@ -253,7 +253,10 @@ sub_LoadGameScreen:
         STA PPU_ADDR
     JMP -
     
+    
+
 +drawCorners:
+    ;; Draw the corners of the playing field
     LDA #$20
     STA PPU_ADDR
     LDA #$A1
@@ -283,9 +286,114 @@ sub_LoadGameScreen:
     STA PPU_DATA
 
 
+    ;; Draw the hud labels
+    LDA #$20
+    STA PPU_ADDR
+    LDA #$62
+    STA PPU_ADDR
+    LDX #$00
+    -
+        LDA tbl_HudText,x
+        STA PPU_DATA
+        INX
+        CPX #28
+    BNE -
+
+
+    ;; Draw the current score
+    LDA #$20
+    STA PPU_ADDR
+    LDA #$83
+    STA PPU_ADDR
+    LDX #$00
+    -
+        LDA ball_score,x
+        CLC
+        ADC #$01
+        STA PPU_DATA
+        INX
+        CPX #$06
+    BNE -
+
+
+    ;; Draw the level number
+    ;; (with primitive HEX>DEC)
+    LDA current_level
+    CLC
+    ADC #$01
+    STA temp+1
+    
+    CMP #20
+    BCS +tempIsTwo
+    
+    CMP #10
+    BCS +tempIsOne
+    
+    LDA #$00
+    JMP +setTemp
+    
++tempIsOne:
+    SEC
+    SBC #10
+    STA temp+1
+    LDA #$01
+    JMP +
+    
++tempIsTwo:
+    SEC
+    SBC #20
+    STA temp+1
+    LDA #$02
+
++setTemp:
+    STA temp
+    
+    INC temp
+    INC temp+1
+    
+    LDA #$20
+    STA PPU_ADDR
+    LDA #$8B
+    STA PPU_ADDR
+    LDA temp
+    STA PPU_DATA
+    LDA temp+1
+    STA PPU_DATA
+
+
+    ;; Draw lives (presumes lives to be capped at 9)
+    LDA #$20
+    STA PPU_ADDR
+    LDA #$92
+    STA PPU_ADDR
+    LDX ball_lives
+    INX
+    STX PPU_DATA
+
+
+    ;; Set and draw bonus
+    LDA #$07
+    STA ball_bonus
+    LDA #$09
+    STA ball_bonus+1
+    STA ball_bonus+2
+    
+    LDA #$20
+    STA PPU_ADDR
+    LDA #$9A
+    STA PPU_ADDR
+    LDX #$00
+    -
+        LDA ball_bonus,x
+        CLC
+        ADC #$01
+        STA PPU_DATA
+        INX
+        CPX #$03
+    BNE -
 
     ;;
-    ;; @TODO: draw hud
+    ;; @TODO: apply tile attributes
     ;;
     
     ;; Return

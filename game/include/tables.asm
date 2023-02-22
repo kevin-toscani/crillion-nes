@@ -140,7 +140,7 @@ tbl_GametileBottomRight:
 
 ;; HUD text data
 tbl_HudText:
-    .db #_S, #_C, #_O, #_R, #_E, #_SPACE, #_SPACE
+    .db #_S, #_C, #_O, #_R, #_E, #_SPACE, #_SPACE, #_SPACE
     .db #_L, #_E, #_V, #_E, #_L, #_SPACE, #_SPACE
-    .db #_L, #_I, #_V, #_E, #_S, #_SPACE, #_SPACE
+    .db #_L, #_I, #_V, #_E, #_S, #_SPACE, #_SPACE, #_SPACE
     .db #_B, #_O, #_N, #_U, #_S
