@@ -49,7 +49,7 @@ sub_LoadGameScreen:
     LDA temp
     AND #%00000011
     TAX
-    LDA tbl_times64,x
+    LDA tbl_Times64,x
     CLC
     ADC temp+3
     CLC
@@ -125,9 +125,9 @@ sub_LoadGameScreen:
         STA PPU_ADDR
         
         ;; Write first and second tile
-        LDA tbl_gametile_top_left,x
+        LDA tbl_GametileTopLeft,x
         STA PPU_DATA
-        LDA tbl_gametile_top_right,x
+        LDA tbl_GametileTopRight,x
         STA PPU_DATA
         
         ;; Update PPU address
@@ -139,9 +139,9 @@ sub_LoadGameScreen:
         STA PPU_ADDR
         
         ;; Write third and fourth tile
-        LDA tbl_gametile_bottom_left,x
+        LDA tbl_GametileBottomLeft,x
         STA PPU_DATA
-        LDA tbl_gametile_bottom_right,x
+        LDA tbl_GametileBottomRight,x
         STA PPU_DATA
         
         ;;

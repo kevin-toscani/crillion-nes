@@ -24,11 +24,16 @@ lvl_layout_3:
     ;; end of level
     .db #LEVEL_END
 
+lvl_layout_4:
+    .db #LEVEL_END
+
+lvl_layout_5:
+    .db #LEVEL_END
 
 ;; Level layout address pointers
 tbl_lvl_layout_hi:
-    .db >#lvl_layout_1, >#lvl_layout_2, >#lvl_layout_3
+    .db >#lvl_layout_1, >#lvl_layout_2, >#lvl_layout_3, >#lvl_layout_4, >#lvl_layout_5
 
 tbl_lvl_layout_lo:
-    .db <#lvl_layout_1, <#lvl_layout_2, <#lvl_layout_3
+    .db <#lvl_layout_1, <#lvl_layout_2, <#lvl_layout_3, <#lvl_layout_4, <#lvl_layout_5
 

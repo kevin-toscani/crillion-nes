@@ -120,26 +120,26 @@ tbl_LoadScreenLo:
 
 
 ;; Helper table to multiply values by 64
-tbl_times64:
+tbl_Times64:
     .db #$00, #$40, #$80, #$C0
 
 
 ;; Metatile ID to CHR data mapper
-tbl_gametile_top_left:
+tbl_GametileTopLeft:
     .db #$40, #$42, #$46, #$44, #$38, #$48, #$4A, #$4E, #$4C, #$38
 
-tbl_gametile_top_right:
+tbl_GametileTopRight:
     .db #$41, #$43, #$47, #$45, #$38, #$49, #$4B, #$4F, #$4D, #$38
 
-tbl_gametile_bottom_left:
+tbl_GametileBottomLeft:
     .db #$50, #$52, #$56, #$54, #$38, #$58, #$5A, #$5E, #$5C, #$38
 
-tbl_gametile_bottom_right:
+tbl_GametileBottomRight:
     .db #$51, #$53, #$57, #$55, #$38, #$59, #$5B, #$5F, #$5D, #$38
 
 
 ;; HUD text data
-tbl_hud_text:
+tbl_HudText:
     .db #_S, #_C, #_O, #_R, #_E, #_SPACE, #_SPACE
     .db #_L, #_E, #_V, #_E, #_L, #_SPACE, #_SPACE
     .db #_L, #_I, #_V, #_E, #_S, #_SPACE, #_SPACE
