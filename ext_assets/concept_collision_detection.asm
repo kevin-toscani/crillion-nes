@@ -53,10 +53,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Game constants
 
-#BALL_LEFT_WGA  = #$FA ; Left position within game area (#$04 minus #$10)
-#BALL_TOP_WGA   = #$DA ; Top position within game area (#$04 minus #$30)
-#BALL_HALF_SIZE = #$04 ; Half the ball's size (8x8)
-#TILE_IS_SOLID  = #%00000001
+BALL_LEFT_WGA  = #$FA ; Left position within game area (#$04 minus #$10)
+BALL_TOP_WGA   = #$DA ; Top position within game area (#$04 minus #$30)
+BALL_HALF_SIZE = #$04 ; Half the ball's size (8x8)
+TILE_IS_SOLID  = #%00000001
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
