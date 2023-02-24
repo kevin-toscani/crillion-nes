@@ -1,0 +1,88 @@
+<NotepadPlus>
+    <Project name="Crillion">
+        <Folder name="ext_assets">
+            <File name="chr.piskel" />
+            <File name="concept_collision_detection.asm" />
+            <File name="concept_level_storage.asm" />
+            <File name="concept_set_attributes.asm" />
+            <File name="concept_set_attributes.xlsx" />
+            <File name="concept_shade_blocks.asm" />
+            <File name="crillion.nss" />
+            <File name="crillion.piskel" />
+            <File name="crillion.txt" />
+            <File name="LevelDesign.xlsx" />
+        </Folder>
+        <Folder name="game">
+            <Folder name="graphics">
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\graphics\backgrounds.chr" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\graphics\sprites.chr" />
+            </Folder>
+            <Folder name="include">
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\include\constants.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\include\header.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\include\macros.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\include\subroutines.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\include\tables.asm" />
+            </Folder>
+            <Folder name="interrupt">
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\interrupt\reset.asm" />
+            </Folder>
+            <Folder name="macro" />
+            <Folder name="ram">
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\ram\misc.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\ram\zp.asm" />
+            </Folder>
+            <Folder name="subroutine">
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\subroutine\ClearScreen.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\subroutine\ColorizeBall.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\subroutine\DisableEnableRendering.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\subroutine\DrawIntroScreenLogoTile.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\subroutine\JumpToPointer.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\subroutine\LoadGameScreen.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\subroutine\LoadIntroScreen.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\subroutine\LoadWinScreen.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\subroutine\WriteByteToPPU.asm" />
+            </Folder>
+            <Folder name="test">
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\test\level_data.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\test\load_next_level.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\test\move_ball.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\test\show_animation.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\test\show_animation_nmi.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\test\show_animation_table.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\test\tile_update.asm" />
+                <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\test\tile_update_nmi.asm" />
+            </Folder>
+            <File name="D:\nesdev\repos\crillion-nes\crillion-nes\game\main.asm" />
+        </Folder>
+        <Folder name="include">
+            <File name="D:\nesdev\repos\crillion-nes\crillion-nes\include\constants.asm" />
+            <File name="D:\nesdev\repos\crillion-nes\crillion-nes\include\macros.asm" />
+            <File name="D:\nesdev\repos\crillion-nes\crillion-nes\include\subroutines.asm" />
+        </Folder>
+        <Folder name="interrupt">
+            <File name="D:\nesdev\repos\crillion-nes\crillion-nes\interrupt\irq.asm" />
+            <File name="D:\nesdev\repos\crillion-nes\crillion-nes\interrupt\nmi.asm" />
+            <File name="D:\nesdev\repos\crillion-nes\crillion-nes\interrupt\reset.asm" />
+        </Folder>
+        <Folder name="macro" />
+        <Folder name="output">
+            <File name="D:\nesdev\repos\crillion-nes\crillion-nes\output\crillion.log" />
+            <File name="D:\nesdev\repos\crillion-nes\crillion-nes\output\crillion.nes" />
+            <File name="D:\nesdev\repos\crillion-nes\crillion-nes\output\crillion.txt" />
+        </Folder>
+        <Folder name="ram">
+            <File name="D:\nesdev\repos\crillion-nes\crillion-nes\ram\misc.asm" />
+            <File name="D:\nesdev\repos\crillion-nes\crillion-nes\ram\zp.asm" />
+        </Folder>
+        <Folder name="subroutine">
+            <File name="D:\nesdev\repos\crillion-nes\crillion-nes\subroutine\GetRandomNumber.asm" />
+            <File name="D:\nesdev\repos\crillion-nes\crillion-nes\subroutine\ReadController.asm" />
+            <File name="D:\nesdev\repos\crillion-nes\crillion-nes\subroutine\WaitForVBlank.asm" />
+        </Folder>
+        <File name="D:\nesdev\repos\crillion-nes\crillion-nes\.gitignore" />
+        <File name="D:\nesdev\repos\crillion-nes\crillion-nes\build.bat" />
+        <File name="D:\nesdev\repos\crillion-nes\crillion-nes\crillion.asm" />
+        <File name="D:\nesdev\repos\crillion-nes\crillion-nes\README.md" />
+    </Project>
+</NotepadPlus>
