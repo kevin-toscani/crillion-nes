@@ -74,7 +74,6 @@
                                 .include "game/include/constants.asm"                                ;; Starting address for screen tile RAM
                                 ADDR_SCREENTILERAM  = $0400
                                 
-                                
                                 ;; Ball bounding box constants
                                 BALL_HEIGHT  = #$08  ; Height of the ball graphic within the sprite(s)
                                 BALL_WIDTH   = #$08  ; Width of the ball graphic within the sprite(s)
@@ -368,8 +367,9 @@
                                 
                                 ;; screen tile data (14x10 metatiles)
                                 .enum ADDR_SCREENTILERAM
-00400                               tile_type                 .dsb 140
-0048C                           .ende
+00400                               tile_type                 .dsb 160
+004A0                               tile_attributes           .dsb 64
+004E0                           .ende
                                 
                                 
                                 ;; Instantly go to the static bank
@@ -507,15 +507,15 @@
 0C07C A8                            TAY
 0C07D                               
 0C07D                               ;; Get address to load screen type from
-0C07D B9 2F C8                      LDA tbl_LoadScreenLo,y
+0C07D B9 FC C8                      LDA tbl_LoadScreenLo,y
 0C080 85 0C                         STA pointer
-0C082 B9 2C C8                      LDA tbl_LoadScreenHi,y
+0C082 B9 F9 C8                      LDA tbl_LoadScreenHi,y
 0C085 85 0D                         STA pointer+1
 0C087                           
 0C087                               ;; Load screen
-0C087 20 43 C3                      JSR sub_DisableRendering
-0C08A 20 84 C3                      JSR sub_JumpToPointer
-0C08D 20 57 C3                      JSR sub_EnableRendering
+0C087 20 57 C3                      JSR sub_DisableRendering
+0C08A 20 98 C3                      JSR sub_JumpToPointer
+0C08D 20 6B C3                      JSR sub_EnableRendering
 0C090                               
 0C090                               ;; Don't load screen anymore next loop
 0C090 A5 27                         LDA screen_mode
@@ -627,9 +627,9 @@
 0C114 BC 34 03                          LDY explosion_currentframe,x
 0C117                           
 0C117                                   ;; Load current frame ROM address from table
-0C117 B9 16 C8                          LDA explosion_anim_lo,y
+0C117 B9 E3 C8                          LDA explosion_anim_lo,y
 0C11A 85 0C                             STA pointer
-0C11C B9 0C C8                          LDA explosion_anim_hi,y
+0C11C B9 D9 C8                          LDA explosion_anim_hi,y
 0C11F 85 0D                             STA pointer+1
 0C121                           
 0C121                                   ;; Save x-register on stack
@@ -759,7 +759,7 @@
 0C19E F0 36                         BEQ +checkHorizontalMovement
 0C1A0                           
 0C1A0                               ;; Update ball color (test)
-0C1A0 20 08 C3                      JSR sub_ColorizeBall
+0C1A0 20 1C C3                      JSR sub_ColorizeBall
 0C1A3                           
 0C1A3                               ;; Change ball direction to "up"
 0C1A3 A9 C8                         LDA #BOUND_BOTTOM
@@ -789,7 +789,7 @@
 0C1C3 B0 11                         BCS +checkHorizontalMovement
 0C1C5                           
 0C1C5                               ;; Change ball direction to "down"
-0C1C5 20 08 C3                      JSR sub_ColorizeBall
+0C1C5 20 1C C3                      JSR sub_ColorizeBall
 0C1C8 A9 30                         LDA #BOUND_TOP
 0C1CA 85 19                         STA ball_ypos_hi
 0C1CC A9 00                         LDA #$00
@@ -1141,1204 +1141,1391 @@
 0C303                                   +
 0C303                                   
 0C303 C0 1E                             CPY #$1E
-0C305 D0 C7                             BNE -
+0C305 D0 C7                         BNE -
 0C307                           
-0C307 60                            RTS0C308                           .include "game/subroutine/ColorizeBall.asm"
-0C308                           sub_ColorizeBall:
-0C308                           
-0C308                               ;; Get next ball color in cycle
-0C308 A5 26                         LDA ball_flags
-0C30A 4A                            LSR
-0C30B 4A                            LSR
-0C30C 4A                            LSR
-0C30D 4A                            LSR
-0C30E 4A                            LSR
-0C30F C9 05                         CMP #$05
-0C311 D0 02                         BNE +
-0C313 A9 FF                             LDA #$FF
-0C315                               +
-0C315 18                            CLC
-0C316 69 01                         ADC #$01
-0C318 AA                            TAX
-0C319                           
-0C319                               ;; Update color in ball flags
-0C319 0A                            ASL
-0C31A 0A                            ASL
-0C31B 0A                            ASL
-0C31C 0A                            ASL
-0C31D 0A                            ASL
-0C31E 85 00                         STA temp
-0C320 A5 26                         LDA ball_flags
-0C322 29 1F                         AND #%00011111
-0C324 05 00                         ORA temp
-0C326 85 26                         STA ball_flags
-0C328                           
-0C328                               ;; Add new light color of ball to PPU palette
-0C328 A9 3F                         LDA #$3F
-0C32A 85 00                         STA temp
-0C32C A9 11                         LDA #$11
-0C32E 85 01                         STA temp+1
-0C330 BD 26 C8                      LDA tbl_BallColorLight,x
-0C333 85 02                         STA temp+2
-0C335 20 C2 C6                      JSR sub_WriteByteToPPUBuffer
-0C338                               
-0C338                               ;; Add new dark color of ball to PPU palette
-0C338 E6 01                         INC temp+1
-0C33A BD 20 C8                      LDA tbl_BallColorDark,x
-0C33D 85 02                         STA temp+2
-0C33F 20 C2 C6                      JSR sub_WriteByteToPPUBuffer
-0C342                               
-0C342 60                            RTS0C343                           .include "game/subroutine/DisableEnableRendering.asm"
-0C343                           sub_DisableRendering:
-0C343                               ;; Force NMI skip, disable rendering
-0C343 A9 01                     	LDA #$01
-0C345 85 14                     	STA force_skip_nmi
-0C347 20 AB C2                      JSR sub_WaitForVBlank
-0C34A A5 12                         LDA soft_ppu_mask
-0C34C 29 E7                         AND #%11100111
-0C34E 8D 01 20                      STA PPU_MASK
-0C351 85 12                         STA soft_ppu_mask
-0C353 20 AB C2                      JSR sub_WaitForVBlank
-0C356 60                            RTS
-0C357                           
-0C357                           sub_EnableRendering:
-0C357                               ;; Enable rendering
-0C357 A9 00                     	LDA #$00
-0C359 8D 05 20                  	STA PPU_SCROLL
-0C35C 8D 05 20                  	STA PPU_SCROLL
-0C35F 20 AB C2                      JSR sub_WaitForVBlank
-0C362 85 14                     	STA force_skip_nmi
-0C364 A5 12                         LDA soft_ppu_mask
-0C366 09 18                         ORA #%00011000
-0C368 85 12                         STA soft_ppu_mask
-0C36A 8D 01 20                      STA PPU_MASK
-0C36D 20 AB C2                      JSR sub_WaitForVBlank
-0C370 60                            RTS
-0C371                           .include "game/subroutine/DrawIntroScreenLogoTile.asm"
-0C371                           sub_drawIntroScreenLogoTile:
-0C371 B9 08 C7                      LDA tbl_IntroScreenLogoChr,y
-0C374 C9 60                         CMP #$60
-0C376 D0 08                         BNE +
-0C378 20 89 C2                          JSR sub_GetRandomNumber
-0C37B 29 07                             AND #$07
-0C37D 18                                CLC
-0C37E 69 60                             ADC #$60
-0C380                               +
-0C380 8D 07 20                      STA PPU_DATA
-0C383 60                            RTS
-0C384                           .include "game/subroutine/JumpToPointer.asm"
-0C384                           sub_JumpToPointer:
-0C384 6C 0C 00                      JMP (pointer)
-0C387                               ;RTS must be handled by the routine (pointer) jumps to
-0C387                           .include "game/subroutine/LoadGameScreen.asm"
-0C387                           sub_LoadGameScreen:
-0C387                           
-0C387                               ;; Clear the screen
-0C387 20 B1 C2                      JSR sub_ClearScreen
-0C38A                               
-0C38A                               ;; Clear collision data
-0C38A A2 00                         LDX #$00
-0C38C 8A                            TXA
-0C38D                               -
-0C38D 9D 00 04                          STA ADDR_SCREENTILERAM,x
-0C390 E8                                INX
-0C391 D0 FA                         BNE -
-0C393                               
-0C393                               ;; Get pointer from current level
-0C393 A6 2E                         LDX current_level
-0C395 BD C0 C8                      LDA tbl_lvl_layout_lo,x
-0C398 85 0C                         STA pointer
-0C39A BD BB C8                      LDA tbl_lvl_layout_hi,x
-0C39D 85 0D                         STA pointer+1
-0C39F                           
-0C39F                               ;; Set up the loop
-0C39F A0 00                         LDY #$00
-0C3A1                           -drawRowColumnLoop:
-0C3A1                           
-0C3A1                               ;; Load (x,y) of current set of tiles
-0C3A1 B1 0C                         LDA (pointer),y
-0C3A3                           
-0C3A3                               ;; Check if level is done; if so, skip the loop
-0C3A3 C9 FF                         CMP #LEVEL_END
-0C3A5 D0 03                         BNE +
-0C3A7 4C EA C4                          JMP +doneLevelLoad
-0C3AA                               +
-0C3AA                           
-0C3AA                               ;; Store (x,y) and number of tiles and tile data in temp variable
-0C3AA 85 00                         STA temp
-0C3AC C8                            INY
-0C3AD B1 0C                         LDA (pointer),y
-0C3AF 85 01                         STA temp+1
-0C3B1                               
-0C3B1                               ;; Convert (x,y) to PPU address
-0C3B1                               ;; temp+2 = PPU_hi = $20 + _y/4_ + carry from temp+3
-0C3B1 A5 00                         LDA temp
-0C3B3 29 0F                         AND #%00001111
-0C3B5 4A                            LSR
-0C3B6 4A                            LSR
-0C3B7 09 20                         ORA #$20
-0C3B9 85 02                         STA temp+2
-0C3BB                               
-0C3BB                               ;; temp+3 = PPU_lo = 2*x + $40*(y%4) + $C2
-0C3BB A5 00                         LDA temp
-0C3BD 29 F0                         AND #%11110000
-0C3BF 4A                            LSR
-0C3C0 4A                            LSR
-0C3C1 4A                            LSR
-0C3C2 85 03                         STA temp+3
-0C3C4                               
-0C3C4 A5 00                         LDA temp
-0C3C6 29 03                         AND #%00000011
-0C3C8 AA                            TAX
-0C3C9 BD C5 C8                      LDA tbl_Times64,x
-0C3CC 18                            CLC
-0C3CD 65 03                         ADC temp+3
-0C3CF 18                            CLC
-0C3D0 69 C2                         ADC #$C2
-0C3D2 85 03                         STA temp+3
-0C3D4                               
-0C3D4                               ;; Add carry to temp+2
-0C3D4 A5 02                         LDA temp+2
-0C3D6 69 00                         ADC #$00
-0C3D8 85 02                         STA temp+2
-0C3DA                           
-0C3DA                               ;; Convert tile data to loop count and tile type
-0C3DA                               ;; temp+4 = color
-0C3DA A5 01                         LDA temp+1
-0C3DC 29 07                         AND #%00000111
-0C3DE                               
-0C3DE                               ;; If color = 7, this is a wall
-0C3DE C9 07                         CMP #%00000111
-0C3E0 F0 14                         BEQ +wallHack
-0C3E2 85 04                             STA temp+4
-0C3E4                                   
-0C3E4                                   ;; temp+7 = first or second set in CHR (add 5 to offset)
-0C3E4 29 01                             AND #%00000001
-0C3E6 F0 02                             BEQ +
-0C3E8 A9 05                                 LDA #$05
-0C3EA                                   +
-0C3EA 85 07                             STA temp+7
-0C3EC                                
-0C3EC                                   ;; temp+5 = tile type
-0C3EC A5 01                             LDA temp+1
-0C3EE 4A                                LSR
-0C3EF 4A                                LSR
-0C3F0 4A                                LSR
-0C3F1 29 03                             AND #%00000011
-0C3F3 4C FE C3                          JMP +setTileType
-0C3F6                               +wallHack:
-0C3F6                               
-0C3F6                               ;; It's a wall! Set color and CHR offset to 0, and tile type to 4.
-0C3F6 A9 00                         LDA #$00
-0C3F8 85 04                         STA temp+4
-0C3FA 85 07                         STA temp+7
-0C3FC A9 04                         LDA #$04
-0C3FE                           
-0C3FE                           +setTileType:    
-0C3FE 85 05                         STA temp+5
-0C400                               
-0C400                               ;; X = tile offset
-0C400 18                            CLC
-0C401 65 07                         ADC temp+7
-0C403 AA                            TAX
-0C404                               
-0C404                               ;; temp+6 = number of tiles
-0C404 A5 01                         LDA temp+1
-0C406 29 60                         AND #%01100000
-0C408 4A                            LSR
-0C409 4A                            LSR
-0C40A 4A                            LSR
-0C40B 4A                            LSR
-0C40C 4A                            LSR
-0C40D 85 06                         STA temp+6
-0C40F                               
-0C40F                               ;; Translate (x,y) to (y,x) for tile RAM
-0C40F A5 00                         LDA temp
-0C411 0A                            ASL
-0C412 0A                            ASL
-0C413 0A                            ASL
-0C414 0A                            ASL
-0C415 85 08                         STA temp+8
-0C417 A5 00                         LDA temp
-0C419 4A                            LSR
+0C307                               ;; Clear attribute table
+0C307 A9 23                         LDA #$23
+0C309 8D 06 20                      STA PPU_ADDR
+0C30C A9 C0                         LDA #$C0
+0C30E 8D 06 20                      STA PPU_ADDR
+0C311 A9 00                         LDA #$00
+0C313 A2 40                         LDX #$40
+0C315                               -
+0C315 8D 07 20                          STA PPU_DATA
+0C318 CA                                DEX
+0C319 D0 FA                         BNE -
+0C31B                               
+0C31B 60                            RTS0C31C                           .include "game/subroutine/ColorizeBall.asm"
+0C31C                           sub_ColorizeBall:
+0C31C                           
+0C31C                               ;; Get next ball color in cycle
+0C31C A5 26                         LDA ball_flags
+0C31E 4A                            LSR
+0C31F 4A                            LSR
+0C320 4A                            LSR
+0C321 4A                            LSR
+0C322 4A                            LSR
+0C323 C9 05                         CMP #$05
+0C325 D0 02                         BNE +
+0C327 A9 FF                             LDA #$FF
+0C329                               +
+0C329 18                            CLC
+0C32A 69 01                         ADC #$01
+0C32C AA                            TAX
+0C32D                           
+0C32D                               ;; Update color in ball flags
+0C32D 0A                            ASL
+0C32E 0A                            ASL
+0C32F 0A                            ASL
+0C330 0A                            ASL
+0C331 0A                            ASL
+0C332 85 00                         STA temp
+0C334 A5 26                         LDA ball_flags
+0C336 29 1F                         AND #%00011111
+0C338 05 00                         ORA temp
+0C33A 85 26                         STA ball_flags
+0C33C                           
+0C33C                               ;; Add new light color of ball to PPU palette
+0C33C A9 3F                         LDA #$3F
+0C33E 85 00                         STA temp
+0C340 A9 11                         LDA #$11
+0C342 85 01                         STA temp+1
+0C344 BD F3 C8                      LDA tbl_BallColorLight,x
+0C347 85 02                         STA temp+2
+0C349 20 8F C7                      JSR sub_WriteByteToPPUBuffer
+0C34C                               
+0C34C                               ;; Add new dark color of ball to PPU palette
+0C34C E6 01                         INC temp+1
+0C34E BD ED C8                      LDA tbl_BallColorDark,x
+0C351 85 02                         STA temp+2
+0C353 20 8F C7                      JSR sub_WriteByteToPPUBuffer
+0C356                               
+0C356 60                            RTS0C357                           .include "game/subroutine/DisableEnableRendering.asm"
+0C357                           sub_DisableRendering:
+0C357                               ;; Force NMI skip, disable rendering
+0C357 A9 01                     	LDA #$01
+0C359 85 14                     	STA force_skip_nmi
+0C35B 20 AB C2                      JSR sub_WaitForVBlank
+0C35E A5 12                         LDA soft_ppu_mask
+0C360 29 E7                         AND #%11100111
+0C362 8D 01 20                      STA PPU_MASK
+0C365 85 12                         STA soft_ppu_mask
+0C367 20 AB C2                      JSR sub_WaitForVBlank
+0C36A 60                            RTS
+0C36B                           
+0C36B                           sub_EnableRendering:
+0C36B                               ;; Enable rendering
+0C36B A9 00                     	LDA #$00
+0C36D 8D 05 20                  	STA PPU_SCROLL
+0C370 8D 05 20                  	STA PPU_SCROLL
+0C373 20 AB C2                      JSR sub_WaitForVBlank
+0C376 85 14                     	STA force_skip_nmi
+0C378 A5 12                         LDA soft_ppu_mask
+0C37A 09 18                         ORA #%00011000
+0C37C 85 12                         STA soft_ppu_mask
+0C37E 8D 01 20                      STA PPU_MASK
+0C381 20 AB C2                      JSR sub_WaitForVBlank
+0C384 60                            RTS
+0C385                           .include "game/subroutine/DrawIntroScreenLogoTile.asm"
+0C385                           sub_drawIntroScreenLogoTile:
+0C385 B9 D5 C7                      LDA tbl_IntroScreenLogoChr,y
+0C388 C9 60                         CMP #$60
+0C38A D0 08                         BNE +
+0C38C 20 89 C2                          JSR sub_GetRandomNumber
+0C38F 29 07                             AND #$07
+0C391 18                                CLC
+0C392 69 60                             ADC #$60
+0C394                               +
+0C394 8D 07 20                      STA PPU_DATA
+0C397 60                            RTS
+0C398                           .include "game/subroutine/JumpToPointer.asm"
+0C398                           sub_JumpToPointer:
+0C398 6C 0C 00                      JMP (pointer)
+0C39B                               ;RTS must be handled by the routine (pointer) jumps to
+0C39B                           .include "game/subroutine/LoadGameScreen.asm"
+0C39B                           sub_LoadGameScreen:
+0C39B                           
+0C39B                               ;; Clear the screen
+0C39B 20 B1 C2                      JSR sub_ClearScreen
+0C39E                               
+0C39E                               ;; Clear collision and attribute data
+0C39E A2 00                         LDX #$00
+0C3A0 8A                            TXA
+0C3A1                               -
+0C3A1 9D 00 04                          STA tile_type,x
+0C3A4 E8                                INX
+0C3A5 D0 FA                         BNE -
+0C3A7                               
+0C3A7                               ;; Get pointer from current level
+0C3A7 A6 2E                         LDX current_level
+0C3A9 BD 89 C9                      LDA tbl_lvl_layout_lo,x
+0C3AC 85 0C                         STA pointer
+0C3AE BD 84 C9                      LDA tbl_lvl_layout_hi,x
+0C3B1 85 0D                         STA pointer+1
+0C3B3                           
+0C3B3                               ;; Set up the loop
+0C3B3 A0 00                         LDY #$00
+0C3B5                           -drawRowColumnLoop:
+0C3B5                           
+0C3B5                               ;; Load (x,y) of current set of tiles
+0C3B5 B1 0C                         LDA (pointer),y
+0C3B7                           
+0C3B7                               ;; Check if level is done; if so, skip the loop
+0C3B7 C9 FF                         CMP #LEVEL_END
+0C3B9 D0 03                         BNE +
+0C3BB 4C 04 C5                          JMP +doneLevelLoad
+0C3BE                               +
+0C3BE                           
+0C3BE                               ;; Store (x,y) and number of tiles and tile data in temp variable
+0C3BE 85 00                         STA temp
+0C3C0 C8                            INY
+0C3C1 B1 0C                         LDA (pointer),y
+0C3C3 85 01                         STA temp+1
+0C3C5                               
+0C3C5                               ;; Convert (x,y) to PPU address
+0C3C5                               ;; temp+2 = PPU_hi = $20 + _y/4_ + carry from temp+3
+0C3C5 A5 00                         LDA temp
+0C3C7 29 0F                         AND #%00001111
+0C3C9 4A                            LSR
+0C3CA 4A                            LSR
+0C3CB 09 20                         ORA #$20
+0C3CD 85 02                         STA temp+2
+0C3CF                               
+0C3CF                               ;; temp+3 = PPU_lo = 2*x + $40*(y%4) + $C2
+0C3CF A5 00                         LDA temp
+0C3D1 29 F0                         AND #%11110000
+0C3D3 4A                            LSR
+0C3D4 4A                            LSR
+0C3D5 4A                            LSR
+0C3D6 85 03                         STA temp+3
+0C3D8                               
+0C3D8 A5 00                         LDA temp
+0C3DA 29 03                         AND #%00000011
+0C3DC AA                            TAX
+0C3DD BD 8E C9                      LDA tbl_Times64,x
+0C3E0 18                            CLC
+0C3E1 65 03                         ADC temp+3
+0C3E3 18                            CLC
+0C3E4 69 C2                         ADC #$C2
+0C3E6 85 03                         STA temp+3
+0C3E8                               
+0C3E8                               ;; Add carry to temp+2
+0C3E8 A5 02                         LDA temp+2
+0C3EA 69 00                         ADC #$00
+0C3EC 85 02                         STA temp+2
+0C3EE                           
+0C3EE                               ;; Convert tile data to loop count and tile type
+0C3EE                               ;; temp+4 = color
+0C3EE A5 01                         LDA temp+1
+0C3F0 29 07                         AND #%00000111
+0C3F2                               
+0C3F2                               ;; If color = 7, this is a wall
+0C3F2 C9 07                         CMP #%00000111
+0C3F4 F0 14                         BEQ +wallHack
+0C3F6 85 04                             STA temp+4
+0C3F8                                   
+0C3F8                                   ;; temp+7 = first or second set in CHR (add 5 to offset)
+0C3F8 29 01                             AND #%00000001
+0C3FA F0 02                             BEQ +
+0C3FC A9 05                                 LDA #$05
+0C3FE                                   +
+0C3FE 85 07                             STA temp+7
+0C400                                
+0C400                                   ;; temp+5 = tile type
+0C400 A5 01                             LDA temp+1
+0C402 4A                                LSR
+0C403 4A                                LSR
+0C404 4A                                LSR
+0C405 29 03                             AND #%00000011
+0C407 4C 10 C4                          JMP +setTileType
+0C40A                               +wallHack:
+0C40A                               
+0C40A                               ;; It's a wall! Set CHR offset to 0, and tile type to 4.
+0C40A A9 00                         LDA #$00
+0C40C 85 07                         STA temp+7
+0C40E A9 04                         LDA #$04
+0C410                           
+0C410                           +setTileType:    
+0C410 85 05                         STA temp+5
+0C412                               
+0C412                               ;; X = tile offset
+0C412 18                            CLC
+0C413 65 07                         ADC temp+7
+0C415 AA                            TAX
+0C416                               
+0C416                               ;; temp+6 = number of tiles
+0C416 A5 01                         LDA temp+1
+0C418 29 60                         AND #%01100000
 0C41A 4A                            LSR
 0C41B 4A                            LSR
 0C41C 4A                            LSR
-0C41D 05 08                         ORA temp+8
-0C41F 85 00                         STA temp
+0C41D 4A                            LSR
+0C41E 4A                            LSR
+0C41F 85 06                         STA temp+6
 0C421                               
-0C421                               ;; Set up loop
-0C421 98                            TYA
-0C422 48                            PHA
-0C423 A4 06                         LDY temp+6
-0C425                           
-0C425                               -drawTileLoop:
-0C425                                   ;; Write PPU address
-0C425 2C 02 20                          BIT PPU_STATUS
-0C428 A5 02                             LDA temp+2
-0C42A 8D 06 20                          STA PPU_ADDR
-0C42D A5 03                             LDA temp+3
-0C42F 8D 06 20                          STA PPU_ADDR
-0C432                                   
-0C432                                   ;; Write first and second tile
-0C432 BD C9 C8                          LDA tbl_GametileTopLeft,x
-0C435 8D 07 20                          STA PPU_DATA
-0C438 BD D3 C8                          LDA tbl_GametileTopRight,x
-0C43B 8D 07 20                          STA PPU_DATA
-0C43E                                   
-0C43E                                   ;; Update PPU address
-0C43E 2C 02 20                          BIT PPU_STATUS
-0C441 A5 02                             LDA temp+2
-0C443 8D 06 20                          STA PPU_ADDR
-0C446 A5 03                             LDA temp+3
-0C448 18                                CLC
-0C449 69 20                             ADC #$20
-0C44B 8D 06 20                          STA PPU_ADDR
-0C44E                                   
-0C44E                                   ;; Write third and fourth tile
-0C44E BD DD C8                          LDA tbl_GametileBottomLeft,x
-0C451 8D 07 20                          STA PPU_DATA
-0C454 BD E7 C8                          LDA tbl_GametileBottomRight,x
-0C457 8D 07 20                          STA PPU_DATA
-0C45A                           
-0C45A                                   ;; Update tile RAM (aka colission table)
-0C45A                                   ;; @TODO: further implement collision table
-0C45A 8A                                TXA
-0C45B 48                                PHA
-0C45C                                   
-0C45C A6 00                             LDX temp
-0C45E A9 01                             LDA #%00000001
-0C460 9D 00 04                          STA ADDR_SCREENTILERAM,x
-0C463                           
-0C463                                   ;; Check if shade 1 should be drawn
-0C463 E8                                INX
-0C464 BD 00 04                          LDA ADDR_SCREENTILERAM,x
-0C467 D0 05                             BNE +
-0C469 A9 00                                 LDA #$00
-0C46B 8D 07 20                              STA PPU_DATA
-0C46E                                   +
+0C421                               ;; Translate (x,y) to (y,x) for tile RAM
+0C421 A5 00                         LDA temp
+0C423 0A                            ASL
+0C424 0A                            ASL
+0C425 0A                            ASL
+0C426 0A                            ASL
+0C427 85 08                         STA temp+8
+0C429 A5 00                         LDA temp
+0C42B 4A                            LSR
+0C42C 4A                            LSR
+0C42D 4A                            LSR
+0C42E 4A                            LSR
+0C42F 05 08                         ORA temp+8
+0C431 85 00                         STA temp
+0C433                               
+0C433                               ;; Set up loop
+0C433 98                            TYA
+0C434 48                            PHA
+0C435 A4 06                         LDY temp+6
+0C437                           
+0C437                               -drawTileLoop:
+0C437                                   ;; Write PPU address
+0C437 2C 02 20                          BIT PPU_STATUS
+0C43A A5 02                             LDA temp+2
+0C43C 8D 06 20                          STA PPU_ADDR
+0C43F A5 03                             LDA temp+3
+0C441 8D 06 20                          STA PPU_ADDR
+0C444                                   
+0C444                                   ;; Write first and second tile
+0C444 BD 92 C9                          LDA tbl_GametileTopLeft,x
+0C447 8D 07 20                          STA PPU_DATA
+0C44A BD 9C C9                          LDA tbl_GametileTopRight,x
+0C44D 8D 07 20                          STA PPU_DATA
+0C450                                   
+0C450                                   ;; Update PPU address
+0C450 2C 02 20                          BIT PPU_STATUS
+0C453 A5 02                             LDA temp+2
+0C455 8D 06 20                          STA PPU_ADDR
+0C458 A5 03                             LDA temp+3
+0C45A 18                                CLC
+0C45B 69 20                             ADC #$20
+0C45D 8D 06 20                          STA PPU_ADDR
+0C460                                   
+0C460                                   ;; Write third and fourth tile
+0C460 BD A6 C9                          LDA tbl_GametileBottomLeft,x
+0C463 8D 07 20                          STA PPU_DATA
+0C466 BD B0 C9                          LDA tbl_GametileBottomRight,x
+0C469 8D 07 20                          STA PPU_DATA
+0C46C                           
+0C46C                                   ;; Push x-register to stack
+0C46C 8A                                TXA
+0C46D 48                                PHA
 0C46E                                   
-0C46E                                   ;; Check if shade 2 should be drawn
-0C46E A5 03                             LDA temp+3
-0C470 18                                CLC
-0C471 69 41                             ADC #$41
-0C473 85 03                             STA temp+3
-0C475 A5 02                             LDA temp+2
-0C477 69 00                             ADC #$00
-0C479 85 02                             STA temp+2
-0C47B                                   
-0C47B 8A                                TXA
-0C47C 18                                CLC
-0C47D 69 10                             ADC #$10
-0C47F AA                                TAX
-0C480                                   
-0C480 BD 00 04                          LDA ADDR_SCREENTILERAM,x
-0C483 D0 0F                             BNE +
-0C485 A5 02                                 LDA temp+2
-0C487 8D 06 20                              STA PPU_ADDR
-0C48A A5 03                                 LDA temp+3
-0C48C 8D 06 20                              STA PPU_ADDR
-0C48F A9 00                                 LDA #$00
-0C491 8D 07 20                              STA PPU_DATA
-0C494                                   +
-0C494                           
-0C494                                   ;; Check if shade 3 should be drawn
-0C494 E8                                INX
-0C495 E6 03                             INC temp+3
-0C497 BD 00 04                          LDA ADDR_SCREENTILERAM,x
-0C49A D0 0F                             BNE +
-0C49C A5 02                                 LDA temp+2
-0C49E 8D 06 20                              STA PPU_ADDR
-0C4A1 A5 03                                 LDA temp+3
-0C4A3 8D 06 20                              STA PPU_ADDR
-0C4A6 A9 00                                 LDA #$00
-0C4A8 8D 07 20                              STA PPU_DATA
-0C4AB                                   +
-0C4AB                                   
-0C4AB 68                                PLA
-0C4AC AA                                TAX
-0C4AD                                   
-0C4AD                                   ;; Reset pointer for next tile
-0C4AD A5 03                             LDA temp+3
-0C4AF 38                                SEC
-0C4B0 E9 42                             SBC #$42
-0C4B2 85 03                             STA temp+3
-0C4B4 A5 02                             LDA temp+2
-0C4B6 E9 00                             SBC #$00
-0C4B8 85 02                             STA temp+2
-0C4BA                                   
-0C4BA                                   ;; Draw next metatile in this loop (if any left)
-0C4BA 88                                DEY
-0C4BB 30 27                             BMI +doneDrawingRowColumn
-0C4BD                                   
-0C4BD                                   ;; Is it a row or a column?
-0C4BD A5 01                             LDA temp+1
-0C4BF 10 17                             BPL +
-0C4C1                                       ;; It is a column: move pointer down (+$40)
-0C4C1 A5 03                                 LDA temp+3
-0C4C3 18                                    CLC
-0C4C4 69 40                                 ADC #$40
-0C4C6 85 03                                 STA temp+3
-0C4C8 A5 02                                 LDA temp+2
-0C4CA 69 00                                 ADC #$00
-0C4CC 85 02                                 STA temp+2
-0C4CE                                       
-0C4CE                                       ;; Add 16 to temp (as a tile RAM pointer)
-0C4CE A5 00                                 LDA temp
-0C4D0 18                                    CLC
-0C4D1 69 10                                 ADC #$10
-0C4D3 85 00                                 STA temp
-0C4D5 4C E1 C4                              JMP +drawNextTile
-0C4D8                                   +
-0C4D8                                   
-0C4D8                                   ;; It is a row: move pointer right (+$02)
-0C4D8 A5 03                             LDA temp+3
-0C4DA 18                                CLC
-0C4DB 69 02                             ADC #$02
-0C4DD 85 03                             STA temp+3
-0C4DF                                   
-0C4DF                                   ;; Add 1 to temp (as a tile RAM pointer)
-0C4DF E6 00                             INC temp
-0C4E1                           
-0C4E1                               
-0C4E1                               ;; Next tile in the row/column
-0C4E1                                   +drawNextTile:
-0C4E1 4C 25 C4                      JMP -drawTileLoop
-0C4E4                           
-0C4E4                               ;; Go to the next set of tiles
-0C4E4                           +doneDrawingRowColumn:
-0C4E4 68                            PLA
-0C4E5 A8                            TAY
-0C4E6 C8                            INY
-0C4E7 4C A1 C3                      JMP -drawRowColumnLoop
-0C4EA                           
-0C4EA                           ;; Level loading is done
-0C4EA                           +doneLevelLoad:
-0C4EA                           
-0C4EA                               ;; Top game bound: set PPU_ADDR offset and draw 28 tiles
-0C4EA A9 20                         LDA #$20
-0C4EC 8D 06 20                      STA PPU_ADDR
-0C4EF A9 A2                         LDA #$A2
-0C4F1 8D 06 20                      STA PPU_ADDR
-0C4F4 A9 35                         LDA #$35
-0C4F6 20 29 C6                      JSR sub_Draw28HorizontalTiles
-0C4F9                           
-0C4F9                               ;; Bottom game bound: set PPU_ADDR offset and draw 28 tiles
-0C4F9 A9 23                         LDA #$23
-0C4FB 8D 06 20                      STA PPU_ADDR
-0C4FE A9 42                         LDA #$42
-0C500 8D 06 20                      STA PPU_ADDR
-0C503 A9 31                         LDA #$31
-0C505 20 29 C6                      JSR sub_Draw28HorizontalTiles
-0C508                           
-0C508                               ;; Left & right game bounds
-0C508                               ;; Set PPU_ADDR and store in temp variables
-0C508 A9 20                         LDA #$20
-0C50A 85 00                         STA temp
-0C50C 8D 06 20                      STA PPU_ADDR
-0C50F A9 C1                         LDA #$C1
-0C511 85 01                         STA temp+1
-0C513 8D 06 20                      STA PPU_ADDR
-0C516                               
-0C516                               ;; Set vertical bound tile and set up loop
-0C516 A0 33                         LDY #$33
-0C518 A2 14                         LDX #20
-0C51A                               -
-0C51A                                   ;; Show left tile
-0C51A 8C 07 20                          STY PPU_DATA
-0C51D                                   
-0C51D                                   ;; Set PPU_ADDR to right bound by adding 29 (tiles) to low byte
-0C51D A5 00                             LDA temp
-0C51F 8D 06 20                          STA PPU_ADDR
-0C522 A5 01                             LDA temp+1
-0C524 18                                CLC
-0C525 69 1D                             ADC #29
-0C527 85 01                             STA temp+1
-0C529 8D 06 20                          STA PPU_ADDR
-0C52C                           
-0C52C                                   ;; Show right tile
-0C52C 8C 07 20                          STY PPU_DATA
-0C52F                           
-0C52F                                   ;; Check if we're done yet
-0C52F CA                                DEX
-0C530 F0 18                             BEQ +drawCorners
-0C532                                   
-0C532                                   ;; Not done yet: add 3 to low byte for next left bound
-0C532 A5 01                             LDA temp+1
-0C534 18                                CLC
-0C535 69 03                             ADC #3
-0C537 85 01                             STA temp+1
-0C539                                   
-0C539                                   ;; Apply carry to high byte
-0C539 A5 00                             LDA temp
-0C53B 69 00                             ADC #$00
-0C53D 85 00                             STA temp
-0C53F                                   
-0C53F                                   ;; Store next PPU_ADDR to draw at
-0C53F 8D 06 20                          STA PPU_ADDR
-0C542 A5 01                             LDA temp+1
-0C544 8D 06 20                          STA PPU_ADDR
-0C547 4C 1A C5                      JMP -
-0C54A                               
-0C54A                               
-0C54A                           
-0C54A                           +drawCorners:
-0C54A                               ;; Draw the corners of the playing field
-0C54A A9 20                         LDA #$20
-0C54C 8D 06 20                      STA PPU_ADDR
-0C54F A9 A1                         LDA #$A1
-0C551 8D 06 20                      STA PPU_ADDR
-0C554 A9 39                         LDA #$39
-0C556 8D 07 20                      STA PPU_DATA
-0C559                           
-0C559 A9 20                         LDA #$20
-0C55B 8D 06 20                      STA PPU_ADDR
-0C55E A9 BE                         LDA #$BE
-0C560 8D 06 20                      STA PPU_ADDR
-0C563 A9 3A                         LDA #$3A
-0C565 8D 07 20                      STA PPU_DATA
-0C568                           
-0C568 A9 23                         LDA #$23
-0C56A 8D 06 20                      STA PPU_ADDR
-0C56D A9 41                         LDA #$41
-0C56F 8D 06 20                      STA PPU_ADDR
-0C572 A9 36                         LDA #$36
-0C574 8D 07 20                      STA PPU_DATA
-0C577                           
-0C577 A9 23                         LDA #$23
-0C579 8D 06 20                      STA PPU_ADDR
-0C57C A9 5E                         LDA #$5E
-0C57E 8D 06 20                      STA PPU_ADDR
-0C581 A9 34                         LDA #$34
-0C583 8D 07 20                      STA PPU_DATA
-0C586                           
-0C586                           
-0C586                               ;; Draw the hud labels
-0C586 A9 20                         LDA #$20
-0C588 8D 06 20                      STA PPU_ADDR
-0C58B A9 62                         LDA #$62
-0C58D 8D 06 20                      STA PPU_ADDR
-0C590 A2 00                         LDX #$00
-0C592                               -
-0C592 BD F1 C8                          LDA tbl_HudText,x
-0C595 8D 07 20                          STA PPU_DATA
-0C598 E8                                INX
-0C599 E0 1C                             CPX #28
-0C59B D0 F5                         BNE -
-0C59D                           
-0C59D                           
-0C59D                               ;; Draw the current score
-0C59D A9 20                         LDA #$20
-0C59F 8D 06 20                      STA PPU_ADDR
-0C5A2 A9 83                         LDA #$83
-0C5A4 8D 06 20                      STA PPU_ADDR
-0C5A7 A2 00                         LDX #$00
-0C5A9                               -
-0C5A9 B5 1C                             LDA ball_score,x
-0C5AB 18                                CLC
-0C5AC 69 01                             ADC #$01
-0C5AE 8D 07 20                          STA PPU_DATA
-0C5B1 E8                                INX
-0C5B2 E0 06                             CPX #$06
-0C5B4 D0 F3                         BNE -
-0C5B6                           
-0C5B6                           
-0C5B6                               ;; Draw the level number
-0C5B6                               ;; (with primitive HEX>DEC)
-0C5B6 A5 2E                         LDA current_level
-0C5B8 18                            CLC
-0C5B9 69 01                         ADC #$01
-0C5BB 85 01                         STA temp+1
-0C5BD                               
-0C5BD C9 14                         CMP #20
-0C5BF B0 13                         BCS +tempIsTwo
-0C5C1                               
-0C5C1 C9 0A                         CMP #10
-0C5C3 B0 05                         BCS +tempIsOne
-0C5C5                               
-0C5C5 A9 00                         LDA #$00
-0C5C7 4C DB C5                      JMP +setTemp
-0C5CA                               
-0C5CA                           +tempIsOne:
-0C5CA 38                            SEC
-0C5CB E9 0A                         SBC #10
-0C5CD 85 01                         STA temp+1
-0C5CF A9 01                         LDA #$01
-0C5D1 4C 61 C6                      JMP +
-0C5D4                               
-0C5D4                           +tempIsTwo:
-0C5D4 38                            SEC
-0C5D5 E9 14                         SBC #20
-0C5D7 85 01                         STA temp+1
-0C5D9 A9 02                         LDA #$02
-0C5DB                           
-0C5DB                           +setTemp:
-0C5DB 85 00                         STA temp
-0C5DD                               
-0C5DD E6 00                         INC temp
-0C5DF E6 01                         INC temp+1
-0C5E1                               
-0C5E1 A9 20                         LDA #$20
-0C5E3 8D 06 20                      STA PPU_ADDR
-0C5E6 A9 8B                         LDA #$8B
-0C5E8 8D 06 20                      STA PPU_ADDR
-0C5EB A5 00                         LDA temp
-0C5ED 8D 07 20                      STA PPU_DATA
-0C5F0 A5 01                         LDA temp+1
-0C5F2 8D 07 20                      STA PPU_DATA
+0C46E                                   ;; Update tile RAM (aka collision table)
+0C46E A6 05                             LDX temp+5
+0C470 BD BA C9                          LDA tbl_GameTileRamByte,x
+0C473 05 04                             ORA temp+4
+0C475 0A                                ASL
+0C476 09 01                             ORA #%00000001
+0C478 A6 00                             LDX temp
+0C47A 9D 00 04                          STA tile_type,x
+0C47D                           
+0C47D                                   ;; Check if shade 1 should be drawn
+0C47D E8                                INX
+0C47E BD 00 04                          LDA tile_type,x
+0C481 D0 05                             BNE +
+0C483 A9 00                                 LDA #$00
+0C485 8D 07 20                              STA PPU_DATA
+0C488                                   +
+0C488                                   
+0C488                                   ;; Check if shade 2 should be drawn
+0C488 A5 03                             LDA temp+3
+0C48A 18                                CLC
+0C48B 69 41                             ADC #$41
+0C48D 85 03                             STA temp+3
+0C48F A5 02                             LDA temp+2
+0C491 69 00                             ADC #$00
+0C493 85 02                             STA temp+2
+0C495                                   
+0C495 8A                                TXA
+0C496 18                                CLC
+0C497 69 10                             ADC #$10
+0C499 AA                                TAX
+0C49A                                   
+0C49A BD 00 04                          LDA tile_type,x
+0C49D D0 0F                             BNE +
+0C49F A5 02                                 LDA temp+2
+0C4A1 8D 06 20                              STA PPU_ADDR
+0C4A4 A5 03                                 LDA temp+3
+0C4A6 8D 06 20                              STA PPU_ADDR
+0C4A9 A9 00                                 LDA #$00
+0C4AB 8D 07 20                              STA PPU_DATA
+0C4AE                                   +
+0C4AE                           
+0C4AE                                   ;; Check if shade 3 should be drawn
+0C4AE E8                                INX
+0C4AF E6 03                             INC temp+3
+0C4B1 BD 00 04                          LDA tile_type,x
+0C4B4 D0 0F                             BNE +
+0C4B6 A5 02                                 LDA temp+2
+0C4B8 8D 06 20                              STA PPU_ADDR
+0C4BB A5 03                                 LDA temp+3
+0C4BD 8D 06 20                              STA PPU_ADDR
+0C4C0 A9 00                                 LDA #$00
+0C4C2 8D 07 20                              STA PPU_DATA
+0C4C5                                   +
+0C4C5                                   
+0C4C5                                   ;; Restore x-register from stack
+0C4C5 68                                PLA
+0C4C6 AA                                TAX
+0C4C7                                   
+0C4C7                                   ;; Reset pointer for next tile
+0C4C7 A5 03                             LDA temp+3
+0C4C9 38                                SEC
+0C4CA E9 42                             SBC #$42
+0C4CC 85 03                             STA temp+3
+0C4CE A5 02                             LDA temp+2
+0C4D0 E9 00                             SBC #$00
+0C4D2 85 02                             STA temp+2
+0C4D4                                   
+0C4D4                                   ;; Draw next metatile in this loop (if any left)
+0C4D4 88                                DEY
+0C4D5 30 27                             BMI +doneDrawingRowColumn
+0C4D7                                   
+0C4D7                                   ;; Is it a row or a column?
+0C4D7 A5 01                             LDA temp+1
+0C4D9 10 17                             BPL +
+0C4DB                                       ;; It is a column: move pointer down (+$40)
+0C4DB A5 03                                 LDA temp+3
+0C4DD 18                                    CLC
+0C4DE 69 40                                 ADC #$40
+0C4E0 85 03                                 STA temp+3
+0C4E2 A5 02                                 LDA temp+2
+0C4E4 69 00                                 ADC #$00
+0C4E6 85 02                                 STA temp+2
+0C4E8                                       
+0C4E8                                       ;; Add 16 to temp (as a tile RAM pointer)
+0C4E8 A5 00                                 LDA temp
+0C4EA 18                                    CLC
+0C4EB 69 10                                 ADC #$10
+0C4ED 85 00                                 STA temp
+0C4EF 4C FB C4                              JMP +drawNextTile
+0C4F2                                   +
+0C4F2                                   
+0C4F2                                   ;; It is a row: move pointer right (+$02)
+0C4F2 A5 03                             LDA temp+3
+0C4F4 18                                CLC
+0C4F5 69 02                             ADC #$02
+0C4F7 85 03                             STA temp+3
+0C4F9                                   
+0C4F9                                   ;; Add 1 to temp (as a tile RAM pointer)
+0C4F9 E6 00                             INC temp
+0C4FB                           
+0C4FB                               
+0C4FB                               ;; Next tile in the row/column
+0C4FB                                   +drawNextTile:
+0C4FB 4C 37 C4                      JMP -drawTileLoop
+0C4FE                           
+0C4FE                               ;; Go to the next set of tiles
+0C4FE                           +doneDrawingRowColumn:
+0C4FE 68                            PLA
+0C4FF A8                            TAY
+0C500 C8                            INY
+0C501 4C B5 C3                      JMP -drawRowColumnLoop
+0C504                           
+0C504                           ;; Level loading is done
+0C504                           +doneLevelLoad:
+0C504                           
+0C504                               ;; Top game bound: set PPU_ADDR offset and draw 28 tiles
+0C504 A9 20                         LDA #$20
+0C506 8D 06 20                      STA PPU_ADDR
+0C509 A9 A2                         LDA #$A2
+0C50B 8D 06 20                      STA PPU_ADDR
+0C50E A9 35                         LDA #$35
+0C510 20 F6 C6                      JSR sub_Draw28HorizontalTiles
+0C513                           
+0C513                               ;; Bottom game bound: set PPU_ADDR offset and draw 28 tiles
+0C513 A9 23                         LDA #$23
+0C515 8D 06 20                      STA PPU_ADDR
+0C518 A9 42                         LDA #$42
+0C51A 8D 06 20                      STA PPU_ADDR
+0C51D A9 31                         LDA #$31
+0C51F 20 F6 C6                      JSR sub_Draw28HorizontalTiles
+0C522                           
+0C522                               ;; Left & right game bounds
+0C522                               ;; Set PPU_ADDR and store in temp variables
+0C522 A9 20                         LDA #$20
+0C524 85 00                         STA temp
+0C526 8D 06 20                      STA PPU_ADDR
+0C529 A9 C1                         LDA #$C1
+0C52B 85 01                         STA temp+1
+0C52D 8D 06 20                      STA PPU_ADDR
+0C530                               
+0C530                               ;; Set vertical bound tile and set up loop
+0C530 A0 33                         LDY #$33
+0C532 A2 14                         LDX #20
+0C534                               -
+0C534                                   ;; Show left tile
+0C534 8C 07 20                          STY PPU_DATA
+0C537                                   
+0C537                                   ;; Set PPU_ADDR to right bound by adding 29 (tiles) to low byte
+0C537 A5 00                             LDA temp
+0C539 8D 06 20                          STA PPU_ADDR
+0C53C A5 01                             LDA temp+1
+0C53E 18                                CLC
+0C53F 69 1D                             ADC #29
+0C541 85 01                             STA temp+1
+0C543 8D 06 20                          STA PPU_ADDR
+0C546                           
+0C546                                   ;; Show right tile
+0C546 8C 07 20                          STY PPU_DATA
+0C549                           
+0C549                                   ;; Check if we're done yet
+0C549 CA                                DEX
+0C54A F0 18                             BEQ +drawCorners
+0C54C                                   
+0C54C                                   ;; Not done yet: add 3 to low byte for next left bound
+0C54C A5 01                             LDA temp+1
+0C54E 18                                CLC
+0C54F 69 03                             ADC #3
+0C551 85 01                             STA temp+1
+0C553                                   
+0C553                                   ;; Apply carry to high byte
+0C553 A5 00                             LDA temp
+0C555 69 00                             ADC #$00
+0C557 85 00                             STA temp
+0C559                                   
+0C559                                   ;; Store next PPU_ADDR to draw at
+0C559 8D 06 20                          STA PPU_ADDR
+0C55C A5 01                             LDA temp+1
+0C55E 8D 06 20                          STA PPU_ADDR
+0C561 4C 34 C5                      JMP -
+0C564                               
+0C564                               
+0C564                           
+0C564                           +drawCorners:
+0C564                               ;; Draw the corners of the playing field
+0C564 A9 20                         LDA #$20
+0C566 8D 06 20                      STA PPU_ADDR
+0C569 A9 A1                         LDA #$A1
+0C56B 8D 06 20                      STA PPU_ADDR
+0C56E A9 39                         LDA #$39
+0C570 8D 07 20                      STA PPU_DATA
+0C573                           
+0C573 A9 20                         LDA #$20
+0C575 8D 06 20                      STA PPU_ADDR
+0C578 A9 BE                         LDA #$BE
+0C57A 8D 06 20                      STA PPU_ADDR
+0C57D A9 3A                         LDA #$3A
+0C57F 8D 07 20                      STA PPU_DATA
+0C582                           
+0C582 A9 23                         LDA #$23
+0C584 8D 06 20                      STA PPU_ADDR
+0C587 A9 41                         LDA #$41
+0C589 8D 06 20                      STA PPU_ADDR
+0C58C A9 36                         LDA #$36
+0C58E 8D 07 20                      STA PPU_DATA
+0C591                           
+0C591 A9 23                         LDA #$23
+0C593 8D 06 20                      STA PPU_ADDR
+0C596 A9 5E                         LDA #$5E
+0C598 8D 06 20                      STA PPU_ADDR
+0C59B A9 34                         LDA #$34
+0C59D 8D 07 20                      STA PPU_DATA
+0C5A0                           
+0C5A0                           
+0C5A0                               ;; Draw the hud labels
+0C5A0 A9 20                         LDA #$20
+0C5A2 8D 06 20                      STA PPU_ADDR
+0C5A5 A9 62                         LDA #$62
+0C5A7 8D 06 20                      STA PPU_ADDR
+0C5AA A2 00                         LDX #$00
+0C5AC                               -
+0C5AC BD BF C9                          LDA tbl_HudText,x
+0C5AF 8D 07 20                          STA PPU_DATA
+0C5B2 E8                                INX
+0C5B3 E0 1C                             CPX #28
+0C5B5 D0 F5                         BNE -
+0C5B7                           
+0C5B7                           
+0C5B7                               ;; Draw the current score
+0C5B7 A9 20                         LDA #$20
+0C5B9 8D 06 20                      STA PPU_ADDR
+0C5BC A9 83                         LDA #$83
+0C5BE 8D 06 20                      STA PPU_ADDR
+0C5C1 A2 00                         LDX #$00
+0C5C3                               -
+0C5C3 B5 1C                             LDA ball_score,x
+0C5C5 18                                CLC
+0C5C6 69 01                             ADC #$01
+0C5C8 8D 07 20                          STA PPU_DATA
+0C5CB E8                                INX
+0C5CC E0 06                             CPX #$06
+0C5CE D0 F3                         BNE -
+0C5D0                           
+0C5D0                           
+0C5D0                               ;; Draw the level number
+0C5D0                               ;; (with primitive HEX>DEC)
+0C5D0 A5 2E                         LDA current_level
+0C5D2 18                            CLC
+0C5D3 69 01                         ADC #$01
+0C5D5 85 01                         STA temp+1
+0C5D7                               
+0C5D7 C9 14                         CMP #20
+0C5D9 B0 13                         BCS +tempIsTwo
+0C5DB                               
+0C5DB C9 0A                         CMP #10
+0C5DD B0 05                         BCS +tempIsOne
+0C5DF                               
+0C5DF A9 00                         LDA #$00
+0C5E1 4C F5 C5                      JMP +setTemp
+0C5E4                               
+0C5E4                           +tempIsOne:
+0C5E4 38                            SEC
+0C5E5 E9 0A                         SBC #10
+0C5E7 85 01                         STA temp+1
+0C5E9 A9 01                         LDA #$01
+0C5EB 4C 78 C6                      JMP +
+0C5EE                               
+0C5EE                           +tempIsTwo:
+0C5EE 38                            SEC
+0C5EF E9 14                         SBC #20
+0C5F1 85 01                         STA temp+1
+0C5F3 A9 02                         LDA #$02
 0C5F5                           
-0C5F5                           
-0C5F5                               ;; Draw lives (presumes lives to be capped at 9)
-0C5F5 A9 20                         LDA #$20
-0C5F7 8D 06 20                      STA PPU_ADDR
-0C5FA A9 92                         LDA #$92
-0C5FC 8D 06 20                      STA PPU_ADDR
-0C5FF A6 1B                         LDX ball_lives
-0C601 E8                            INX
-0C602 8E 07 20                      STX PPU_DATA
-0C605                           
-0C605                           
-0C605                               ;; Set and draw bonus
-0C605 A9 07                         LDA #$07
-0C607 85 22                         STA ball_bonus
-0C609 A9 09                         LDA #$09
-0C60B 85 23                         STA ball_bonus+1
-0C60D 85 24                         STA ball_bonus+2
-0C60F                               
+0C5F5                           +setTemp:
+0C5F5 85 00                         STA temp
+0C5F7                               
+0C5F7 E6 00                         INC temp
+0C5F9 E6 01                         INC temp+1
+0C5FB                               
+0C5FB A9 20                         LDA #$20
+0C5FD 8D 06 20                      STA PPU_ADDR
+0C600 A9 8B                         LDA #$8B
+0C602 8D 06 20                      STA PPU_ADDR
+0C605 A5 00                         LDA temp
+0C607 8D 07 20                      STA PPU_DATA
+0C60A A5 01                         LDA temp+1
+0C60C 8D 07 20                      STA PPU_DATA
+0C60F                           
+0C60F                           
+0C60F                               ;; Draw lives (presumes lives to be capped at 9)
 0C60F A9 20                         LDA #$20
 0C611 8D 06 20                      STA PPU_ADDR
-0C614 A9 9A                         LDA #$9A
+0C614 A9 92                         LDA #$92
 0C616 8D 06 20                      STA PPU_ADDR
-0C619 A2 00                         LDX #$00
-0C61B                               -
-0C61B B5 22                             LDA ball_bonus,x
-0C61D 18                                CLC
-0C61E 69 01                             ADC #$01
-0C620 8D 07 20                          STA PPU_DATA
-0C623 E8                                INX
-0C624 E0 03                             CPX #$03
-0C626 D0 F3                         BNE -
-0C628                           
-0C628                               ;;
-0C628                               ;; @TODO: apply tile attributes
-0C628                               ;;
-0C628                               
-0C628                               ;; Return
-0C628 60                            RTS
-0C629                           
-0C629                           
-0C629                           ;; Subroutine: draw 28 tiles in a row
-0C629                           sub_Draw28HorizontalTiles:
-0C629 A2 1C                         LDX #28
-0C62B                               -
-0C62B 8D 07 20                          STA PPU_DATA
-0C62E CA                                DEX
-0C62F D0 FA                         BNE -
-0C631 60                            RTS0C632                           .include "game/subroutine/LoadIntroScreen.asm"
-0C632                           sub_LoadIntroScreen:
-0C632                           
-0C632                               ;; Load intro palette
-0C632 2C 02 20                      BIT PPU_STATUS
-0C635 A9 3F                         LDA #$3F
-0C637 8D 06 20                      STA PPU_ADDR
-0C63A A9 00                         LDA #$00
-0C63C 8D 06 20                      STA PPU_ADDR
-0C63F A2 00                         LDX #$00
-0C641                               -
-0C641 BD E8 C6                          LDA tbl_IntroScreenPalette,x
-0C644 8D 07 20                          STA PPU_DATA
-0C647 E8                                INX
-0C648 E0 20                             CPX #$20
-0C64A D0 F5                         BNE -
-0C64C                               
-0C64C                               ;; Put ball in the middle
-0C64C A9 7C                         LDA #$7C
-0C64E 85 17                         STA ball_xpos_hi
-0C650 85 19                         STA ball_ypos_hi
+0C619 A6 1B                         LDX ball_lives
+0C61B E8                            INX
+0C61C 8E 07 20                      STX PPU_DATA
+0C61F                           
+0C61F                           
+0C61F                               ;; Set and draw bonus
+0C61F A9 07                         LDA #$07
+0C621 85 22                         STA ball_bonus
+0C623 A9 09                         LDA #$09
+0C625 85 23                         STA ball_bonus+1
+0C627 85 24                         STA ball_bonus+2
+0C629                               
+0C629 A9 20                         LDA #$20
+0C62B 8D 06 20                      STA PPU_ADDR
+0C62E A9 9A                         LDA #$9A
+0C630 8D 06 20                      STA PPU_ADDR
+0C633 A2 00                         LDX #$00
+0C635                               -
+0C635 B5 22                             LDA ball_bonus,x
+0C637 18                                CLC
+0C638 69 01                             ADC #$01
+0C63A 8D 07 20                          STA PPU_DATA
+0C63D E8                                INX
+0C63E E0 03                             CPX #$03
+0C640 D0 F3                         BNE -
+0C642                           
+0C642                           
+0C642                               ;; Set attribute data to RAM
+0C642                               
+0C642                               ;; Byte 0-7 of attribute ram should be #%10100000
+0C642 A2 00                         LDX #$00
+0C644 A9 A0                         LDA #$A0
+0C646                               -
+0C646 9D A0 04                          STA tile_attributes,x
+0C649 E8                                INX
+0C64A E0 08                             CPX #$08
+0C64C D0 F8                         BNE -
+0C64E                           
+0C64E                               ;; Byte 8-55 of attribute ram are filled with game subpal data
+0C64E                           
+0C64E                           -attributeLoop:
+0C64E                               ;; Reset current attribute value
+0C64E A9 00                         LDA #$00
+0C650 85 02                         STA temp+2
 0C652                           
-0C652                               ;; Clear the screen
-0C652 20 B1 C2                      JSR sub_ClearScreen
-0C655                           
-0C655                               ;; Set up intro screen draw loop
-0C655 A2 00                         LDX #$00
-0C657                           
-0C657                           -loop_IntroScreenData:
-0C657                           
-0C657                               ;; Get current byte from intro screen data
-0C657 BD 10 C7                      LDA tbl_IntroScreenData,x
-0C65A                           
-0C65A                               ;; If current byte is #$3F, we're done drawing.
-0C65A C9 3F                         CMP #$3F
-0C65C D0 03                         BNE +
-0C65E 4C AB C6                          JMP +goToEndIntroScreen
-0C661                               +
-0C661                           
-0C661                               ;; If highest bits are %11, draw a plain tile
-0C661 29 C0                         AND #%11000000
-0C663 D0 03                         BNE +
-0C665 4C 8B C6                          JMP +drawTile
-0C668                               +
-0C668                               
-0C668                               ;; If highest bits are %01, set the PPU address
-0C668                               ;; If not, draw two logo tiles
-0C668 C9 40                         CMP #%01000000
-0C66A D0 03                         BNE +drawLogo
-0C66C 4C 95 C6                          JMP +setPpuAddr
-0C66F                           
-0C66F                           +drawLogo:
-0C66F                               ;; Get bits 0-2 and store in a temp variable
-0C66F BD 10 C7                      LDA tbl_IntroScreenData,x
-0C672 29 07                         AND #%00000111
-0C674 85 00                         STA temp
-0C676                               
-0C676                               ;; Get bits 3-5, shift over to get a value from 0-7
-0C676 BD 10 C7                      LDA tbl_IntroScreenData,x
-0C679 4A                            LSR
-0C67A 4A                            LSR
-0C67B 4A                            LSR
-0C67C 29 07                         AND #%00000111
-0C67E                               
-0C67E                               ;; Draw the tile that corresponds with that value
-0C67E A8                            TAY
-0C67F 20 71 C3                      JSR sub_drawIntroScreenLogoTile
-0C682                               
-0C682                               ;; Do the same for the value stored in temp
-0C682 A4 00                         LDY temp
-0C684 20 71 C3                      JSR sub_drawIntroScreenLogoTile
-0C687                           
-0C687                               ;; Next byte please
-0C687 E8                            INX
-0C688 4C 57 C6                      JMP -loop_IntroScreenData
-0C68B                           
-0C68B                           +drawTile:
-0C68B                               ;; Just draw the tile value on screen
-0C68B BD 10 C7                      LDA tbl_IntroScreenData,x
-0C68E 8D 07 20                      STA PPU_DATA
-0C691                               
-0C691                               ;; Next byte please
-0C691 E8                            INX
-0C692 4C 57 C6                      JMP -loop_IntroScreenData
-0C695                           
-0C695                           
-0C695                           +setPpuAddr:
-0C695                               ;; Reset the PPU latch
-0C695 2C 02 20                      BIT PPU_STATUS
-0C698                               
-0C698                               ;; Sanitize and write the high byte of the PPU address
-0C698 BD 10 C7                      LDA tbl_IntroScreenData,x
-0C69B 29 3F                         AND #%00111111
-0C69D 8D 06 20                      STA PPU_ADDR
+0C652                               ;; Get first metatile in tile ram based on attribute index
+0C652                               ;; metatile = (attr-8)*2 +(16*(attr-8)/8))
+0C652 8A                            TXA
+0C653                           
+0C653 38                            SEC
+0C654 E9 08                         SBC #$08
+0C656 85 01                         STA temp+1      ; attr - 8 (temp1)
+0C658 0A                            ASL             ; * 2
+0C659 85 00                         STA temp        ; temp = temp1 * 2
+0C65B                           
+0C65B A5 01                         LDA temp+1      ; temp1
+0C65D 29 F8                         AND #%11111000  ; rounded down to 8's
+0C65F 0A                            ASL             ; * 2
+0C660 18                            CLC
+0C661 65 00                         ADC temp        ; + temp1 * 2
+0C663 85 00                         STA temp        ; first metatile
+0C665                           
+0C665                               ;; Store first metatile in y-register
+0C665 A8                            TAY
+0C666                           
+0C666                               ;; If X MOD 8 == 7, don't apply bottom right metatile
+0C666 8A                            TXA
+0C667 29 07                         AND #%00000111
+0C669 C9 07                         CMP #%00000111
+0C66B F0 0B                         BEQ +
+0C66D                           
+0C66D                               ;; If X >= $30, don't apply bottom right metatile
+0C66D E0 30                         CPX #$30
+0C66F B0 07                         BCS +
+0C671                               
+0C671                               ;; Add metatile1 subpalette to attribute value
+0C671 B9 00 04                      LDA tile_type,y
+0C674 29 0C                         AND #%00001100
+0C676 85 02                         STA temp+2
+0C678                               +
+0C678                           
+0C678                           
+0C678                               ;; Apply second metatile
+0C678 88                            DEY
+0C679                           
+0C679                               ;; If X MOD 8 == 0, don't apply bottom left metatile
+0C679 8A                            TXA
+0C67A 29 07                         AND #%00000111
+0C67C F0 10                         BEQ +
+0C67E                           
+0C67E                               ;; If X >= $30, don't apply bottom left metatile
+0C67E E0 30                         CPX #$30
+0C680 B0 0C                         BCS +
+0C682                           
+0C682                           
+0C682                           
+0C682                               ;; Add metatile2 subpalette to attribute value
+0C682 B9 00 04                      LDA tile_type,y
+0C685 29 0C                         AND #%00001100
+0C687 4A                            LSR
+0C688 4A                            LSR
+0C689 05 02                         ORA temp+2
+0C68B 4C 90 C6                      JMP ++
+0C68E                               +
+0C68E A5 02                         LDA temp+2
+0C690                               ++
+0C690 0A                            ASL
+0C691 0A                            ASL
+0C692 85 02                         STA temp+2
+0C694                           
+0C694                           
+0C694                               ;; Apply third metatile
+0C694 98                            TYA
+0C695 38                            SEC
+0C696 E9 0F                         SBC #$0F
+0C698 A8                            TAY
+0C699                           
+0C699                               ;; If X MOD 8 == 7, don't apply top right metatile
+0C699 8A                            TXA
+0C69A 29 07                         AND #%00000111
+0C69C C9 07                         CMP #%00000111
+0C69E F0 11                         BEQ +
 0C6A0                           
-0C6A0                               ;; Write the low byte of the PPU address
-0C6A0 E8                            INX
-0C6A1 BD 10 C7                      LDA tbl_IntroScreenData,x
-0C6A4 8D 06 20                      STA PPU_ADDR
-0C6A7                               
-0C6A7                               ;; PPU has been set up to draw tiles at the correct spot now.
-0C6A7                               
-0C6A7                               ;; Next byte please.
-0C6A7 E8                            INX
-0C6A8 4C 57 C6                      JMP -loop_IntroScreenData
-0C6AB                           
-0C6AB                           +goToEndIntroScreen:
-0C6AB                           
-0C6AB                               ;; To color the 1.LEVEL: line green, we need to update two
-0C6AB                               ;; values in the PPU attribute data.
-0C6AB 2C 02 20                      BIT PPU_STATUS
-0C6AE A9 23                         LDA #$23
-0C6B0 8D 06 20                      STA PPU_ADDR
-0C6B3 A9 CB                         LDA #$CB
-0C6B5 8D 06 20                      STA PPU_ADDR
-0C6B8 A9 0A                         LDA #%00001010
-0C6BA 8D 07 20                      STA PPU_DATA
-0C6BD 8D 07 20                      STA PPU_DATA
-0C6C0                           
-0C6C0 60                            RTS
-0C6C1                           
-0C6C1                           .include "game/subroutine/LoadWinScreen.asm"
-0C6C1                           sub_LoadWinScreen:
-0C6C1 60                            RTS
+0C6A0                               ;; If X < $10, don't apply top right metatile
+0C6A0 8A                            TXA
+0C6A1 29 F0                         AND #%11110000
+0C6A3 F0 0C                         BEQ +
+0C6A5                           
+0C6A5                               ;; Add metatile3 subpalette to attribute value
+0C6A5 B9 00 04                      LDA tile_type,y
+0C6A8 29 0C                         AND #%00001100
+0C6AA 4A                            LSR
+0C6AB 4A                            LSR
+0C6AC 05 02                         ORA temp+2
+0C6AE 4C B3 C6                      JMP ++
+0C6B1                               +
+0C6B1 A5 02                         LDA temp+2
+0C6B3                               ++
+0C6B3 0A                            ASL
+0C6B4 0A                            ASL
+0C6B5 85 02                         STA temp+2
+0C6B7                           
+0C6B7                           
+0C6B7                               ;; Apply fourth metatile
+0C6B7 88                            DEY
+0C6B8                           
+0C6B8                               ;; If X MOD 8 == 0, don't apply top left metatile
+0C6B8 8A                            TXA
+0C6B9 29 07                         AND #%00000111
+0C6BB F0 11                         BEQ +
+0C6BD                           
+0C6BD                               ;; If X < $10, don't apply top left metatile
+0C6BD 8A                            TXA
+0C6BE 29 F0                         AND #%11110000
+0C6C0 F0 0C                         BEQ +
 0C6C2                           
-0C6C2                           .include "game/subroutine/WriteByteToPPU.asm"
-0C6C2                           sub_WriteByteToPPUBuffer:
-0C6C2                           
-0C6C2                               ;; Prevent updating until full 3-byte buffer is filled,
-0C6C2                               ;; so that graphics won't glitch out if NMI happens during
-0C6C2                               ;; updating the buffer
-0C6C2 A9 00                         LDA #$00
-0C6C4 85 29                         STA ppu_buffer_update
-0C6C6                           
-0C6C6                               ;; Check if buffer full; if so, wait a frame and force update
-0C6C6 A4 2A                         LDY ppu_buffer_pointer
-0C6C8 C0 30                         CPY #$30
-0C6CA D0 05                         BNE +
-0C6CC E6 29                             INC ppu_buffer_update
-0C6CE 20 AB C2                          JSR sub_WaitForVBlank
-0C6D1                               +
-0C6D1                           
-0C6D1                               ;; Add ppu_addr high byte to buffer
-0C6D1 A5 00                         LDA temp
-0C6D3 99 00 03                      STA ppu_buffer,y
-0C6D6                           
-0C6D6                               ;; Add ppu_addr low byte to buffer
-0C6D6 C8                            INY
-0C6D7 A5 01                         LDA temp+1
-0C6D9 99 00 03                      STA ppu_buffer,y
-0C6DC                           
-0C6DC                               ;; Add ppu_data to buffer
-0C6DC C8                            INY
-0C6DD A5 02                         LDA temp+2
-0C6DF 99 00 03                      STA ppu_buffer,y
-0C6E2                           
-0C6E2                               ;; Update buffer pointer
-0C6E2 C8                            INY
-0C6E3 84 2A                         STY ppu_buffer_pointer
-0C6E5                           
-0C6E5                               ;; Tell NMI to update next round
-0C6E5 E6 29                         INC ppu_buffer_update
-0C6E7                           
-0C6E7                               ;; Return
-0C6E7 60                            RTS0C6E8                           
-0C6E8                           
-0C6E8                           ;; LUTs
-0C6E8                           .include "game/include/tables.asm"
-0C6E8                           
-0C6E8                           ;; Intro screen palette
-0C6E8                           tbl_IntroScreenPalette:
-0C6E8 0F 2C 12 30                   .db #$0F, #$2C, #$12, #$30
-0C6EC 0F 16 38 30                   .db #$0F, #$16, #$38, #$30
-0C6F0 0F 29 14 30                   .db #$0F, #$29, #$14, #$30
-0C6F4 0F 00 10 30                   .db #$0F, #$00, #$10, #$30
-0C6F8                           
-0C6F8 0F 2C 12 30                   .db #$0F, #$2C, #$12, #$30
-0C6FC 0F 16 38 30                   .db #$0F, #$16, #$38, #$30
-0C700 0F 29 14 30                   .db #$0F, #$29, #$14, #$30
-0C704 0F 00 10 30                   .db #$0F, #$00, #$10, #$30
-0C708                           
-0C708                           
-0C708                           ;; Intro: mapping logo index to chr tile
-0C708                           tbl_IntroScreenLogoChr:
-0C708 00 31 33 60 30 32 34 36       .db #$00, #$31, #$33, #$60, #$30, #$32, #$34, #$36
-0C710                           
-0C710                           
-0C710                           ;; Intro screen data
-0C710                           tbl_IntroScreenData:
-0C710                           
-0C710                               ;; Set PPU address $20AC and draw
-0C710 60 AC                         .db #$60, #$AC
-0C712 02 26 16 0F 20 0F 16 27       .db #_1, #_DOT, #_L, #_E, #_V, #_E, #_L, #_COLON
-0C71A                           
-0C71A                               ;; Set PPU address $20CF and draw
-0C71A 60 CF                         .db #$60, #$CF
-0C71C 01 02                         .db #_0, #_1
-0C71E                               
-0C71E                               ;; Set PPU address $2122 and draw
-0C71E 61 22                         .db #$61, #$22
-0C720 0E 0F 1D 13 11 18 25          .db #_D, #_E, #_S, #_I, #_G, #_N, #_COMMA
-0C727 1D 19 1F 18 0E 25             .db #_S, #_O, #_U, #_N, #_D, #_COMMA
-0C72D 11 1C 0B 1A 12 13 0D 1D       .db #_G, #_R, #_A, #_P, #_H, #_I, #_C, #_S
-0C735 00 0B 18 0E 00                .db #_SPACE, #_A, #_N, #_D, #_SPACE
-0C73A                               
-0C73A                               ;; Set PPU address $2147 and draw
-0C73A 61 47                         .db #$61, #$47
-0C73C 1A 1C 19 11 1C 0B 17          .db #_P, #_R, #_O, #_G, #_R, #_A, #_M
-0C743 00 0C 23 00                   .db #_SPACE, #_B, #_Y, #_SPACE
-0C747 19 16 13 20 0F 1C             .db #_O, #_L, #_I, #_V, #_E, #_R
-0C74D 00 15 13 1C 21 0B             .db #_SPACE, #_K, #_I, #_R, #_W, #_A
-0C753                               
-0C753                               ;; Set PPU address $218B and draw
-0C753 61 8B                         .db #$61, #$8B
-0C755 28 00 02 0A 09 08             .db #_COPY, #_SPACE, #_1, #_9, #_8, #_7
-0C75B 25 02 0A 09 09                .db #_COMMA, #_1, #_9, #_8, #_8
-0C760                               
-0C760                               ;; Set PPU address $21E6 and draw
-0C760 61 E6                         .db #$61, #$E6
-0C762 18 0F 1D 00 1A 19 1C 1E       .db #_N, #_E, #_S, #_SPACE, #_P, #_O, #_R, #_T
-0C76A 00 0C 23 00                   .db #_SPACE, #_B, #_Y, #_SPACE
-0C76E 15 0F 20 13 18 09 02          .db #_K, #_E, #_V, #_I, #_N, #_8, #_1
-0C775                               
-0C775                               ;; Set PPU address $222D and draw
-0C775 62 2D                         .db #$62, #$2D
-0C777 28 00 03 01 03 04             .db #_COPY, #_SPACE, #_2, #_0, #_2, #_3
-0C77D                               
-0C77D                               ;; Set PPU address $2281
-0C77D 62 81                         .db #$62, #$81
-0C77F                               
-0C77F                               ;; Draw the Crillion logo
-0C77F E1 C8 E1 E8                   .db #%11100001, #%11001000, #%11100001, #%11101000
-0C783 C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
-0C787 C0 C2 C4 C9                   .db #%11000000, #%11000010, #%11000100, #%11001001
-0C78B E8 E1 CD C0                   .db #%11101000, #%11100001, #%11001101, #%11000000
-0C78F                               
-0C78F D0 C0 D3 D0                   .db #%11010000, #%11000000, #%11010011, #%11010000
-0C793 C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
-0C797 C0 C2 C2 DB                   .db #%11000000, #%11000010, #%11000010, #%11011011
-0C79B D0 D0 C2 C0                   .db #%11010000, #%11010000, #%11000010, #%11000000
-0C79F                               
-0C79F D0 C0 D1 CD                   .db #%11010000, #%11000000, #%11010001, #%11001101
-0C7A3 C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
-0C7A7 C0 C2 C2 DB                   .db #%11000000, #%11000010, #%11000010, #%11011011
-0C7AB D0 D0 C2 C0                   .db #%11010000, #%11010000, #%11000010, #%11000000
+0C6C2                               ;; Add metatile4 subpalette to attribute value
+0C6C2 B9 00 04                      LDA tile_type,y
+0C6C5 29 0C                         AND #%00001100
+0C6C7 4A                            LSR
+0C6C8 4A                            LSR
+0C6C9 05 02                         ORA temp+2
+0C6CB 4C D0 C6                      JMP ++
+0C6CE                               +
+0C6CE A5 02                         LDA temp+2
+0C6D0                               ++
+0C6D0 9D A0 04                      STA tile_attributes,x
+0C6D3                           
+0C6D3                               ;; Check the next attribute, if any left
+0C6D3 E8                            INX
+0C6D4 E0 38                         CPX #$38
+0C6D6 F0 03                         BEQ +
+0C6D8 4C 4E C6                          JMP -attributeLoop
+0C6DB                               +
+0C6DB                           
+0C6DB                           
+0C6DB                               ;; Stream RAM to PPU
+0C6DB 2C 02 20                      BIT PPU_STATUS
+0C6DE A9 23                         LDA #$23
+0C6E0 8D 06 20                      STA PPU_ADDR
+0C6E3 A9 C0                         LDA #$C0
+0C6E5 8D 06 20                      STA PPU_ADDR
+0C6E8 A2 00                         LDX #$00
+0C6EA                               -
+0C6EA BD A0 04                          LDA tile_attributes,x
+0C6ED 8D 07 20                          STA PPU_DATA
+0C6F0 E8                                INX
+0C6F1 E0 40                             CPX #$40
+0C6F3 D0 F5                         BNE -
+0C6F5                               
+0C6F5                               ;; Return
+0C6F5 60                            RTS
+0C6F6                           
+0C6F6                           
+0C6F6                           ;; Subroutine: draw 28 tiles in a row
+0C6F6                           sub_Draw28HorizontalTiles:
+0C6F6 A2 1C                         LDX #28
+0C6F8                               -
+0C6F8 8D 07 20                          STA PPU_DATA
+0C6FB CA                                DEX
+0C6FC D0 FA                         BNE -
+0C6FE 60                            RTS0C6FF                           .include "game/subroutine/LoadIntroScreen.asm"
+0C6FF                           sub_LoadIntroScreen:
+0C6FF                           
+0C6FF                               ;; Load intro palette
+0C6FF 2C 02 20                      BIT PPU_STATUS
+0C702 A9 3F                         LDA #$3F
+0C704 8D 06 20                      STA PPU_ADDR
+0C707 A9 00                         LDA #$00
+0C709 8D 06 20                      STA PPU_ADDR
+0C70C A2 00                         LDX #$00
+0C70E                               -
+0C70E BD B5 C7                          LDA tbl_IntroScreenPalette,x
+0C711 8D 07 20                          STA PPU_DATA
+0C714 E8                                INX
+0C715 E0 20                             CPX #$20
+0C717 D0 F5                         BNE -
+0C719                               
+0C719                               ;; Put ball in the middle
+0C719 A9 7C                         LDA #$7C
+0C71B 85 17                         STA ball_xpos_hi
+0C71D 85 19                         STA ball_ypos_hi
+0C71F                           
+0C71F                               ;; Clear the screen
+0C71F 20 B1 C2                      JSR sub_ClearScreen
+0C722                           
+0C722                               ;; Set up intro screen draw loop
+0C722 A2 00                         LDX #$00
+0C724                           
+0C724                           -loop_IntroScreenData:
+0C724                           
+0C724                               ;; Get current byte from intro screen data
+0C724 BD DD C7                      LDA tbl_IntroScreenData,x
+0C727                           
+0C727                               ;; If current byte is #$3F, we're done drawing.
+0C727 C9 3F                         CMP #$3F
+0C729 D0 03                         BNE +
+0C72B 4C 78 C7                          JMP +goToEndIntroScreen
+0C72E                               +
+0C72E                           
+0C72E                               ;; If highest bits are %11, draw a plain tile
+0C72E 29 C0                         AND #%11000000
+0C730 D0 03                         BNE +
+0C732 4C 58 C7                          JMP +drawTile
+0C735                               +
+0C735                               
+0C735                               ;; If highest bits are %01, set the PPU address
+0C735                               ;; If not, draw two logo tiles
+0C735 C9 40                         CMP #%01000000
+0C737 D0 03                         BNE +drawLogo
+0C739 4C 62 C7                          JMP +setPpuAddr
+0C73C                           
+0C73C                           +drawLogo:
+0C73C                               ;; Get bits 0-2 and store in a temp variable
+0C73C BD DD C7                      LDA tbl_IntroScreenData,x
+0C73F 29 07                         AND #%00000111
+0C741 85 00                         STA temp
+0C743                               
+0C743                               ;; Get bits 3-5, shift over to get a value from 0-7
+0C743 BD DD C7                      LDA tbl_IntroScreenData,x
+0C746 4A                            LSR
+0C747 4A                            LSR
+0C748 4A                            LSR
+0C749 29 07                         AND #%00000111
+0C74B                               
+0C74B                               ;; Draw the tile that corresponds with that value
+0C74B A8                            TAY
+0C74C 20 85 C3                      JSR sub_drawIntroScreenLogoTile
+0C74F                               
+0C74F                               ;; Do the same for the value stored in temp
+0C74F A4 00                         LDY temp
+0C751 20 85 C3                      JSR sub_drawIntroScreenLogoTile
+0C754                           
+0C754                               ;; Next byte please
+0C754 E8                            INX
+0C755 4C 24 C7                      JMP -loop_IntroScreenData
+0C758                           
+0C758                           +drawTile:
+0C758                               ;; Just draw the tile value on screen
+0C758 BD DD C7                      LDA tbl_IntroScreenData,x
+0C75B 8D 07 20                      STA PPU_DATA
+0C75E                               
+0C75E                               ;; Next byte please
+0C75E E8                            INX
+0C75F 4C 24 C7                      JMP -loop_IntroScreenData
+0C762                           
+0C762                           
+0C762                           +setPpuAddr:
+0C762                               ;; Reset the PPU latch
+0C762 2C 02 20                      BIT PPU_STATUS
+0C765                               
+0C765                               ;; Sanitize and write the high byte of the PPU address
+0C765 BD DD C7                      LDA tbl_IntroScreenData,x
+0C768 29 3F                         AND #%00111111
+0C76A 8D 06 20                      STA PPU_ADDR
+0C76D                           
+0C76D                               ;; Write the low byte of the PPU address
+0C76D E8                            INX
+0C76E BD DD C7                      LDA tbl_IntroScreenData,x
+0C771 8D 06 20                      STA PPU_ADDR
+0C774                               
+0C774                               ;; PPU has been set up to draw tiles at the correct spot now.
+0C774                               
+0C774                               ;; Next byte please.
+0C774 E8                            INX
+0C775 4C 24 C7                      JMP -loop_IntroScreenData
+0C778                           
+0C778                           +goToEndIntroScreen:
+0C778                           
+0C778                               ;; To color the 1.LEVEL: line green, we need to update two
+0C778                               ;; values in the PPU attribute data.
+0C778 2C 02 20                      BIT PPU_STATUS
+0C77B A9 23                         LDA #$23
+0C77D 8D 06 20                      STA PPU_ADDR
+0C780 A9 CB                         LDA #$CB
+0C782 8D 06 20                      STA PPU_ADDR
+0C785 A9 0A                         LDA #%00001010
+0C787 8D 07 20                      STA PPU_DATA
+0C78A 8D 07 20                      STA PPU_DATA
+0C78D                           
+0C78D 60                            RTS
+0C78E                           
+0C78E                           .include "game/subroutine/LoadWinScreen.asm"
+0C78E                           sub_LoadWinScreen:
+0C78E 60                            RTS
+0C78F                           
+0C78F                           .include "game/subroutine/WriteByteToPPU.asm"
+0C78F                           sub_WriteByteToPPUBuffer:
+0C78F                           
+0C78F                               ;; Prevent updating until full 3-byte buffer is filled,
+0C78F                               ;; so that graphics won't glitch out if NMI happens during
+0C78F                               ;; updating the buffer
+0C78F A9 00                         LDA #$00
+0C791 85 29                         STA ppu_buffer_update
+0C793                           
+0C793                               ;; Check if buffer full; if so, wait a frame and force update
+0C793 A4 2A                         LDY ppu_buffer_pointer
+0C795 C0 30                         CPY #$30
+0C797 D0 05                         BNE +
+0C799 E6 29                             INC ppu_buffer_update
+0C79B 20 AB C2                          JSR sub_WaitForVBlank
+0C79E                               +
+0C79E                           
+0C79E                               ;; Add ppu_addr high byte to buffer
+0C79E A5 00                         LDA temp
+0C7A0 99 00 03                      STA ppu_buffer,y
+0C7A3                           
+0C7A3                               ;; Add ppu_addr low byte to buffer
+0C7A3 C8                            INY
+0C7A4 A5 01                         LDA temp+1
+0C7A6 99 00 03                      STA ppu_buffer,y
+0C7A9                           
+0C7A9                               ;; Add ppu_data to buffer
+0C7A9 C8                            INY
+0C7AA A5 02                         LDA temp+2
+0C7AC 99 00 03                      STA ppu_buffer,y
 0C7AF                           
-0C7AF D0 C0 D0 C2                   .db #%11010000, #%11000000, #%11010000, #%11000010
-0C7B3 C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
-0C7B7 C0 C2 C2 DB                   .db #%11000000, #%11000010, #%11000010, #%11011011
-0C7BB D0 D0 C2 C0                   .db #%11010000, #%11010000, #%11000010, #%11000000
-0C7BF                               
-0C7BF D0 C0 D0 C2                   .db #%11010000, #%11000000, #%11010000, #%11000010
-0C7C3 C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
-0C7C7 C0 C2 C2 DB                   .db #%11000000, #%11000010, #%11000010, #%11011011
-0C7CB D0 D0 C2 C0                   .db #%11010000, #%11010000, #%11000010, #%11000000
-0C7CF                           
-0C7CF F9 C8 D0 C2                   .db #%11111001, #%11001000, #%11010000, #%11000010
-0C7D3 C2 C7 C9 C7                   .db #%11000010, #%11000111, #%11001001, #%11000111
-0C7D7 C9 C2 C7 C9                   .db #%11001001, #%11000010, #%11000111, #%11001001
-0C7DB F0 D0 C2                      .db #%11110000, #%11010000, #%11000010
-0C7DE                           
-0C7DE                               ;; End of intro
-0C7DE 3F                            .db #$3F
-0C7DF                           
-0C7DF                           
-0C7DF                           ;; test animation table
-0C7DF                           .include "game/test/show_animation_table.asm"
-0C7DF                           ;; CHR tile-id's per slide of explosion
-0C7DF                           explosion_slide0:
-0C7DF 00 00 00                      .db #$00, #$00, #$00
-0C7E2 2C 2D 2E                      .db #$2C, #$2D, #$2E
-0C7E5 3C 3D 3E                      .db #$3C, #$3D, #$3E
-0C7E8                           
-0C7E8                           explosion_slide1:
-0C7E8 00 00 00                      .db #$00, #$00, #$00
-0C7EB 29 2A 2B                      .db #$29, #$2A, #$2B
-0C7EE 39 3A 3B                      .db #$39, #$3A, #$3B
-0C7F1                           
-0C7F1                           explosion_slide2:
-0C7F1 16 00 00                      .db #$16, #$00, #$00
-0C7F4 26 27 28                      .db #$26, #$27, #$28
-0C7F7 36 37 38                      .db #$36, #$37, #$38
-0C7FA                           
-0C7FA                           explosion_slide3:
-0C7FA 00 14 15                      .db #$00, #$14, #$15
-0C7FD 23 24 25                      .db #$23, #$24, #$25
-0C800 33 34 35                      .db #$33, #$34, #$35
-0C803                           
-0C803                           explosion_slide4:
-0C803 10 11 12                      .db #$10, #$11, #$12
-0C806 20 21 22                      .db #$20, #$21, #$22
-0C809 30 31 32                      .db #$30, #$31, #$32
-0C80C                           
-0C80C                           ;; High and low bytes of animation slides
-0C80C                           explosion_anim_hi:
-0C80C C7                            .db >#explosion_slide0
-0C80D C7                            .db >#explosion_slide1
-0C80E C7                            .db >#explosion_slide2
-0C80F C7                            .db >#explosion_slide3
-0C810 C8                            .db >#explosion_slide4
-0C811 C8                            .db >#explosion_slide4
-0C812 C7                            .db >#explosion_slide3
-0C813 C7                            .db >#explosion_slide2
-0C814 C7                            .db >#explosion_slide1
-0C815 C7                            .db >#explosion_slide0
-0C816                           
-0C816                           explosion_anim_lo:
-0C816 DF                            .db <#explosion_slide0
-0C817 E8                            .db <#explosion_slide1
-0C818 F1                            .db <#explosion_slide2
-0C819 FA                            .db <#explosion_slide3
-0C81A 03                            .db <#explosion_slide4
-0C81B 03                            .db <#explosion_slide4
-0C81C FA                            .db <#explosion_slide3
-0C81D F1                            .db <#explosion_slide2
-0C81E E8                            .db <#explosion_slide1
-0C81F DF                            .db <#explosion_slide0
-0C820                           
-0C820                           
-0C820                           
-0C820                           ;; Ball palette color cycle
-0C820                           tbl_BallColorDark:
-0C820 12 14 16 27 28 19             .db #$12, #$14, #$16, #$27, #$28, #$19
-0C826                            
-0C826                           tbl_BallColorLight:
-0C826 2C 24 25 37 20 2B             .db #$2C, #$24, #$25, #$37, #$20, #$2B
-0C82C                           
-0C82C                               
-0C82C                           ;; Screen mode drawing routine addresses
-0C82C                           tbl_LoadScreenHi:
-0C82C C6 C3 C6                      .db >#sub_LoadIntroScreen, >#sub_LoadGameScreen, >#sub_LoadWinScreen
-0C82F                           
-0C82F                           tbl_LoadScreenLo:
-0C82F 32 87 C1                      .db <#sub_LoadIntroScreen, <#sub_LoadGameScreen, <#sub_LoadWinScreen
-0C832                           
-0C832                           
-0C832                           ;; Test level data
-0C832                           .include "game/test/level_data.asm"
-0C832                           lvl_layout_1:
-0C832 61 21                         .db #$61, #%00100001
-0C834 52 61                         .db #$52, #%01100001
-0C836 43 62                         .db #$43, #%01100010
-0C838 83 02                         .db #$83, #%00000010
-0C83A 93 12                         .db #$93, #%00010010
-0C83C 34 78                         .db #$34, #%01111000
-0C83E 74 78                         .db #$74, #%01111000
-0C840 35 78                         .db #$35, #%01111000
-0C842 75 78                         .db #$75, #%01111000
-0C844 46 62                         .db #$46, #%01100010
-0C846 86 22                         .db #$86, #%00100010
-0C848 57 61                         .db #$57, #%01100001
-0C84A 68 21                         .db #$68, #%00100001
-0C84C FF                            .db #LEVEL_END
-0C84D                           
-0C84D                           lvl_layout_2:
-0C84D C0 09                         .db #$C0, #%00001001
-0C84F 11 12                         .db #$11, #%00010010
-0C851 21 61                         .db #$21, #%01100001
-0C853 61 61                         .db #$61, #%01100001
-0C855 A1 41                         .db #$A1, #%01000001
-0C857 12 67                         .db #$12, #%01100111
-0C859 52 67                         .db #$52, #%01100111
-0C85B 92 67                         .db #$92, #%01100111
-0C85D C3 0A                         .db #$C3, #%00001010
-0C85F 14 13                         .db #$14, #%00010011
-0C861 24 62                         .db #$24, #%01100010
-0C863 64 62                         .db #$64, #%01100010
-0C865 A4 42                         .db #$A4, #%01000010
-0C867 15 67                         .db #$15, #%01100111
-0C869 55 67                         .db #$55, #%01100111
-0C86B 95 67                         .db #$95, #%01100111
-0C86D 17 11                         .db #$17, #%00010001
-0C86F 27 63                         .db #$27, #%01100011
-0C871 67 63                         .db #$67, #%01100011
-0C873 A7 43                         .db #$A7, #%01000011
-0C875 38 78                         .db #$38, #%01111000
-0C877 98 58                         .db #$98, #%01011000
-0C879 18 27                         .db #$18, #%00100111
-0C87B 48 27                         .db #$48, #%00100111
-0C87D 78 27                         .db #$78, #%00100111
-0C87F C8 07                         .db #$C8, #%00000111
-0C881 FF                            .db #LEVEL_END
-0C882                           
-0C882                           lvl_layout_3:
-0C882                               ; one row of death blocks
-0C882 00 78 40 78 80 78 C0 38       .db #$00, #%01111000, #$40, #%01111000, #$80, #%01111000, #$C0, #%00111000
-0C88A                           
-0C88A                               ; four sets of color blocks at the 2nd grid column
-0C88A 10 A0 13 E0 16 C0 19 00       .db #$10, #%10100000, #$13, #%11100000, #$16, #%11000000, #$19, #%00000000
-0C892                           
-0C892                               ; three sets of color blocks at the 4th grid column
-0C892 30 C0 34 C0 38 A0             .db #$30, #%11000000, #$34, #%11000000, #$38, #%10100000
-0C898                           
-0C898                               ; also for grid columns 6, 8, 10, 12 and 14
-0C898 50 E0 55 00 57 C0             .db #$50, #%11100000, #$55, #%00000000, #$57, #%11000000
-0C89E 70 E0 74 00 76 E0             .db #$70, #%11100000, #$74, #%00000000, #$76, #%11100000
-0C8A4 90 E0 95 00 97 C0             .db #$90, #%11100000, #$95, #%00000000, #$97, #%11000000
-0C8AA B0 C0 B4 C0 B8 A0             .db #$B0, #%11000000, #$B4, #%11000000, #$B8, #%10100000
-0C8B0 D0 A0 D3 E0 D6 C0 D9 00       .db #$D0, #%10100000, #$D3, #%11100000, #$D6, #%11000000, #$D9, #%00000000
-0C8B8                               
-0C8B8                               ;; end of level
-0C8B8 FF                            .db #LEVEL_END
-0C8B9                           
-0C8B9                           lvl_layout_4:
-0C8B9 FF                            .db #LEVEL_END
-0C8BA                           
-0C8BA                           lvl_layout_5:
-0C8BA FF                            .db #LEVEL_END
-0C8BB                           
-0C8BB                           ;; Level layout address pointers
-0C8BB                           tbl_lvl_layout_hi:
-0C8BB C8 C8 C8 C8 C8                .db >#lvl_layout_1, >#lvl_layout_2, >#lvl_layout_3, >#lvl_layout_4, >#lvl_layout_5
-0C8C0                           
-0C8C0                           tbl_lvl_layout_lo:
-0C8C0 32 4D 82 B9 BA                .db <#lvl_layout_1, <#lvl_layout_2, <#lvl_layout_3, <#lvl_layout_4, <#lvl_layout_5
-0C8C5                           
-0C8C5                           
-0C8C5                           
-0C8C5                           ;; Helper table to multiply values by 64
-0C8C5                           tbl_Times64:
-0C8C5 00 40 80 C0                   .db #$00, #$40, #$80, #$C0
-0C8C9                           
-0C8C9                           
-0C8C9                           ;; Metatile ID to CHR data mapper
-0C8C9                           tbl_GametileTopLeft:
-0C8C9 40 42 46 44 38 48 4A 4E..     .db #$40, #$42, #$46, #$44, #$38, #$48, #$4A, #$4E, #$4C, #$38
-0C8D3                           
-0C8D3                           tbl_GametileTopRight:
-0C8D3 41 43 47 45 38 49 4B 4F..     .db #$41, #$43, #$47, #$45, #$38, #$49, #$4B, #$4F, #$4D, #$38
-0C8DD                           
-0C8DD                           tbl_GametileBottomLeft:
-0C8DD 50 52 56 54 38 58 5A 5E..     .db #$50, #$52, #$56, #$54, #$38, #$58, #$5A, #$5E, #$5C, #$38
-0C8E7                           
-0C8E7                           tbl_GametileBottomRight:
-0C8E7 51 53 57 55 38 59 5B 5F..     .db #$51, #$53, #$57, #$55, #$38, #$59, #$5B, #$5F, #$5D, #$38
-0C8F1                           
-0C8F1                           
-0C8F1                           ;; HUD text data
-0C8F1                           tbl_HudText:
-0C8F1 1D 0D 19 1C 0F 00 00 00       .db #_S, #_C, #_O, #_R, #_E, #_SPACE, #_SPACE, #_SPACE
-0C8F9 16 0F 20 0F 16 00 00          .db #_L, #_E, #_V, #_E, #_L, #_SPACE, #_SPACE
-0C900 16 13 20 0F 1D 00 00 00       .db #_L, #_I, #_V, #_E, #_S, #_SPACE, #_SPACE, #_SPACE
-0C908 0C 19 18 1F 1D                .db #_B, #_O, #_N, #_U, #_S0C90D                           
-0C90D                           ;; NMI handler
-0C90D                           NMI:
-0C90D                               .include "interrupt/nmi.asm"
-0C90D                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-0C90D                           ;;
-0C90D                           ;; include/nmi.asm
-0C90D                           ;;
-0C90D                           ;; Non-maskable interrupt script. This script is being executed
-0C90D                           ;; when vBlank hits.
-0C90D                           ;;
-0C90D                           ;;
-0C90D                           
-0C90D                               ;; Preserve accumulator through stack
-0C90D 48                            PHA
-0C90E                           
-0C90E                               ;; Should NMI be skipped?
-0C90E A5 13                         LDA skip_nmi
-0C910 F0 03                         BEQ +
-0C912 4C A0 C9                          JMP +skip_nmi
-0C915                               +
-0C915                           
-0C915                               ;; When in NMI, skip additional NMI requests
-0C915 A9 01                         LDA #$01
-0C917 85 13                         STA skip_nmi
-0C919                           
-0C919                               ;; Preserve X, Y, and PC through stack
-0C919 8A                            TXA
-0C91A 48                            PHA
-0C91B 98                            TYA
-0C91C 48                            PHA
-0C91D 08                            PHP
-0C91E                               
-0C91E                               ;; Check forced NMI skip
-0C91E A5 14                         LDA force_skip_nmi
-0C920 F0 03                         BEQ +
-0C922 4C 91 C9                          JMP +force_skip_nmi
-0C925                               +
-0C925                           
-0C925                               ;; Update PPU mask
-0C925                               ;LDA #$00
-0C925                               ;STA PPU_CTRL
-0C925 A5 12                         LDA soft_ppu_mask
-0C927 8D 01 20                      STA PPU_MASK
-0C92A                               
-0C92A                               
-0C92A                               ;; Additional PPU updates go here
-0C92A                               .include "game/test/tile_update_nmi.asm"
-0C92A                           
-0C92A                               ;; Check if ppu_buffer needs updating
-0C92A A5 29                         LDA ppu_buffer_update
-0C92C D0 03                         BNE +
-0C92E 4C 70 C9                          JMP +no_ppu_buffer_update
-0C931                               +
-0C931                           
-0C931                               ;; Reset ppu control register and mask
-0C931 A2 00                         LDX #$00
-0C933 8E 00 20                      STX PPU_CTRL
-0C936 8E 01 20                      STX PPU_MASK
-0C939                           
-0C939                               ;; Set up loop
-0C939                               -
-0C939                                   ;; Reset hi/lo latch
-0C939 2C 02 20                          BIT PPU_STATUS
-0C93C                           
-0C93C                                   ;; Write ppu_buffer hi and lo addresss to PPU_ADDR
-0C93C BD 00 03                          LDA ppu_buffer,x
-0C93F 8D 06 20                          STA PPU_ADDR
-0C942 E8                                INX
-0C943 BD 00 03                          LDA ppu_buffer,x
-0C946 8D 06 20                          STA PPU_ADDR
-0C949                           
-0C949                                   ;; Write ppu_buffer data to PPU_ADDR
-0C949 E8                                INX
-0C94A BD 00 03                          LDA ppu_buffer,x
-0C94D 8D 07 20                          STA PPU_DATA
-0C950                           
-0C950                                   ;; Check if updating is done (eg. X is at pointer)
-0C950 E8                                INX
-0C951 E4 2A                             CPX ppu_buffer_pointer
-0C953 F0 03                             BEQ +
-0C955 4C 39 C9                      JMP -
-0C958                           +
-0C958                           
-0C958                               ;; Reset ppu buffer update and pointer
-0C958 A9 00                         LDA #$00
-0C95A 85 29                         STA ppu_buffer_update
-0C95C 85 2A                         STA ppu_buffer_pointer
-0C95E                               
-0C95E                               ;; Reset scrolling position
-0C95E 8D 05 20                      STA PPU_SCROLL
-0C961 8D 05 20                      STA PPU_SCROLL
-0C964                           
-0C964                               ;; Restore ppu control register and mask
-0C964 A9 90                         LDA #%10010000
-0C966 8D 00 20                      STA PPU_CTRL
-0C969 A5 12                         LDA soft_ppu_mask
-0C96B 8D 01 20                      STA PPU_MASK
-0C96E A9 00                         LDA #$00
-0C970                           
-0C970                           ;; Continue other NMI stuff
-0C970                           +no_ppu_buffer_update:
-0C970                               .include "game/test/show_animation_nmi.asm"
-0C970                               ;; Reset sprite RAM, draw sprites
-0C970 8D 03 20                      STA OAM_ADDR
-0C973 A9 02                         LDA #$02
-0C975 8D 14 40                      STA OAM_DMA
-0C978                           
-0C978 A0 04                         LDY #MAX_ANIMATIONS
-0C97A A2 00                         LDX #$00
-0C97C                               -
-0C97C BD 30 03                          LDA explosion_framecounter,x
-0C97F F0 03                             BEQ +
-0C981 DE 30 03                              DEC explosion_framecounter,x
-0C984                                   +
-0C984 E8                                INX
-0C985 88                                DEY
-0C986 F0 03                             BEQ +done        
-0C988 4C 7C C9                      JMP -
-0C98B                           +done:
-0C98B                               
-0C98B A5 2D                         LDA nudge_counter
-0C98D F0 02                         BEQ +
-0C98F C6 2D                             DEC nudge_counter
-0C991                               +
-0C991                           
-0C991                           ;; This is what happens when we forced nmi skip
-0C991                           +force_skip_nmi:
-0C991                           
-0C991                               ;; Increase frame counters
-0C991 E6 15                         INC frame_counter
-0C993                           
-0C993                               ;; reset ball_update_position
-0C993 A9 00                         LDA #$00
-0C995 85 25                         STA ball_update_position
-0C997                           
-0C997                               ;; Don't skip next NMI request
-0C997 A9 00                         LDA #$00
-0C999 85 13                         STA skip_nmi
-0C99B                           
-0C99B                               ;; Restore X, Y and PC from stack
-0C99B 28                            PLP
-0C99C 68                            PLA
-0C99D A8                            TAY
-0C99E 68                            PLA
-0C99F AA                            TAX
-0C9A0                           
-0C9A0                           +skip_nmi:
-0C9A0                               ;; Restore accumulator from stack
-0C9A0 68                            PLA
-0C9A1                           
-0C9A1                               ;; Return
-0C9A1 40                            RTI
-0C9A2                           
-0C9A2                           ;; IRQ handler (empty)
-0C9A2                           IRQ:
-0C9A2                               .include "interrupt/irq.asm"
-0C9A2 40                            RTI0C9A3                           
-0C9A3                           ;; Interrupt vectors
-0C9A3 00 00 00 00 00 00 00 00.. .org ADDR_VECTORS
-0FFFA 0D C9                         .dw NMI
+0C7AF                               ;; Update buffer pointer
+0C7AF C8                            INY
+0C7B0 84 2A                         STY ppu_buffer_pointer
+0C7B2                           
+0C7B2                               ;; Tell NMI to update next round
+0C7B2 E6 29                         INC ppu_buffer_update
+0C7B4                           
+0C7B4                               ;; Return
+0C7B4 60                            RTS0C7B5                           
+0C7B5                           
+0C7B5                           ;; LUTs
+0C7B5                           .include "game/include/tables.asm"
+0C7B5                           
+0C7B5                           ;; Intro screen palette
+0C7B5                           tbl_IntroScreenPalette:
+0C7B5 0F 2C 12 30                   .db #$0F, #$2C, #$12, #$30
+0C7B9 0F 16 38 30                   .db #$0F, #$16, #$38, #$30
+0C7BD 0F 29 14 30                   .db #$0F, #$29, #$14, #$30
+0C7C1 0F 00 10 30                   .db #$0F, #$00, #$10, #$30
+0C7C5                           
+0C7C5 0F 2C 12 30                   .db #$0F, #$2C, #$12, #$30
+0C7C9 0F 16 38 30                   .db #$0F, #$16, #$38, #$30
+0C7CD 0F 29 14 30                   .db #$0F, #$29, #$14, #$30
+0C7D1 0F 00 10 30                   .db #$0F, #$00, #$10, #$30
+0C7D5                           
+0C7D5                           
+0C7D5                           ;; Intro: mapping logo index to chr tile
+0C7D5                           tbl_IntroScreenLogoChr:
+0C7D5 00 31 33 60 30 32 34 36       .db #$00, #$31, #$33, #$60, #$30, #$32, #$34, #$36
+0C7DD                           
+0C7DD                           
+0C7DD                           ;; Intro screen data
+0C7DD                           tbl_IntroScreenData:
+0C7DD                           
+0C7DD                               ;; Set PPU address $20AC and draw
+0C7DD 60 AC                         .db #$60, #$AC
+0C7DF 02 26 16 0F 20 0F 16 27       .db #_1, #_DOT, #_L, #_E, #_V, #_E, #_L, #_COLON
+0C7E7                           
+0C7E7                               ;; Set PPU address $20CF and draw
+0C7E7 60 CF                         .db #$60, #$CF
+0C7E9 01 02                         .db #_0, #_1
+0C7EB                               
+0C7EB                               ;; Set PPU address $2122 and draw
+0C7EB 61 22                         .db #$61, #$22
+0C7ED 0E 0F 1D 13 11 18 25          .db #_D, #_E, #_S, #_I, #_G, #_N, #_COMMA
+0C7F4 1D 19 1F 18 0E 25             .db #_S, #_O, #_U, #_N, #_D, #_COMMA
+0C7FA 11 1C 0B 1A 12 13 0D 1D       .db #_G, #_R, #_A, #_P, #_H, #_I, #_C, #_S
+0C802 00 0B 18 0E 00                .db #_SPACE, #_A, #_N, #_D, #_SPACE
+0C807                               
+0C807                               ;; Set PPU address $2147 and draw
+0C807 61 47                         .db #$61, #$47
+0C809 1A 1C 19 11 1C 0B 17          .db #_P, #_R, #_O, #_G, #_R, #_A, #_M
+0C810 00 0C 23 00                   .db #_SPACE, #_B, #_Y, #_SPACE
+0C814 19 16 13 20 0F 1C             .db #_O, #_L, #_I, #_V, #_E, #_R
+0C81A 00 15 13 1C 21 0B             .db #_SPACE, #_K, #_I, #_R, #_W, #_A
+0C820                               
+0C820                               ;; Set PPU address $218B and draw
+0C820 61 8B                         .db #$61, #$8B
+0C822 28 00 02 0A 09 08             .db #_COPY, #_SPACE, #_1, #_9, #_8, #_7
+0C828 25 02 0A 09 09                .db #_COMMA, #_1, #_9, #_8, #_8
+0C82D                               
+0C82D                               ;; Set PPU address $21E6 and draw
+0C82D 61 E6                         .db #$61, #$E6
+0C82F 18 0F 1D 00 1A 19 1C 1E       .db #_N, #_E, #_S, #_SPACE, #_P, #_O, #_R, #_T
+0C837 00 0C 23 00                   .db #_SPACE, #_B, #_Y, #_SPACE
+0C83B 15 0F 20 13 18 09 02          .db #_K, #_E, #_V, #_I, #_N, #_8, #_1
+0C842                               
+0C842                               ;; Set PPU address $222D and draw
+0C842 62 2D                         .db #$62, #$2D
+0C844 28 00 03 01 03 04             .db #_COPY, #_SPACE, #_2, #_0, #_2, #_3
+0C84A                               
+0C84A                               ;; Set PPU address $2281
+0C84A 62 81                         .db #$62, #$81
+0C84C                               
+0C84C                               ;; Draw the Crillion logo
+0C84C E1 C8 E1 E8                   .db #%11100001, #%11001000, #%11100001, #%11101000
+0C850 C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
+0C854 C0 C2 C4 C9                   .db #%11000000, #%11000010, #%11000100, #%11001001
+0C858 E8 E1 CD C0                   .db #%11101000, #%11100001, #%11001101, #%11000000
+0C85C                               
+0C85C D0 C0 D3 D0                   .db #%11010000, #%11000000, #%11010011, #%11010000
+0C860 C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
+0C864 C0 C2 C2 DB                   .db #%11000000, #%11000010, #%11000010, #%11011011
+0C868 D0 D0 C2 C0                   .db #%11010000, #%11010000, #%11000010, #%11000000
+0C86C                               
+0C86C D0 C0 D1 CD                   .db #%11010000, #%11000000, #%11010001, #%11001101
+0C870 C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
+0C874 C0 C2 C2 DB                   .db #%11000000, #%11000010, #%11000010, #%11011011
+0C878 D0 D0 C2 C0                   .db #%11010000, #%11010000, #%11000010, #%11000000
+0C87C                           
+0C87C D0 C0 D0 C2                   .db #%11010000, #%11000000, #%11010000, #%11000010
+0C880 C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
+0C884 C0 C2 C2 DB                   .db #%11000000, #%11000010, #%11000010, #%11011011
+0C888 D0 D0 C2 C0                   .db #%11010000, #%11010000, #%11000010, #%11000000
+0C88C                               
+0C88C D0 C0 D0 C2                   .db #%11010000, #%11000000, #%11010000, #%11000010
+0C890 C2 C2 C0 C2                   .db #%11000010, #%11000010, #%11000000, #%11000010
+0C894 C0 C2 C2 DB                   .db #%11000000, #%11000010, #%11000010, #%11011011
+0C898 D0 D0 C2 C0                   .db #%11010000, #%11010000, #%11000010, #%11000000
+0C89C                           
+0C89C F9 C8 D0 C2                   .db #%11111001, #%11001000, #%11010000, #%11000010
+0C8A0 C2 C7 C9 C7                   .db #%11000010, #%11000111, #%11001001, #%11000111
+0C8A4 C9 C2 C7 C9                   .db #%11001001, #%11000010, #%11000111, #%11001001
+0C8A8 F0 D0 C2                      .db #%11110000, #%11010000, #%11000010
+0C8AB                           
+0C8AB                               ;; End of intro
+0C8AB 3F                            .db #$3F
+0C8AC                           
+0C8AC                           
+0C8AC                           ;; test animation table
+0C8AC                           .include "game/test/show_animation_table.asm"
+0C8AC                           ;; CHR tile-id's per slide of explosion
+0C8AC                           explosion_slide0:
+0C8AC 00 00 00                      .db #$00, #$00, #$00
+0C8AF 2C 2D 2E                      .db #$2C, #$2D, #$2E
+0C8B2 3C 3D 3E                      .db #$3C, #$3D, #$3E
+0C8B5                           
+0C8B5                           explosion_slide1:
+0C8B5 00 00 00                      .db #$00, #$00, #$00
+0C8B8 29 2A 2B                      .db #$29, #$2A, #$2B
+0C8BB 39 3A 3B                      .db #$39, #$3A, #$3B
+0C8BE                           
+0C8BE                           explosion_slide2:
+0C8BE 16 00 00                      .db #$16, #$00, #$00
+0C8C1 26 27 28                      .db #$26, #$27, #$28
+0C8C4 36 37 38                      .db #$36, #$37, #$38
+0C8C7                           
+0C8C7                           explosion_slide3:
+0C8C7 00 14 15                      .db #$00, #$14, #$15
+0C8CA 23 24 25                      .db #$23, #$24, #$25
+0C8CD 33 34 35                      .db #$33, #$34, #$35
+0C8D0                           
+0C8D0                           explosion_slide4:
+0C8D0 10 11 12                      .db #$10, #$11, #$12
+0C8D3 20 21 22                      .db #$20, #$21, #$22
+0C8D6 30 31 32                      .db #$30, #$31, #$32
+0C8D9                           
+0C8D9                           ;; High and low bytes of animation slides
+0C8D9                           explosion_anim_hi:
+0C8D9 C8                            .db >#explosion_slide0
+0C8DA C8                            .db >#explosion_slide1
+0C8DB C8                            .db >#explosion_slide2
+0C8DC C8                            .db >#explosion_slide3
+0C8DD C8                            .db >#explosion_slide4
+0C8DE C8                            .db >#explosion_slide4
+0C8DF C8                            .db >#explosion_slide3
+0C8E0 C8                            .db >#explosion_slide2
+0C8E1 C8                            .db >#explosion_slide1
+0C8E2 C8                            .db >#explosion_slide0
+0C8E3                           
+0C8E3                           explosion_anim_lo:
+0C8E3 AC                            .db <#explosion_slide0
+0C8E4 B5                            .db <#explosion_slide1
+0C8E5 BE                            .db <#explosion_slide2
+0C8E6 C7                            .db <#explosion_slide3
+0C8E7 D0                            .db <#explosion_slide4
+0C8E8 D0                            .db <#explosion_slide4
+0C8E9 C7                            .db <#explosion_slide3
+0C8EA BE                            .db <#explosion_slide2
+0C8EB B5                            .db <#explosion_slide1
+0C8EC AC                            .db <#explosion_slide0
+0C8ED                           
+0C8ED                           
+0C8ED                           
+0C8ED                           ;; Ball palette color cycle
+0C8ED                           tbl_BallColorDark:
+0C8ED 12 14 16 27 28 19             .db #$12, #$14, #$16, #$27, #$28, #$19
+0C8F3                            
+0C8F3                           tbl_BallColorLight:
+0C8F3 2C 24 25 37 20 2B             .db #$2C, #$24, #$25, #$37, #$20, #$2B
+0C8F9                           
+0C8F9                               
+0C8F9                           ;; Screen mode drawing routine addresses
+0C8F9                           tbl_LoadScreenHi:
+0C8F9 C6 C3 C7                      .db >#sub_LoadIntroScreen, >#sub_LoadGameScreen, >#sub_LoadWinScreen
+0C8FC                           
+0C8FC                           tbl_LoadScreenLo:
+0C8FC FF 9B 8E                      .db <#sub_LoadIntroScreen, <#sub_LoadGameScreen, <#sub_LoadWinScreen
+0C8FF                           
+0C8FF                           
+0C8FF                           ;; Test level data
+0C8FF                           .include "game/test/level_data.asm"
+0C8FF                           lvl_layout_1:
+0C8FF 61 21                         .db #$61, #%00100001
+0C901 52 61                         .db #$52, #%01100001
+0C903 43 65                         .db #$43, #%01100101
+0C905 83 05                         .db #$83, #%00000101
+0C907 93 15                         .db #$93, #%00010101
+0C909 34 7A                         .db #$34, #%01111010
+0C90B 74 7A                         .db #$74, #%01111010
+0C90D 35 7A                         .db #$35, #%01111010
+0C90F 75 7A                         .db #$75, #%01111010
+0C911 46 65                         .db #$46, #%01100101
+0C913 86 25                         .db #$86, #%00100101
+0C915 57 61                         .db #$57, #%01100001
+0C917 68 21                         .db #$68, #%00100001
+0C919 FF                            .db #LEVEL_END
+0C91A                           
+0C91A                           lvl_layout_2:
+0C91A C0 0A                         .db #$C0, #%00001010
+0C91C 11 15                         .db #$11, #%00010101
+0C91E 21 62                         .db #$21, #%01100010
+0C920 61 62                         .db #$61, #%01100010
+0C922 A1 42                         .db #$A1, #%01000010
+0C924 12 67                         .db #$12, #%01100111
+0C926 52 67                         .db #$52, #%01100111
+0C928 92 67                         .db #$92, #%01100111
+0C92A C3 0D                         .db #$C3, #%00001101
+0C92C 14 11                         .db #$14, #%00010001
+0C92E 24 65                         .db #$24, #%01100101
+0C930 64 65                         .db #$64, #%01100101
+0C932 A4 45                         .db #$A4, #%01000101
+0C934 15 67                         .db #$15, #%01100111
+0C936 55 67                         .db #$55, #%01100111
+0C938 95 67                         .db #$95, #%01100111
+0C93A 17 12                         .db #$17, #%00010010
+0C93C 27 61                         .db #$27, #%01100001
+0C93E 67 61                         .db #$67, #%01100001
+0C940 A7 41                         .db #$A7, #%01000001
+0C942 38 7A                         .db #$38, #%01111010
+0C944 98 5A                         .db #$98, #%01011010
+0C946 18 27                         .db #$18, #%00100111
+0C948 48 27                         .db #$48, #%00100111
+0C94A 78 27                         .db #$78, #%00100111
+0C94C C8 07                         .db #$C8, #%00000111
+0C94E FF                            .db #LEVEL_END
+0C94F                           
+0C94F                           lvl_layout_3:
+0C94F 00 7A                         .db #$00, #%01111010
+0C951 40 7A                         .db #$40, #%01111010
+0C953 80 7A                         .db #$80, #%01111010
+0C955 C0 1A                         .db #$C0, #%00011010
+0C957 10 A1                         .db #$10, #%10100001
+0C959 13 E1                         .db #$13, #%11100001
+0C95B 17 C1                         .db #$17, #%11000001
+0C95D 30 C1                         .db #$30, #%11000001
+0C95F 34 C1                         .db #$34, #%11000001
+0C961 38 A1                         .db #$38, #%10100001
+0C963 50 E1                         .db #$50, #%11100001
+0C965 55 81                         .db #$55, #%10000001
+0C967 57 C1                         .db #$57, #%11000001
+0C969 70 C1                         .db #$70, #%11000001
+0C96B 73 A1                         .db #$73, #%10100001
+0C96D 76 E1                         .db #$76, #%11100001
+0C96F 90 E1                         .db #$90, #%11100001
+0C971 95 81                         .db #$95, #%10000001
+0C973 97 C1                         .db #$97, #%11000001
+0C975 B0 C1                         .db #$B0, #%11000001
+0C977 B4 C1                         .db #$B4, #%11000001
+0C979 B8 A1                         .db #$B8, #%10100001
+0C97B D0 A1                         .db #$D0, #%10100001
+0C97D D3 E1                         .db #$D3, #%11100001
+0C97F D7 C1                         .db #$D7, #%11000001
+0C981 FF                            .db #LEVEL_END
+0C982                           
+0C982                           lvl_layout_4:
+0C982 FF                            .db #LEVEL_END
+0C983                           
+0C983                           lvl_layout_5:
+0C983 FF                            .db #LEVEL_END
+0C984                           
+0C984                           ;; Level layout address pointers
+0C984                           tbl_lvl_layout_hi:
+0C984 C8 C9 C9 C9 C9                .db >#lvl_layout_1, >#lvl_layout_2, >#lvl_layout_3, >#lvl_layout_4, >#lvl_layout_5
+0C989                           
+0C989                           tbl_lvl_layout_lo:
+0C989 FF 1A 4F 82 83                .db <#lvl_layout_1, <#lvl_layout_2, <#lvl_layout_3, <#lvl_layout_4, <#lvl_layout_5
+0C98E                           
+0C98E                           
+0C98E                           
+0C98E                           ;; Helper table to multiply values by 64
+0C98E                           tbl_Times64:
+0C98E 00 40 80 C0                   .db #$00, #$40, #$80, #$C0
+0C992                           
+0C992                           
+0C992                           ;; Metatile ID to CHR data mapper
+0C992                           tbl_GametileTopLeft:
+0C992 40 42 46 44 38 48 4A 4E..     .db #$40, #$42, #$46, #$44, #$38, #$48, #$4A, #$4E, #$4C, #$38
+0C99C                           
+0C99C                           tbl_GametileTopRight:
+0C99C 41 43 47 45 38 49 4B 4F..     .db #$41, #$43, #$47, #$45, #$38, #$49, #$4B, #$4F, #$4D, #$38
+0C9A6                           
+0C9A6                           tbl_GametileBottomLeft:
+0C9A6 50 52 56 54 38 58 5A 5E..     .db #$50, #$52, #$56, #$54, #$38, #$58, #$5A, #$5E, #$5C, #$38
+0C9B0                           
+0C9B0                           tbl_GametileBottomRight:
+0C9B0 51 53 57 55 38 59 5B 5F..     .db #$51, #$53, #$57, #$55, #$38, #$59, #$5B, #$5F, #$5D, #$38
+0C9BA                           
+0C9BA                           ;; Metatile ID to RAM byte data mapper
+0C9BA                           tbl_GameTileRamByte:
+0C9BA 40 20 10 08 00                .db #%01000000, #%00100000, #%00010000, #%00001000, #%00000000
+0C9BF                           
+0C9BF                           ;; HUD text data
+0C9BF                           tbl_HudText:
+0C9BF 1D 0D 19 1C 0F 00 00 00       .db #_S, #_C, #_O, #_R, #_E, #_SPACE, #_SPACE, #_SPACE
+0C9C7 16 0F 20 0F 16 00 00          .db #_L, #_E, #_V, #_E, #_L, #_SPACE, #_SPACE
+0C9CE 16 13 20 0F 1D 00 00 00       .db #_L, #_I, #_V, #_E, #_S, #_SPACE, #_SPACE, #_SPACE
+0C9D6 0C 19 18 1F 1D                .db #_B, #_O, #_N, #_U, #_S0C9DB                           
+0C9DB                           ;; NMI handler
+0C9DB                           NMI:
+0C9DB                               .include "interrupt/nmi.asm"
+0C9DB                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+0C9DB                           ;;
+0C9DB                           ;; include/nmi.asm
+0C9DB                           ;;
+0C9DB                           ;; Non-maskable interrupt script. This script is being executed
+0C9DB                           ;; when vBlank hits.
+0C9DB                           ;;
+0C9DB                           ;;
+0C9DB                           
+0C9DB                               ;; Preserve accumulator through stack
+0C9DB 48                            PHA
+0C9DC                           
+0C9DC                               ;; Should NMI be skipped?
+0C9DC A5 13                         LDA skip_nmi
+0C9DE F0 03                         BEQ +
+0C9E0 4C 6E CA                          JMP +skip_nmi
+0C9E3                               +
+0C9E3                           
+0C9E3                               ;; When in NMI, skip additional NMI requests
+0C9E3 A9 01                         LDA #$01
+0C9E5 85 13                         STA skip_nmi
+0C9E7                           
+0C9E7                               ;; Preserve X, Y, and PC through stack
+0C9E7 8A                            TXA
+0C9E8 48                            PHA
+0C9E9 98                            TYA
+0C9EA 48                            PHA
+0C9EB 08                            PHP
+0C9EC                               
+0C9EC                               ;; Check forced NMI skip
+0C9EC A5 14                         LDA force_skip_nmi
+0C9EE F0 03                         BEQ +
+0C9F0 4C 5F CA                          JMP +force_skip_nmi
+0C9F3                               +
+0C9F3                           
+0C9F3                               ;; Update PPU mask
+0C9F3                               ;LDA #$00
+0C9F3                               ;STA PPU_CTRL
+0C9F3 A5 12                         LDA soft_ppu_mask
+0C9F5 8D 01 20                      STA PPU_MASK
+0C9F8                               
+0C9F8                               
+0C9F8                               ;; Additional PPU updates go here
+0C9F8                               .include "game/test/tile_update_nmi.asm"
+0C9F8                           
+0C9F8                               ;; Check if ppu_buffer needs updating
+0C9F8 A5 29                         LDA ppu_buffer_update
+0C9FA D0 03                         BNE +
+0C9FC 4C 3E CA                          JMP +no_ppu_buffer_update
+0C9FF                               +
+0C9FF                           
+0C9FF                               ;; Reset ppu control register and mask
+0C9FF A2 00                         LDX #$00
+0CA01 8E 00 20                      STX PPU_CTRL
+0CA04 8E 01 20                      STX PPU_MASK
+0CA07                           
+0CA07                               ;; Set up loop
+0CA07                               -
+0CA07                                   ;; Reset hi/lo latch
+0CA07 2C 02 20                          BIT PPU_STATUS
+0CA0A                           
+0CA0A                                   ;; Write ppu_buffer hi and lo addresss to PPU_ADDR
+0CA0A BD 00 03                          LDA ppu_buffer,x
+0CA0D 8D 06 20                          STA PPU_ADDR
+0CA10 E8                                INX
+0CA11 BD 00 03                          LDA ppu_buffer,x
+0CA14 8D 06 20                          STA PPU_ADDR
+0CA17                           
+0CA17                                   ;; Write ppu_buffer data to PPU_ADDR
+0CA17 E8                                INX
+0CA18 BD 00 03                          LDA ppu_buffer,x
+0CA1B 8D 07 20                          STA PPU_DATA
+0CA1E                           
+0CA1E                                   ;; Check if updating is done (eg. X is at pointer)
+0CA1E E8                                INX
+0CA1F E4 2A                             CPX ppu_buffer_pointer
+0CA21 F0 03                             BEQ +
+0CA23 4C 07 CA                      JMP -
+0CA26                           +
+0CA26                           
+0CA26                               ;; Reset ppu buffer update and pointer
+0CA26 A9 00                         LDA #$00
+0CA28 85 29                         STA ppu_buffer_update
+0CA2A 85 2A                         STA ppu_buffer_pointer
+0CA2C                               
+0CA2C                               ;; Reset scrolling position
+0CA2C 8D 05 20                      STA PPU_SCROLL
+0CA2F 8D 05 20                      STA PPU_SCROLL
+0CA32                           
+0CA32                               ;; Restore ppu control register and mask
+0CA32 A9 90                         LDA #%10010000
+0CA34 8D 00 20                      STA PPU_CTRL
+0CA37 A5 12                         LDA soft_ppu_mask
+0CA39 8D 01 20                      STA PPU_MASK
+0CA3C A9 00                         LDA #$00
+0CA3E                           
+0CA3E                           ;; Continue other NMI stuff
+0CA3E                           +no_ppu_buffer_update:
+0CA3E                               .include "game/test/show_animation_nmi.asm"
+0CA3E                               ;; Reset sprite RAM, draw sprites
+0CA3E 8D 03 20                      STA OAM_ADDR
+0CA41 A9 02                         LDA #$02
+0CA43 8D 14 40                      STA OAM_DMA
+0CA46                           
+0CA46 A0 04                         LDY #MAX_ANIMATIONS
+0CA48 A2 00                         LDX #$00
+0CA4A                               -
+0CA4A BD 30 03                          LDA explosion_framecounter,x
+0CA4D F0 03                             BEQ +
+0CA4F DE 30 03                              DEC explosion_framecounter,x
+0CA52                                   +
+0CA52 E8                                INX
+0CA53 88                                DEY
+0CA54 F0 03                             BEQ +done        
+0CA56 4C 4A CA                      JMP -
+0CA59                           +done:
+0CA59                               
+0CA59 A5 2D                         LDA nudge_counter
+0CA5B F0 02                         BEQ +
+0CA5D C6 2D                             DEC nudge_counter
+0CA5F                               +
+0CA5F                           
+0CA5F                           ;; This is what happens when we forced nmi skip
+0CA5F                           +force_skip_nmi:
+0CA5F                           
+0CA5F                               ;; Increase frame counters
+0CA5F E6 15                         INC frame_counter
+0CA61                           
+0CA61                               ;; reset ball_update_position
+0CA61 A9 00                         LDA #$00
+0CA63 85 25                         STA ball_update_position
+0CA65                           
+0CA65                               ;; Don't skip next NMI request
+0CA65 A9 00                         LDA #$00
+0CA67 85 13                         STA skip_nmi
+0CA69                           
+0CA69                               ;; Restore X, Y and PC from stack
+0CA69 28                            PLP
+0CA6A 68                            PLA
+0CA6B A8                            TAY
+0CA6C 68                            PLA
+0CA6D AA                            TAX
+0CA6E                           
+0CA6E                           +skip_nmi:
+0CA6E                               ;; Restore accumulator from stack
+0CA6E 68                            PLA
+0CA6F                           
+0CA6F                               ;; Return
+0CA6F 40                            RTI
+0CA70                           
+0CA70                           ;; IRQ handler (empty)
+0CA70                           IRQ:
+0CA70                               .include "interrupt/irq.asm"
+0CA70 40                            RTI0CA71                           
+0CA71                           ;; Interrupt vectors
+0CA71 00 00 00 00 00 00 00 00.. .org ADDR_VECTORS
+0FFFA DB C9                         .dw NMI
 0FFFC 00 C0                         .dw RESET
-0FFFE A2 C9                         .dw IRQ
+0FFFE 70 CA                         .dw IRQ
 10000                           
 10000                           ;; CHR data (if any)
 10000 00 00 00 00 00 00 00 00.. .incbin "game/graphics/sprites.chr"

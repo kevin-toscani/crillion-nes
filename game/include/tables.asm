@@ -137,6 +137,9 @@ tbl_GametileBottomLeft:
 tbl_GametileBottomRight:
     .db #$51, #$53, #$57, #$55, #$38, #$59, #$5B, #$5F, #$5D, #$38
 
+;; Metatile ID to RAM byte data mapper
+tbl_GameTileRamByte:
+    .db #%01000000, #%00100000, #%00010000, #%00001000, #%00000000
 
 ;; HUD text data
 tbl_HudText:

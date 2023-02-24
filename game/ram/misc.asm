@@ -24,6 +24,7 @@
 
 ;; screen tile data (14x10 metatiles)
 .enum ADDR_SCREENTILERAM
-    tile_type                 .dsb 140
+    tile_type                 .dsb 160
+    tile_attributes           .dsb 64
 .ende
 

@@ -1,7 +1,6 @@
 ;; Starting address for screen tile RAM
 ADDR_SCREENTILERAM  = $0400
 
-
 ;; Ball bounding box constants
 BALL_HEIGHT  = #$08  ; Height of the ball graphic within the sprite(s)
 BALL_WIDTH   = #$08  ; Width of the ball graphic within the sprite(s)

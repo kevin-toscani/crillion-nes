@@ -8,12 +8,13 @@
 ;;  the address that corresponds with the metatile at (x,y) is $04YX
 ;;  the values of tile RAM are stored as follows:
 ;;
-;;  #% b p m d ccc s
+;;  #% b m p d ccC s
 ;;     | | | | ||| +-- block is solid
-;;     | | | | +++---- block color (0-5)
+;;     | | | | ||+---- block color (CHR offset boolean)
+;;     | | | | ++----- block color (subpal 0-3)
 ;;     | | | +-------- death block
-;;     | | +---------- move block
-;;     | +------------ paint block
+;;     | | +---------- paint block
+;;     | +------------ move block
 ;;     +-------------- color block
 ;;
 ;;

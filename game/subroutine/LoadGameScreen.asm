@@ -3,11 +3,11 @@ sub_LoadGameScreen:
     ;; Clear the screen
     JSR sub_ClearScreen
     
-    ;; Clear collision data
+    ;; Clear collision and attribute data
     LDX #$00
     TXA
     -
-        STA ADDR_SCREENTILERAM,x
+        STA tile_type,x
         INX
     BNE -
     
@@ -95,9 +95,8 @@ sub_LoadGameScreen:
         JMP +setTileType
     +wallHack:
     
-    ;; It's a wall! Set color and CHR offset to 0, and tile type to 4.
+    ;; It's a wall! Set CHR offset to 0, and tile type to 4.
     LDA #$00
-    STA temp+4
     STA temp+7
     LDA #$04
 
@@ -168,18 +167,22 @@ sub_LoadGameScreen:
         LDA tbl_GametileBottomRight,x
         STA PPU_DATA
 
-        ;; Update tile RAM (aka colission table)
-        ;; @TODO: further implement collision table
+        ;; Push x-register to stack
         TXA
         PHA
         
+        ;; Update tile RAM (aka collision table)
+        LDX temp+5
+        LDA tbl_GameTileRamByte,x
+        ORA temp+4
+        ASL
+        ORA #%00000001
         LDX temp
-        LDA #%00000001
-        STA ADDR_SCREENTILERAM,x
+        STA tile_type,x
 
         ;; Check if shade 1 should be drawn
         INX
-        LDA ADDR_SCREENTILERAM,x
+        LDA tile_type,x
         BNE +
             LDA #$00
             STA PPU_DATA
@@ -199,7 +202,7 @@ sub_LoadGameScreen:
         ADC #$10
         TAX
         
-        LDA ADDR_SCREENTILERAM,x
+        LDA tile_type,x
         BNE +
             LDA temp+2
             STA PPU_ADDR
@@ -212,7 +215,7 @@ sub_LoadGameScreen:
         ;; Check if shade 3 should be drawn
         INX
         INC temp+3
-        LDA ADDR_SCREENTILERAM,x
+        LDA tile_type,x
         BNE +
             LDA temp+2
             STA PPU_ADDR
@@ -222,6 +225,7 @@ sub_LoadGameScreen:
             STA PPU_DATA
         +
         
+        ;; Restore x-register from stack
         PLA
         TAX
         
@@ -486,9 +490,169 @@ sub_LoadGameScreen:
         CPX #$03
     BNE -
 
-    ;;
-    ;; @TODO: apply tile attributes
-    ;;
+
+    ;; Set attribute data to RAM
+    
+    ;; Byte 0-7 of attribute ram should be #%10100000
+    LDX #$00
+    LDA #$A0
+    -
+        STA tile_attributes,x
+        INX
+        CPX #$08
+    BNE -
+
+    ;; Byte 8-55 of attribute ram are filled with game subpal data
+
+-attributeLoop:
+    ;; Reset current attribute value
+    LDA #$00
+    STA temp+2
+
+    ;; Get first metatile in tile ram based on attribute index
+    ;; metatile = (attr-8)*2 +(16*(attr-8)/8))
+    TXA
+
+    SEC
+    SBC #$08
+    STA temp+1      ; attr - 8 (temp1)
+    ASL             ; * 2
+    STA temp        ; temp = temp1 * 2
+
+    LDA temp+1      ; temp1
+    AND #%11111000  ; rounded down to 8's
+    ASL             ; * 2
+    CLC
+    ADC temp        ; + temp1 * 2
+    STA temp        ; first metatile
+
+    ;; Store first metatile in y-register
+    TAY
+
+    ;; If X MOD 8 == 7, don't apply bottom right metatile
+    TXA
+    AND #%00000111
+    CMP #%00000111
+    BEQ +
+
+    ;; If X >= $30, don't apply bottom right metatile
+    CPX #$30
+    BCS +
+    
+    ;; Add metatile1 subpalette to attribute value
+    LDA tile_type,y
+    AND #%00001100
+    STA temp+2
+    +
+
+
+    ;; Apply second metatile
+    DEY
+
+    ;; If X MOD 8 == 0, don't apply bottom left metatile
+    TXA
+    AND #%00000111
+    BEQ +
+
+    ;; If X >= $30, don't apply bottom left metatile
+    CPX #$30
+    BCS +
+
+
+
+    ;; Add metatile2 subpalette to attribute value
+    LDA tile_type,y
+    AND #%00001100
+    LSR
+    LSR
+    ORA temp+2
+    JMP ++
+    +
+    LDA temp+2
+    ++
+    ASL
+    ASL
+    STA temp+2
+
+
+    ;; Apply third metatile
+    TYA
+    SEC
+    SBC #$0F
+    TAY
+
+    ;; If X MOD 8 == 7, don't apply top right metatile
+    TXA
+    AND #%00000111
+    CMP #%00000111
+    BEQ +
+
+    ;; If X < $10, don't apply top right metatile
+    TXA
+    AND #%11110000
+    BEQ +
+
+    ;; Add metatile3 subpalette to attribute value
+    LDA tile_type,y
+    AND #%00001100
+    LSR
+    LSR
+    ORA temp+2
+    JMP ++
+    +
+    LDA temp+2
+    ++
+    ASL
+    ASL
+    STA temp+2
+
+
+    ;; Apply fourth metatile
+    DEY
+
+    ;; If X MOD 8 == 0, don't apply top left metatile
+    TXA
+    AND #%00000111
+    BEQ +
+
+    ;; If X < $10, don't apply top left metatile
+    TXA
+    AND #%11110000
+    BEQ +
+
+    ;; Add metatile4 subpalette to attribute value
+    LDA tile_type,y
+    AND #%00001100
+    LSR
+    LSR
+    ORA temp+2
+    JMP ++
+    +
+    LDA temp+2
+    ++
+    STA tile_attributes,x
+
+    ;; Check the next attribute, if any left
+    INX
+    CPX #$38
+    BEQ +
+        JMP -attributeLoop
+    +
+
+
+    ;; Stream RAM to PPU
+    BIT PPU_STATUS
+    LDA #$23
+    STA PPU_ADDR
+    LDA #$C0
+    STA PPU_ADDR
+    LDX #$00
+    -
+        LDA tile_attributes,x
+        STA PPU_DATA
+        INX
+        CPX #$40
+    BNE -
     
     ;; Return
     RTS

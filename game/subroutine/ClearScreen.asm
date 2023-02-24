@@ -79,6 +79,18 @@ sub_ClearScreen:
         +
         
         CPY #$1E
-        BNE -
+    BNE -
 
+    ;; Clear attribute table
+    LDA #$23
+    STA PPU_ADDR
+    LDA #$C0
+    STA PPU_ADDR
+    LDA #$00
+    LDX #$40
+    -
+        STA PPU_DATA
+        DEX
+    BNE -
+    
     RTS
