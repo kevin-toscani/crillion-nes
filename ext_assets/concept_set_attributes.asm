@@ -24,9 +24,9 @@
     SBC #$08
     STA temp+1      ; attr - 8 (temp1)
     ASL             ; * 2
-    CLC
-    ADC #$01        ; + 1
-    STA temp        ; temp = temp1 * 2 + 1
+    SEC
+    SBC #$01        ; - 1
+    STA temp        ; temp = temp1 * 2 - 1
 
     LDA temp+1      ; temp1
     AND #%11111000  ; rounded down to 8's
