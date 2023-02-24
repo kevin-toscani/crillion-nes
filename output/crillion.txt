@@ -83,7 +83,7 @@
                                 
                                 ;; Ball speed (high/low byte), tile and attribute
                                 BALL_SPEED_HI = #$02
-                                BALL_SPEED_LO = #$C0
+                                BALL_SPEED_LO = #$30
                                 BALL_TILE_CHR = #$01
                                 BALL_ATTR     = #%00000000
                                 
@@ -134,7 +134,7 @@
                                 
                                 
                                 ;; Max number of nudge frames
-                                NUDGE_FRAMES    = #$04
+                                NUDGE_FRAMES    = #$03
                                 
                                 
                                 ;; Helper constant for when a level is done loading
@@ -745,7 +745,7 @@
 0C18D                               ;; update the low byte
 0C18D A5 1A                         LDA ball_ypos_lo
 0C18F 18                            CLC
-0C190 69 C0                         ADC #BALL_SPEED_LO
+0C190 69 30                         ADC #BALL_SPEED_LO
 0C192 85 1A                         STA ball_ypos_lo
 0C194                           
 0C194                               ;; update the high byte with carry
@@ -776,7 +776,7 @@
 0C1B4                               ;; update the low byte
 0C1B4 A5 1A                         LDA ball_ypos_lo
 0C1B6 38                            SEC
-0C1B7 E9 C0                         SBC #BALL_SPEED_LO
+0C1B7 E9 30                         SBC #BALL_SPEED_LO
 0C1B9 85 1A                         STA ball_ypos_lo
 0C1BB                           
 0C1BB                               ;; update the high byte with carry
@@ -812,7 +812,7 @@
 0C1E0                                   ;; update the low byte
 0C1E0 A5 18                             LDA ball_xpos_lo
 0C1E2 38                                SEC
-0C1E3 E9 C0                             SBC #BALL_SPEED_LO
+0C1E3 E9 30                             SBC #BALL_SPEED_LO
 0C1E5 85 18                             STA ball_xpos_lo
 0C1E7                           
 0C1E7                                   ;; update the high byte
@@ -830,7 +830,7 @@
 0C1F5 85 26                             STA ball_flags
 0C1F7                                   
 0C1F7                                   ;; Set nudge timer
-0C1F7 A9 04                             LDA #NUDGE_FRAMES
+0C1F7 A9 03                             LDA #NUDGE_FRAMES
 0C1F9 85 2D                             STA nudge_counter
 0C1FB                                   
 0C1FB                           
@@ -844,7 +844,7 @@
 0C204                                   ;; update the low byte
 0C204 A5 18                             LDA ball_xpos_lo
 0C206 18                                CLC
-0C207 69 C0                             ADC #BALL_SPEED_LO
+0C207 69 30                             ADC #BALL_SPEED_LO
 0C209 85 18                             STA ball_xpos_lo
 0C20B                           
 0C20B                                   ;; update the high byte
@@ -863,7 +863,7 @@
 0C21B 85 26                             STA ball_flags
 0C21D                                   
 0C21D                                   ;; Set nudge timer
-0C21D A9 04                             LDA #NUDGE_FRAMES
+0C21D A9 03                             LDA #NUDGE_FRAMES
 0C21F 85 2D                             STA nudge_counter
 0C221                               +
 0C221                           
@@ -880,7 +880,7 @@
 0C22B                                       ;; update the low byte
 0C22B A5 18                                 LDA ball_xpos_lo
 0C22D 18                                    CLC
-0C22E 69 C0                                 ADC #BALL_SPEED_LO
+0C22E 69 30                                 ADC #BALL_SPEED_LO
 0C230 85 18                                 STA ball_xpos_lo
 0C232                           
 0C232                                       ;; update the high byte
@@ -893,7 +893,7 @@
 0C23B                                   ;; update the low byte
 0C23B A5 18                             LDA ball_xpos_lo
 0C23D 38                                SEC
-0C23E E9 C0                             SBC #BALL_SPEED_LO
+0C23E E9 30                             SBC #BALL_SPEED_LO
 0C240 85 18                             STA ball_xpos_lo
 0C242                           
 0C242                                   ;; update the high byte
