@@ -1680,7 +1680,7 @@
 0C5E5 E9 0A                         SBC #10
 0C5E7 85 01                         STA temp+1
 0C5E9 A9 01                         LDA #$01
-0C5EB 4C 78 C6                      JMP +
+0C5EB 4C F5 C5                      JMP +setTemp
 0C5EE                               
 0C5EE                           +tempIsTwo:
 0C5EE 38                            SEC

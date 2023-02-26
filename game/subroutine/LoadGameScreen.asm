@@ -435,7 +435,7 @@ sub_LoadGameScreen:
     SBC #10
     STA temp+1
     LDA #$01
-    JMP +
+    JMP +setTemp
     
 +tempIsTwo:
     SEC
