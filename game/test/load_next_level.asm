@@ -5,7 +5,7 @@
         ;; Load the next level
         INC current_level
         LDA current_level
-        CMP #$05
+        CMP #10
         BNE +
             LDA #$00
             STA current_level
