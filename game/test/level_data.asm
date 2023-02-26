@@ -422,3 +422,22 @@ tbl_lvl_layout_lo:
     .db <#lvl_layout_16, <#lvl_layout_17, <#lvl_layout_18, <#lvl_layout_19, <#lvl_layout_20
     .db <#lvl_layout_21, <#lvl_layout_22, <#lvl_layout_23, <#lvl_layout_24, <#lvl_layout_25
 
+;; Ball start position
+tbl_lvl_ball_startpos:
+    .db #$57, #$57, #$57, #$57, #$57
+    .db #$57, #$57, #$57, #$57, #$57
+    .db #$57, #$57, #$57, #$57, #$57
+    .db #$57, #$57, #$57, #$57, #$57
+    .db #$57, #$57, #$57, #$57, #$57
+    
+;; Ball start direction, color and tile score
+;; #% v ccc tttt
+;;    | ||| ++++-- tile score
+;;    | +++------- color
+;;    +----------- vertical direction, down (0) or up (1)
+tbl_lvl_ball_init:
+    .db #%00000000, #%00000000, #%00000000, #%00000000, #%00000000
+    .db #%00000000, #%00000000, #%00000000, #%00000000, #%00000000
+    .db #%00000000, #%00000000, #%00000000, #%00000000, #%00000000
+    .db #%00000000, #%00000000, #%00000000, #%00000000, #%00000000
+    .db #%00000000, #%00000000, #%00000000, #%00000000, #%00000000

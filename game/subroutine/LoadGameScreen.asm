@@ -639,8 +639,7 @@ sub_LoadGameScreen:
         JMP -attributeLoop
     +
 
-
-    ;; Stream RAM to PPU
+    ;; Stream attribute RAM to PPU
     BIT PPU_STATUS
     LDA #$23
     STA PPU_ADDR
@@ -653,6 +652,39 @@ sub_LoadGameScreen:
         INX
         CPX #$40
     BNE -
+
+    ;; Set initial ball position
+    LDX current_level
+    LDA tbl_lvl_ball_startpos,x
+    AND #%11110000
+    CLC
+    ADC #$34
+    STA ball_ypos_hi
+    LDY tbl_lvl_ball_startpos,x
+    ASL
+    ASL
+    ASL
+    ASL
+    CLC
+    ADC #$14
+    STA ball_xpos_hi
+    LDA #$00
+    STA ball_xpos_lo
+    STA ball_ypos_lo
+    
+    ;; Set initial ball direction
+    LDA tbl_lvl_ball_init,x
+    AND #%10000000
+    BEQ +
+        LDA #MOVE_BALL_UP
+    +
+    STA ball_flags
+    
+    ;; Set initial ball color
+    LDA tbl_lvl_ball_init,x
+    AND #%01110000
+    ASL
+    JSR sub_ColorizeBall
     
     ;; Return
     RTS

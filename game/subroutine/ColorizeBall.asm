@@ -1,26 +1,6 @@
 sub_ColorizeBall:
 
-    ;; Get next ball color in cycle
-    LDA ball_flags
-    LSR
-    LSR
-    LSR
-    LSR
-    LSR
-    CMP #$05
-    BNE +
-        LDA #$FF
-    +
-    CLC
-    ADC #$01
-    TAX
-
     ;; Update color in ball flags
-    ASL
-    ASL
-    ASL
-    ASL
-    ASL
     STA temp
     LDA ball_flags
     AND #%00011111
