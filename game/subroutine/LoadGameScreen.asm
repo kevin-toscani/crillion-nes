@@ -73,11 +73,11 @@ sub_LoadGameScreen:
     ;; temp+4 = color
     LDA temp+1
     AND #%00000111
+    STA temp+4
     
     ;; If color = 7, this is a wall
     CMP #%00000111
     BEQ +wallHack
-        STA temp+4
         
         ;; temp+7 = first or second set in CHR (add 5 to offset)
         AND #%00000001
@@ -199,7 +199,7 @@ sub_LoadGameScreen:
         
         TXA
         CLC
-        ADC #$10
+        ADC #$0F
         TAX
         
         LDA tile_type,x
