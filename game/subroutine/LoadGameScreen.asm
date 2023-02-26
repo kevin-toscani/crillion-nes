@@ -660,7 +660,7 @@ sub_LoadGameScreen:
     CLC
     ADC #$34
     STA ball_ypos_hi
-    LDY tbl_lvl_ball_startpos,x
+    LDA tbl_lvl_ball_startpos,x
     ASL
     ASL
     ASL
@@ -672,18 +672,10 @@ sub_LoadGameScreen:
     STA ball_xpos_lo
     STA ball_ypos_lo
     
-    ;; Set initial ball direction
+    ;; Set initial ball color and direction
     LDA tbl_lvl_ball_init,x
-    AND #%10000000
-    BEQ +
-        LDA #MOVE_BALL_UP
-    +
+    AND #%11110000
     STA ball_flags
-    
-    ;; Set initial ball color
-    LDA tbl_lvl_ball_init,x
-    AND #%01110000
-    ASL
     JSR sub_ColorizeBall
     
     ;; Return

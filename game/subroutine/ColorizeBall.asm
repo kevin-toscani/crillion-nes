@@ -1,11 +1,21 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Subroutine: ColorizeBall
+;;
+;;  Applies the color set through ball_flags to the ball sprite.
+;;
+;;
+
+
 sub_ColorizeBall:
 
-    ;; Update color in ball flags
-    STA temp
-    LDA ball_flags
-    AND #%00011111
-    ORA temp
-    STA ball_flags
+    ;; Get color from ball_flags
+    LSR
+    LSR
+    LSR
+    LSR
+    LSR
+    TAX
 
     ;; Add new light color of ball to PPU palette
     LDA #$3F
@@ -23,3 +33,4 @@ sub_ColorizeBall:
     JSR sub_WriteByteToPPUBuffer
     
     RTS
+

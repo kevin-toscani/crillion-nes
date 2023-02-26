@@ -99,12 +99,12 @@ tbl_IntroScreenData:
 .include "game/test/show_animation_table.asm"
 
 
-;; Ball palette color cycle
+;; Ball palette color table (CBRYGM)
 tbl_BallColorDark:
-    .db #$12, #$14, #$16, #$27, #$28, #$19
+    .db #$2C, #$12, #$16, #$38, #$29, #$14
  
 tbl_BallColorLight:
-    .db #$2C, #$24, #$25, #$37, #$20, #$2B
+    .db #$3C, #$22, #$25, #$20, #$39, #$24
 
     
 ;; Screen mode drawing routine addresses
