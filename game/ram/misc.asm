@@ -22,9 +22,19 @@
 .ende
 
 
-;; screen tile data (14x10 metatiles)
 .enum ADDR_SCREENTILERAM
+    ;; screen tile type data
+    ;;  #% b m p d ccC s
+    ;;     | | | | ||| +-- block is solid
+    ;;     | | | | ||+---- block color (CHR offset boolean)
+    ;;     | | | | ++----- block color (subpal 0-3)
+    ;;     | | | +-------- death block
+    ;;     | | +---------- paint block
+    ;;     | +------------ move block
+    ;;     +-------------- color block
     tile_type                 .dsb 160
+    
+    ;; attribute table in ram (for easy updating during gameplay)
     tile_attributes           .dsb 64
 .ende
 
