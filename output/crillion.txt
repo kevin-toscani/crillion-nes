@@ -365,9 +365,19 @@
 00348                           .ende
                                 
                                 
-                                ;; screen tile data (14x10 metatiles)
                                 .enum ADDR_SCREENTILERAM
+00400                               ;; screen tile type data
+00400                               ;;  #% b m p d ccC s
+00400                               ;;     | | | | ||| +-- block is solid
+00400                               ;;     | | | | ||+---- block color (CHR offset boolean)
+00400                               ;;     | | | | ++----- block color (subpal 0-3)
+00400                               ;;     | | | +-------- death block
+00400                               ;;     | | +---------- paint block
+00400                               ;;     | +------------ move block
+00400                               ;;     +-------------- color block
 00400                               tile_type                 .dsb 160
+004A0                               
+004A0                               ;; attribute table in ram (for easy updating during gameplay)
 004A0                               tile_attributes           .dsb 64
 004E0                           .ende
                                 
@@ -1247,9 +1257,9 @@
 0C387                               
 0C387                               ;; Get pointer from current level
 0C387 A6 2E                         LDX current_level
-0C389 BD DD CD                      LDA tbl_lvl_layout_lo,x
+0C389 BD FF CF                      LDA tbl_lvl_layout_lo,x
 0C38C 85 0C                         STA pointer
-0C38E BD C4 CD                      LDA tbl_lvl_layout_hi,x
+0C38E BD E6 CF                      LDA tbl_lvl_layout_hi,x
 0C391 85 0D                         STA pointer+1
 0C393                           
 0C393                               ;; Set up the loop
@@ -1291,7 +1301,7 @@
 0C3B8 A5 00                         LDA temp
 0C3BA 29 03                         AND #%00000011
 0C3BC AA                            TAX
-0C3BD BD 28 CE                      LDA tbl_Times64,x
+0C3BD BD 4A D0                      LDA tbl_Times64,x
 0C3C0 18                            CLC
 0C3C1 65 03                         ADC temp+3
 0C3C3 18                            CLC
@@ -1381,9 +1391,9 @@
 0C421 8D 06 20                          STA PPU_ADDR
 0C424                                   
 0C424                                   ;; Write first and second tile
-0C424 BD 2C CE                          LDA tbl_GametileTopLeft,x
+0C424 BD 4E D0                          LDA tbl_GametileTopLeft,x
 0C427 8D 07 20                          STA PPU_DATA
-0C42A BD 36 CE                          LDA tbl_GametileTopRight,x
+0C42A BD 58 D0                          LDA tbl_GametileTopRight,x
 0C42D 8D 07 20                          STA PPU_DATA
 0C430                                   
 0C430                                   ;; Update PPU address
@@ -1396,9 +1406,9 @@
 0C43D 8D 06 20                          STA PPU_ADDR
 0C440                                   
 0C440                                   ;; Write third and fourth tile
-0C440 BD 40 CE                          LDA tbl_GametileBottomLeft,x
+0C440 BD 62 D0                          LDA tbl_GametileBottomLeft,x
 0C443 8D 07 20                          STA PPU_DATA
-0C446 BD 4A CE                          LDA tbl_GametileBottomRight,x
+0C446 BD 6C D0                          LDA tbl_GametileBottomRight,x
 0C449 8D 07 20                          STA PPU_DATA
 0C44C                           
 0C44C                                   ;; Push x-register to stack
@@ -1407,7 +1417,7 @@
 0C44E                                   
 0C44E                                   ;; Update tile RAM (aka collision table)
 0C44E A6 05                             LDX temp+5
-0C450 BD 54 CE                          LDA tbl_GameTileRamByte,x
+0C450 BD 76 D0                          LDA tbl_GameTileRamByte,x
 0C453 05 04                             ORA temp+4
 0C455 0A                                ASL
 0C456 09 01                             ORA #%00000001
@@ -1625,7 +1635,7 @@
 0C587 8D 06 20                      STA PPU_ADDR
 0C58A A2 00                         LDX #$00
 0C58C                               -
-0C58C BD 59 CE                          LDA tbl_HudText,x
+0C58C BD 7B D0                          LDA tbl_HudText,x
 0C58F 8D 07 20                          STA PPU_DATA
 0C592 E8                                INX
 0C593 E0 1C                             CPX #28
@@ -1889,12 +1899,12 @@
 0C6D5                           
 0C6D5                               ;; Set initial ball position
 0C6D5 A6 2E                         LDX current_level
-0C6D7 BD F6 CD                      LDA tbl_lvl_ball_startpos,x
+0C6D7 BD 18 D0                      LDA tbl_lvl_ball_startpos,x
 0C6DA 29 F0                         AND #%11110000
 0C6DC 18                            CLC
 0C6DD 69 34                         ADC #$34
 0C6DF 85 19                         STA ball_ypos_hi
-0C6E1 BD F6 CD                      LDA tbl_lvl_ball_startpos,x
+0C6E1 BD 18 D0                      LDA tbl_lvl_ball_startpos,x
 0C6E4 0A                            ASL
 0C6E5 0A                            ASL
 0C6E6 0A                            ASL
@@ -1907,7 +1917,7 @@
 0C6F1 85 1A                         STA ball_ypos_lo
 0C6F3                               
 0C6F3                               ;; Set initial ball color and direction
-0C6F3 BD 0F CE                      LDA tbl_lvl_ball_init,x
+0C6F3 BD 31 D0                      LDA tbl_lvl_ball_init,x
 0C6F6 29 F0                         AND #%11110000
 0C6F8 85 26                         STA ball_flags
 0C6FA 20 16 C3                      JSR sub_ColorizeBall
@@ -2353,7 +2363,7 @@
 0C9A8 36 CC                         .db #$36, #%11001100
 0C9AA 56 CC                         .db #$56, #%11001100
 0C9AC 66 EC                         .db #$66, #%11101100
-0C9AE 96 EC                         .db #$96, #%11101100
+0C9AE 96 6C                         .db #$96, #%01101100
 0C9B0 C7 AC                         .db #$C7, #%10101100
 0C9B2 08 2C                         .db #$08, #%00101100
 0C9B4 78 6C                         .db #$78, #%01101100
@@ -2870,293 +2880,566 @@
 0CD76 FF                            .db #LEVEL_END
 0CD77                           
 0CD77                           lvl_layout_17:
-0CD77 FF                            .db #LEVEL_END
-0CD78                           
-0CD78                           lvl_layout_18:
-0CD78 FF                            .db #LEVEL_END
-0CD79                           
-0CD79                           lvl_layout_19:
-0CD79 FF                            .db #LEVEL_END
-0CD7A                           
-0CD7A                           lvl_layout_20:
-0CD7A FF                            .db #LEVEL_END
-0CD7B                           
-0CD7B                           lvl_layout_21:
-0CD7B FF                            .db #LEVEL_END
-0CD7C                           
-0CD7C                           lvl_layout_22:
-0CD7C FF                            .db #LEVEL_END
-0CD7D                           
-0CD7D                           lvl_layout_23:
-0CD7D FF                            .db #LEVEL_END
-0CD7E                           
-0CD7E                           lvl_layout_24:
-0CD7E 02 67                         .db #$02, #%01100111
-0CD80 42 67                         .db #$42, #%01100111
-0CD82 82 67                         .db #$82, #%01100111
-0CD84 05 67                         .db #$05, #%01100111
-0CD86 45 67                         .db #$45, #%01100111
-0CD88 85 67                         .db #$85, #%01100111
-0CD8A 08 67                         .db #$08, #%01100111
-0CD8C 48 67                         .db #$48, #%01100111
-0CD8E 88 67                         .db #$88, #%01100111
-0CD90 30 E7                         .db #$30, #%11100111
-0CD92 70 E7                         .db #$70, #%11100111
-0CD94 B0 E7                         .db #$B0, #%11100111
-0CD96 34 E7                         .db #$34, #%11100111
-0CD98 74 E7                         .db #$74, #%11100111
-0CD9A B4 E7                         .db #$B4, #%11100111
-0CD9C 20 13                         .db #$20, #%00010011
-0CD9E 40 10                         .db #$40, #%00010000
-0CDA0 80 02                         .db #$80, #%00000010
-0CDA2 41 05                         .db #$41, #%00000101
-0CDA4 B1 09                         .db #$B1, #%00001001
-0CDA6 02 09                         .db #$02, #%00001001
-0CDA8 52 0C                         .db #$52, #%00001100
-0CDAA 13 11                         .db #$13, #%00010001
-0CDAC 33 04                         .db #$33, #%00000100
-0CDAE 74 0C                         .db #$74, #%00001100
-0CDB0 B4 08                         .db #$B4, #%00001000
-0CDB2 15 09                         .db #$15, #%00001001
-0CDB4 55 0C                         .db #$55, #%00001100
-0CDB6 95 0C                         .db #$95, #%00001100
-0CDB8 47 03                         .db #$47, #%00000011
-0CDBA A7 12                         .db #$A7, #%00010010
-0CDBC 18 15                         .db #$18, #%00010101
-0CDBE 09 05                         .db #$09, #%00000101
-0CDC0 19 03                         .db #$19, #%00000011
-0CDC2 FF                            .db #LEVEL_END
-0CDC3                           
-0CDC3                           lvl_layout_25:
-0CDC3 FF                            .db #LEVEL_END
-0CDC4                           
-0CDC4                           ;; Level layout address pointers
-0CDC4                           tbl_lvl_layout_hi:
-0CDC4 C9 C9 C9 C9 C9                .db >#lvl_layout_01, >#lvl_layout_02, >#lvl_layout_03, >#lvl_layout_04, >#lvl_layout_05
-0CDC9 CA CA CB CB CB                .db >#lvl_layout_06, >#lvl_layout_07, >#lvl_layout_08, >#lvl_layout_09, >#lvl_layout_10
-0CDCE CB CB CC CC CC                .db >#lvl_layout_11, >#lvl_layout_12, >#lvl_layout_13, >#lvl_layout_14, >#lvl_layout_15
-0CDD3 CD CD CD CD CD                .db >#lvl_layout_16, >#lvl_layout_17, >#lvl_layout_18, >#lvl_layout_19, >#lvl_layout_20
-0CDD8 CD CD CD CD CD                .db >#lvl_layout_21, >#lvl_layout_22, >#lvl_layout_23, >#lvl_layout_24, >#lvl_layout_25
-0CDDD                           
-0CDDD                           tbl_lvl_layout_lo:
-0CDDD 07 22 57 8A FB                .db <#lvl_layout_01, <#lvl_layout_02, <#lvl_layout_03, <#lvl_layout_04, <#lvl_layout_05
-0CDE2 36 BF 00 37 7A                .db <#lvl_layout_06, <#lvl_layout_07, <#lvl_layout_08, <#lvl_layout_09, <#lvl_layout_10
-0CDE7 A9 FC 27 7A F1                .db <#lvl_layout_11, <#lvl_layout_12, <#lvl_layout_13, <#lvl_layout_14, <#lvl_layout_15
-0CDEC 22 77 78 79 7A                .db <#lvl_layout_16, <#lvl_layout_17, <#lvl_layout_18, <#lvl_layout_19, <#lvl_layout_20
-0CDF1 7B 7C 7D 7E C3                .db <#lvl_layout_21, <#lvl_layout_22, <#lvl_layout_23, <#lvl_layout_24, <#lvl_layout_25
-0CDF6                           
-0CDF6                           ;; Ball start position (#$YX)
-0CDF6                           tbl_lvl_ball_startpos:
-0CDF6 9B 10 21 9B 11                .db #$9B, #$10, #$21, #$9B, #$11
-0CDFB 81 89 47 1C 20                .db #$81, #$89, #$47, #$1C, #$20
-0CE00 77 20 7D 6B 28                .db #$77, #$20, #$7D, #$6B, #$28
-0CE05 9D 00 00 00 00                .db #$9D, #$00, #$00, #$00, #$00
-0CE0A 00 00 00 34 00                .db #$00, #$00, #$00, #$34, #$00
-0CE0F                               
-0CE0F                           ;; Ball start direction, color and tile score
-0CE0F                           ;; #% ccc v tttt
-0CE0F                           ;;    ||| | ++++-- tile score
-0CE0F                           ;;    ||| +------- vertical direction, up (0) or down
-0CE0F                           ;;    +++--------- color (CBRYGM)
-0CE0F                           tbl_lvl_ball_init:
-0CE0F 30 30 30 20 50                .db #%00110000, #%00110000, #%00110000, #%00100000, #%01010000
-0CE14 70 50 B0 80 50                .db #%01110000, #%01010000, #%10110000, #%10000000, #%01010000
-0CE19 50 50 A0 90 90                .db #%01010000, #%01010000, #%10100000, #%10010000, #%10010000
-0CE1E 20 00 00 00 00                .db #%00100000, #%00000000, #%00000000, #%00000000, #%00000000
-0CE23 00 00 00 90 00                .db #%00000000, #%00000000, #%00000000, #%10010000, #%00000000
-0CE28                           
-0CE28                           
-0CE28                           
-0CE28                           ;; Helper table to multiply values by 64
-0CE28                           tbl_Times64:
-0CE28 00 40 80 C0                   .db #$00, #$40, #$80, #$C0
-0CE2C                           
-0CE2C                           
-0CE2C                           ;; Metatile ID to CHR data mapper
-0CE2C                           tbl_GametileTopLeft:
-0CE2C 40 42 46 44 38 48 4A 4E..     .db #$40, #$42, #$46, #$44, #$38, #$48, #$4A, #$4E, #$4C, #$38
-0CE36                           
-0CE36                           tbl_GametileTopRight:
-0CE36 41 43 47 45 38 49 4B 4F..     .db #$41, #$43, #$47, #$45, #$38, #$49, #$4B, #$4F, #$4D, #$38
-0CE40                           
-0CE40                           tbl_GametileBottomLeft:
-0CE40 50 52 56 54 38 58 5A 5E..     .db #$50, #$52, #$56, #$54, #$38, #$58, #$5A, #$5E, #$5C, #$38
-0CE4A                           
-0CE4A                           tbl_GametileBottomRight:
-0CE4A 51 53 57 55 38 59 5B 5F..     .db #$51, #$53, #$57, #$55, #$38, #$59, #$5B, #$5F, #$5D, #$38
-0CE54                           
-0CE54                           ;; Metatile ID to RAM byte data mapper
-0CE54                           tbl_GameTileRamByte:
-0CE54 40 20 10 08 00                .db #%01000000, #%00100000, #%00010000, #%00001000, #%00000000
-0CE59                           
-0CE59                           ;; HUD text data
-0CE59                           tbl_HudText:
-0CE59 1D 0D 19 1C 0F 00 00 00       .db #_S, #_C, #_O, #_R, #_E, #_SPACE, #_SPACE, #_SPACE
-0CE61 16 0F 20 0F 16 00 00          .db #_L, #_E, #_V, #_E, #_L, #_SPACE, #_SPACE
-0CE68 16 13 20 0F 1D 00 00 00       .db #_L, #_I, #_V, #_E, #_S, #_SPACE, #_SPACE, #_SPACE
-0CE70 0C 19 18 1F 1D                .db #_B, #_O, #_N, #_U, #_S0CE75                           
-0CE75                           ;; NMI handler
-0CE75                           NMI:
-0CE75                               .include "interrupt/nmi.asm"
-0CE75                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-0CE75                           ;;
-0CE75                           ;; include/nmi.asm
-0CE75                           ;;
-0CE75                           ;; Non-maskable interrupt script. This script is being executed
-0CE75                           ;; when vBlank hits.
-0CE75                           ;;
-0CE75                           ;;
-0CE75                           
-0CE75                               ;; Preserve accumulator through stack
-0CE75 48                            PHA
-0CE76                           
-0CE76                               ;; Should NMI be skipped?
-0CE76 A5 13                         LDA skip_nmi
-0CE78 F0 03                         BEQ +
-0CE7A 4C 08 CF                          JMP +skip_nmi
-0CE7D                               +
-0CE7D                           
-0CE7D                               ;; When in NMI, skip additional NMI requests
-0CE7D A9 01                         LDA #$01
-0CE7F 85 13                         STA skip_nmi
-0CE81                           
-0CE81                               ;; Preserve X, Y, and PC through stack
-0CE81 8A                            TXA
-0CE82 48                            PHA
-0CE83 98                            TYA
-0CE84 48                            PHA
-0CE85 08                            PHP
-0CE86                               
-0CE86                               ;; Check forced NMI skip
-0CE86 A5 14                         LDA force_skip_nmi
-0CE88 F0 03                         BEQ +
-0CE8A 4C F9 CE                          JMP +force_skip_nmi
-0CE8D                               +
-0CE8D                           
-0CE8D                               ;; Update PPU mask
-0CE8D                               ;LDA #$00
-0CE8D                               ;STA PPU_CTRL
-0CE8D A5 12                         LDA soft_ppu_mask
-0CE8F 8D 01 20                      STA PPU_MASK
-0CE92                               
-0CE92                               
-0CE92                               ;; Additional PPU updates go here
-0CE92                               .include "game/test/tile_update_nmi.asm"
-0CE92                           
-0CE92                               ;; Check if ppu_buffer needs updating
-0CE92 A5 29                         LDA ppu_buffer_update
-0CE94 D0 03                         BNE +
-0CE96 4C D8 CE                          JMP +no_ppu_buffer_update
-0CE99                               +
-0CE99                           
-0CE99                               ;; Reset ppu control register and mask
-0CE99 A2 00                         LDX #$00
-0CE9B 8E 00 20                      STX PPU_CTRL
-0CE9E 8E 01 20                      STX PPU_MASK
-0CEA1                           
-0CEA1                               ;; Set up loop
-0CEA1                               -
-0CEA1                                   ;; Reset hi/lo latch
-0CEA1 2C 02 20                          BIT PPU_STATUS
-0CEA4                           
-0CEA4                                   ;; Write ppu_buffer hi and lo addresss to PPU_ADDR
-0CEA4 BD 00 03                          LDA ppu_buffer,x
-0CEA7 8D 06 20                          STA PPU_ADDR
-0CEAA E8                                INX
-0CEAB BD 00 03                          LDA ppu_buffer,x
-0CEAE 8D 06 20                          STA PPU_ADDR
-0CEB1                           
-0CEB1                                   ;; Write ppu_buffer data to PPU_ADDR
-0CEB1 E8                                INX
-0CEB2 BD 00 03                          LDA ppu_buffer,x
-0CEB5 8D 07 20                          STA PPU_DATA
-0CEB8                           
-0CEB8                                   ;; Check if updating is done (eg. X is at pointer)
-0CEB8 E8                                INX
-0CEB9 E4 2A                             CPX ppu_buffer_pointer
-0CEBB F0 03                             BEQ +
-0CEBD 4C A1 CE                      JMP -
-0CEC0                           +
-0CEC0                           
-0CEC0                               ;; Reset ppu buffer update and pointer
-0CEC0 A9 00                         LDA #$00
-0CEC2 85 29                         STA ppu_buffer_update
-0CEC4 85 2A                         STA ppu_buffer_pointer
-0CEC6                               
-0CEC6                               ;; Reset scrolling position
-0CEC6 8D 05 20                      STA PPU_SCROLL
-0CEC9 8D 05 20                      STA PPU_SCROLL
-0CECC                           
-0CECC                               ;; Restore ppu control register and mask
-0CECC A9 90                         LDA #%10010000
-0CECE 8D 00 20                      STA PPU_CTRL
-0CED1 A5 12                         LDA soft_ppu_mask
-0CED3 8D 01 20                      STA PPU_MASK
-0CED6 A9 00                         LDA #$00
-0CED8                           
-0CED8                           ;; Continue other NMI stuff
-0CED8                           +no_ppu_buffer_update:
-0CED8                               .include "game/test/show_animation_nmi.asm"
-0CED8                               ;; Reset sprite RAM, draw sprites
-0CED8 8D 03 20                      STA OAM_ADDR
-0CEDB A9 02                         LDA #$02
-0CEDD 8D 14 40                      STA OAM_DMA
-0CEE0                           
-0CEE0 A0 04                         LDY #MAX_ANIMATIONS
-0CEE2 A2 00                         LDX #$00
-0CEE4                               -
-0CEE4 BD 30 03                          LDA explosion_framecounter,x
-0CEE7 F0 03                             BEQ +
-0CEE9 DE 30 03                              DEC explosion_framecounter,x
-0CEEC                                   +
-0CEEC E8                                INX
-0CEED 88                                DEY
-0CEEE F0 03                             BEQ +done        
-0CEF0 4C E4 CE                      JMP -
-0CEF3                           +done:
-0CEF3                               
-0CEF3 A5 2D                         LDA nudge_counter
-0CEF5 F0 02                         BEQ +
-0CEF7 C6 2D                             DEC nudge_counter
-0CEF9                               +
-0CEF9                           
-0CEF9                           ;; This is what happens when we forced nmi skip
-0CEF9                           +force_skip_nmi:
-0CEF9                           
-0CEF9                               ;; Increase frame counters
-0CEF9 E6 15                         INC frame_counter
-0CEFB                           
-0CEFB                               ;; reset ball_update_position
-0CEFB A9 00                         LDA #$00
-0CEFD 85 25                         STA ball_update_position
-0CEFF                           
-0CEFF                               ;; Don't skip next NMI request
-0CEFF A9 00                         LDA #$00
-0CF01 85 13                         STA skip_nmi
-0CF03                           
-0CF03                               ;; Restore X, Y and PC from stack
-0CF03 28                            PLP
-0CF04 68                            PLA
-0CF05 A8                            TAY
-0CF06 68                            PLA
-0CF07 AA                            TAX
-0CF08                           
-0CF08                           +skip_nmi:
-0CF08                               ;; Restore accumulator from stack
-0CF08 68                            PLA
-0CF09                           
-0CF09                               ;; Return
-0CF09 40                            RTI
-0CF0A                           
-0CF0A                           ;; IRQ handler (empty)
-0CF0A                           IRQ:
-0CF0A                               .include "interrupt/irq.asm"
-0CF0A 40                            RTI0CF0B                           
-0CF0B                           ;; Interrupt vectors
-0CF0B 00 00 00 00 00 00 00 00.. .org ADDR_VECTORS
-0FFFA 75 CE                         .dw NMI
+0CD77 10 EA                         .db #$10, #%11101010
+0CD79 20 E2                         .db #$20, #%11100010
+0CD7B 30 62                         .db #$30, #%01100010
+0CD7D 70 02                         .db #$70, #%00000010
+0CD7F 80 6A                         .db #$80, #%01101010
+0CD81 90 22                         .db #$90, #%00100010
+0CD83 01 AA                         .db #$01, #%10101010
+0CD85 31 6A                         .db #$31, #%01101010
+0CD87 81 2A                         .db #$81, #%00101010
+0CD89 A1 02                         .db #$A1, #%00000010
+0CD8B C1 02                         .db #$C1, #%00000010
+0CD8D D1 0A                         .db #$D1, #%00001010
+0CD8F 32 EA                         .db #$32, #%11101010
+0CD91 42 6A                         .db #$42, #%01101010
+0CD93 62 02                         .db #$62, #%00000010
+0CD95 92 6A                         .db #$92, #%01101010
+0CD97 D2 E2                         .db #$D2, #%11100010
+0CD99 43 1A                         .db #$43, #%00011010
+0CD9B 53 CA                         .db #$53, #%11001010
+0CD9D 73 02                         .db #$73, #%00000010
+0CD9F 83 4A                         .db #$83, #%01001010
+0CDA1 B3 CA                         .db #$B3, #%11001010
+0CDA3 C3 EA                         .db #$C3, #%11101010
+0CDA5 04 0A                         .db #$04, #%00001010
+0CDA7 14 A2                         .db #$14, #%10100010
+0CDA9 24 AA                         .db #$24, #%10101010
+0CDAB 44 AA                         .db #$44, #%10101010
+0CDAD 64 6A                         .db #$64, #%01101010
+0CDAF 65 6A                         .db #$65, #%01101010
+0CDB1 A5 AA                         .db #$A5, #%10101010
+0CDB3 06 EA                         .db #$06, #%11101010
+0CDB5 16 62                         .db #$16, #%01100010
+0CDB7 66 22                         .db #$66, #%00100010
+0CDB9 86 2A                         .db #$86, #%00101010
+0CDBB 17 42                         .db #$17, #%01000010
+0CDBD 47 12                         .db #$47, #%00010010
+0CDBF 57 6A                         .db #$57, #%01101010
+0CDC1 97 4A                         .db #$97, #%01001010
+0CDC3 A7 02                         .db #$A7, #%00000010
+0CDC5 18 02                         .db #$18, #%00000010
+0CDC7 28 0A                         .db #$28, #%00001010
+0CDC9 38 22                         .db #$38, #%00100010
+0CDCB 68 2A                         .db #$68, #%00101010
+0CDCD 88 62                         .db #$88, #%01100010
+0CDCF C8 0A                         .db #$C8, #%00001010
+0CDD1 D8 02                         .db #$D8, #%00000010
+0CDD3 19 2A                         .db #$19, #%00101010
+0CDD5 39 2A                         .db #$39, #%00101010
+0CDD7 69 42                         .db #$69, #%01000010
+0CDD9 99 2A                         .db #$99, #%00101010
+0CDDB B9 42                         .db #$B9, #%01000010
+0CDDD FF                            .db #LEVEL_END
+0CDDE                           
+0CDDE                           lvl_layout_18:
+0CDDE 00 12                         .db #$00, #%00010010
+0CDE0 40 1A                         .db #$40, #%00011010
+0CDE2 50 11                         .db #$50, #%00010001
+0CDE4 70 1A                         .db #$70, #%00011010
+0CDE6 80 10                         .db #$80, #%00010000
+0CDE8 D0 13                         .db #$D0, #%00010011
+0CDEA 01 1A                         .db #$01, #%00011010
+0CDEC 22 15                         .db #$22, #%00010101
+0CDEE A2 1A                         .db #$A2, #%00011010
+0CDF0 B2 14                         .db #$B2, #%00010100
+0CDF2 03 67                         .db #$03, #%01100111
+0CDF4 43 67                         .db #$43, #%01100111
+0CDF6 83 67                         .db #$83, #%01100111
+0CDF8 24 09                         .db #$24, #%00001001
+0CDFA 74 0D                         .db #$74, #%00001101
+0CDFC C4 0A                         .db #$C4, #%00001010
+0CDFE 05 A7                         .db #$05, #%10100111
+0CE00 45 27                         .db #$45, #%00100111
+0CE02 95 27                         .db #$95, #%00100111
+0CE04 16 C7                         .db #$16, #%11000111
+0CE06 36 67                         .db #$36, #%01100111
+0CE08 86 67                         .db #$86, #%01100111
+0CE0A D6 07                         .db #$D6, #%00000111
+0CE0C 07 A3                         .db #$07, #%10100011
+0CE0E 27 23                         .db #$27, #%00100011
+0CE10 47 C7                         .db #$47, #%11000111
+0CE12 57 A0                         .db #$57, #%10100000
+0CE14 67 A7                         .db #$67, #%10100111
+0CE16 77 20                         .db #$77, #%00100000
+0CE18 97 C7                         .db #$97, #%11000111
+0CE1A A7 A4                         .db #$A7, #%10100100
+0CE1C B7 A7                         .db #$B7, #%10100111
+0CE1E C7 24                         .db #$C7, #%00100100
+0CE20 28 0B                         .db #$28, #%00001011
+0CE22 38 A3                         .db #$38, #%10100011
+0CE24 78 08                         .db #$78, #%00001000
+0CE26 88 A3                         .db #$88, #%10100011
+0CE28 C8 0C                         .db #$C8, #%00001100
+0CE2A D8 A4                         .db #$D8, #%10100100
+0CE2C 09 43                         .db #$09, #%01000011
+0CE2E 59 40                         .db #$59, #%01000000
+0CE30 A9 44                         .db #$A9, #%01000100
+0CE32 FF                            .db #LEVEL_END
+0CE33                           
+0CE33                           lvl_layout_19:
+0CE33 11 A8                         .db #$11, #%10101000
+0CE35 21 68                         .db #$21, #%01101000
+0CE37 81 28                         .db #$81, #%00101000
+0CE39 B1 48                         .db #$B1, #%01001000
+0CE3B 22 48                         .db #$22, #%01001000
+0CE3D 62 68                         .db #$62, #%01101000
+0CE3F B2 28                         .db #$B2, #%00101000
+0CE41 23 28                         .db #$23, #%00101000
+0CE43 83 28                         .db #$83, #%00101000
+0CE45 B3 28                         .db #$B3, #%00101000
+0CE47 04 E8                         .db #$04, #%11101000
+0CE49 24 08                         .db #$24, #%00001000
+0CE4B 44 08                         .db #$44, #%00001000
+0CE4D 64 E8                         .db #$64, #%11101000
+0CE4F 84 E8                         .db #$84, #%11101000
+0CE51 C4 A8                         .db #$C4, #%10101000
+0CE53 D4 E8                         .db #$D4, #%11101000
+0CE55 15 48                         .db #$15, #%01001000
+0CE57 55 C8                         .db #$55, #%11001000
+0CE59 75 C8                         .db #$75, #%11001000
+0CE5B A5 08                         .db #$A5, #%00001000
+0CE5D 36 08                         .db #$36, #%00001000
+0CE5F B6 08                         .db #$B6, #%00001000
+0CE61 27 48                         .db #$27, #%01001000
+0CE63 97 28                         .db #$97, #%00101000
+0CE65 C7 08                         .db #$C7, #%00001000
+0CE67 09 61                         .db #$09, #%01100001
+0CE69 19 11                         .db #$19, #%00010001
+0CE6B 49 61                         .db #$49, #%01100001
+0CE6D 89 31                         .db #$89, #%00110001
+0CE6F A9 61                         .db #$A9, #%01100001
+0CE71 FF                            .db #LEVEL_END
+0CE72                           
+0CE72                           lvl_layout_20:
+0CE72 00 60                         .db #$00, #%01100000
+0CE74 10 1A                         .db #$10, #%00011010
+0CE76 40 A7                         .db #$40, #%10100111
+0CE78 50 20                         .db #$50, #%00100000
+0CE7A 70 1A                         .db #$70, #%00011010
+0CE7C 80 40                         .db #$80, #%01000000
+0CE7E B0 1A                         .db #$B0, #%00011010
+0CE80 C0 20                         .db #$C0, #%00100000
+0CE82 01 40                         .db #$01, #%01000000
+0CE84 31 1A                         .db #$31, #%00011010
+0CE86 A1 40                         .db #$A1, #%01000000
+0CE88 D1 1A                         .db #$D1, #%00011010
+0CE8A 43 67                         .db #$43, #%01100111
+0CE8C 83 47                         .db #$83, #%01000111
+0CE8E 44 A7                         .db #$44, #%10100111
+0CE90 54 25                         .db #$54, #%00100101
+0CE92 94 08                         .db #$94, #%00001000
+0CE94 A4 A7                         .db #$A4, #%10100111
+0CE96 55 05                         .db #$55, #%00000101
+0CE98 65 08                         .db #$65, #%00001000
+0CE9A 06 27                         .db #$06, #%00100111
+0CE9C 36 67                         .db #$36, #%01100111
+0CE9E 76 28                         .db #$76, #%00101000
+0CEA0 A6 27                         .db #$A6, #%00100111
+0CEA2 D6 07                         .db #$D6, #%00000111
+0CEA4 A7 A7                         .db #$A7, #%10100111
+0CEA6 08 60                         .db #$08, #%01100000
+0CEA8 09 60                         .db #$09, #%01100000
+0CEAA 18 A7                         .db #$18, #%10100111
+0CEAC 48 A7                         .db #$48, #%10100111
+0CEAE 58 47                         .db #$58, #%01000111
+0CEB0 88 27                         .db #$88, #%00100111
+0CEB2 B8 20                         .db #$B8, #%00100000
+0CEB4 D8 1A                         .db #$D8, #%00011010
+0CEB6 59 15                         .db #$59, #%00010101
+0CEB8 69 60                         .db #$69, #%01100000
+0CEBA A9 60                         .db #$A9, #%01100000
+0CEBC FF                            .db #LEVEL_END
+0CEBD                           
+0CEBD                           lvl_layout_21:
+0CEBD 00 13                         .db #$00, #%00010011
+0CEBF 10 11                         .db #$10, #%00010001
+0CEC1 20 67                         .db #$20, #%01100111
+0CEC3 60 67                         .db #$60, #%01100111
+0CEC5 A0 47                         .db #$A0, #%01000111
+0CEC7 D0 15                         .db #$D0, #%00010101
+0CEC9 32 63                         .db #$32, #%01100011
+0CECB 72 05                         .db #$72, #%00000101
+0CECD 82 43                         .db #$82, #%01000011
+0CECF B2 43                         .db #$B2, #%01000011
+0CED1 33 03                         .db #$33, #%00000011
+0CED3 43 2A                         .db #$43, #%00101010
+0CED5 63 7A                         .db #$63, #%01111010
+0CED7 73 2A                         .db #$73, #%00101010
+0CED9 A3 7A                         .db #$A3, #%01111010
+0CEDB 34 63                         .db #$34, #%01100011
+0CEDD 74 63                         .db #$74, #%01100011
+0CEDF B4 43                         .db #$B4, #%01000011
+0CEE1 06 63                         .db #$06, #%01100011
+0CEE3 46 63                         .db #$46, #%01100011
+0CEE5 86 63                         .db #$86, #%01100011
+0CEE7 C6 C3                         .db #$C6, #%11000011
+0CEE9 07 7A                         .db #$07, #%01111010
+0CEEB 47 7A                         .db #$47, #%01111010
+0CEED 67 0A                         .db #$67, #%00001010
+0CEEF 87 7A                         .db #$87, #%01111010
+0CEF1 08 13                         .db #$08, #%00010011
+0CEF3 18 43                         .db #$18, #%01000011
+0CEF5 48 63                         .db #$48, #%01100011
+0CEF7 88 63                         .db #$88, #%01100011
+0CEF9 FF                            .db #LEVEL_END
+0CEFA                           
+0CEFA                           lvl_layout_22:
+0CEFA 00 7A                         .db #$00, #%01111010
+0CEFC 40 7A                         .db #$40, #%01111010
+0CEFE 80 7A                         .db #$80, #%01111010
+0CF00 C0 3A                         .db #$C0, #%00111010
+0CF02 13 67                         .db #$13, #%01100111
+0CF04 83 A7                         .db #$83, #%10100111
+0CF06 B3 07                         .db #$B3, #%00000111
+0CF08 14 07                         .db #$14, #%00000111
+0CF0A 44 07                         .db #$44, #%00000111
+0CF0C A4 07                         .db #$A4, #%00000111
+0CF0E 15 A5                         .db #$15, #%10100101
+0CF10 45 A5                         .db #$45, #%10100101
+0CF12 85 25                         .db #$85, #%00100101
+0CF14 86 05                         .db #$86, #%00000101
+0CF16 A6 05                         .db #$A6, #%00000101
+0CF18 17 11                         .db #$17, #%00010001
+0CF1A 47 A1                         .db #$47, #%10100001
+0CF1C 87 A1                         .db #$87, #%10100001
+0CF1E B7 A1                         .db #$B7, #%10100001
+0CF20 18 41                         .db #$18, #%01000001
+0CF22 68 01                         .db #$68, #%00000001
+0CF24 D8 01                         .db #$D8, #%00000001
+0CF26 FF                            .db #LEVEL_END
+0CF27                           
+0CF27                           lvl_layout_23:
+0CF27 00 71                         .db #$00, #%01110001
+0CF29 40 11                         .db #$40, #%00010001
+0CF2B 50 43                         .db #$50, #%01000011
+0CF2D 80 D1                         .db #$80, #%11010001
+0CF2F 90 E3                         .db #$90, #%11100011
+0CF31 A0 63                         .db #$A0, #%01100011
+0CF33 01 63                         .db #$01, #%01100011
+0CF35 41 63                         .db #$41, #%01100011
+0CF37 A1 63                         .db #$A1, #%01100011
+0CF39 02 63                         .db #$02, #%01100011
+0CF3B 42 63                         .db #$42, #%01100011
+0CF3D 62 11                         .db #$62, #%00010001
+0CF3F A2 67                         .db #$A2, #%01100111
+0CF41 04 63                         .db #$04, #%01100011
+0CF43 44 23                         .db #$44, #%00100011
+0CF45 64 D1                         .db #$64, #%11010001
+0CF47 74 E3                         .db #$74, #%11100011
+0CF49 84 F1                         .db #$84, #%11110001
+0CF4B 94 E3                         .db #$94, #%11100011
+0CF4D A4 C7                         .db #$A4, #%11000111
+0CF4F B4 23                         .db #$B4, #%00100011
+0CF51 05 63                         .db #$05, #%01100011
+0CF53 45 23                         .db #$45, #%00100011
+0CF55 06 71                         .db #$06, #%01110001
+0CF57 46 11                         .db #$46, #%00010001
+0CF59 56 E3                         .db #$56, #%11100011
+0CF5B D6 07                         .db #$D6, #%00000111
+0CF5D 17 D1                         .db #$17, #%11010001
+0CF5F 27 43                         .db #$27, #%01000011
+0CF61 67 D1                         .db #$67, #%11010001
+0CF63 A7 C7                         .db #$A7, #%11000111
+0CF65 C7 A7                         .db #$C7, #%10100111
+0CF67 D7 B3                         .db #$D7, #%10110011
+0CF69 28 43                         .db #$28, #%01000011
+0CF6B 78 43                         .db #$78, #%01000011
+0CF6D 29 43                         .db #$29, #%01000011
+0CF6F 79 43                         .db #$79, #%01000011
+0CF71 FF                           .db #LEVEL_END
+0CF72                           
+0CF72                           lvl_layout_24:
+0CF72 02 67                         .db #$02, #%01100111
+0CF74 42 67                         .db #$42, #%01100111
+0CF76 82 67                         .db #$82, #%01100111
+0CF78 05 67                         .db #$05, #%01100111
+0CF7A 45 67                         .db #$45, #%01100111
+0CF7C 85 67                         .db #$85, #%01100111
+0CF7E 08 67                         .db #$08, #%01100111
+0CF80 48 67                         .db #$48, #%01100111
+0CF82 88 67                         .db #$88, #%01100111
+0CF84 30 E7                         .db #$30, #%11100111
+0CF86 70 E7                         .db #$70, #%11100111
+0CF88 B0 E7                         .db #$B0, #%11100111
+0CF8A 34 E7                         .db #$34, #%11100111
+0CF8C 74 E7                         .db #$74, #%11100111
+0CF8E B4 E7                         .db #$B4, #%11100111
+0CF90 20 13                         .db #$20, #%00010011
+0CF92 40 10                         .db #$40, #%00010000
+0CF94 80 02                         .db #$80, #%00000010
+0CF96 41 05                         .db #$41, #%00000101
+0CF98 B1 09                         .db #$B1, #%00001001
+0CF9A 02 09                         .db #$02, #%00001001
+0CF9C 52 0C                         .db #$52, #%00001100
+0CF9E 13 11                         .db #$13, #%00010001
+0CFA0 33 04                         .db #$33, #%00000100
+0CFA2 74 0C                         .db #$74, #%00001100
+0CFA4 B4 08                         .db #$B4, #%00001000
+0CFA6 15 09                         .db #$15, #%00001001
+0CFA8 55 0C                         .db #$55, #%00001100
+0CFAA 95 0C                         .db #$95, #%00001100
+0CFAC 47 03                         .db #$47, #%00000011
+0CFAE A7 12                         .db #$A7, #%00010010
+0CFB0 18 15                         .db #$18, #%00010101
+0CFB2 09 05                         .db #$09, #%00000101
+0CFB4 19 03                         .db #$19, #%00000011
+0CFB6 FF                            .db #LEVEL_END
+0CFB7                           
+0CFB7                           lvl_layout_25:
+0CFB7 00 12                         .db #$00, #%00010010
+0CFB9 10 63                         .db #$10, #%01100011
+0CFBB 60 63                         .db #$60, #%01100011
+0CFBD A0 07                         .db #$A0, #%00000111
+0CFBF 01 11                         .db #$01, #%00010001
+0CFC1 A1 02                         .db #$A1, #%00000010
+0CFC3 02 67                         .db #$02, #%01100111
+0CFC5 42 07                         .db #$42, #%00000111
+0CFC7 62 67                         .db #$62, #%01100111
+0CFC9 A2 C7                         .db #$A2, #%11000111
+0CFCB 03 61                         .db #$03, #%01100001
+0CFCD 43 01                         .db #$43, #%00000001
+0CFCF 63 61                         .db #$63, #%01100001
+0CFD1 A6 E7                         .db #$A6, #%11100111
+0CFD3 B6 47                         .db #$B6, #%01000111
+0CFD5 C6 01                         .db #$C6, #%00000001
+0CFD7 B7 42                         .db #$B7, #%01000010
+0CFD9 B8 42                         .db #$B8, #%01000010
+0CFDB C8 0A                         .db #$C8, #%00001010
+0CFDD 09 7A                         .db #$09, #%01111010
+0CFDF 49 7A                         .db #$49, #%01111010
+0CFE1 89 3A                         .db #$89, #%00111010
+0CFE3 B9 42                         .db #$B9, #%01000010
+0CFE5 FF                            .db #LEVEL_END
+0CFE6                           
+0CFE6                           ;; Level layout address pointers
+0CFE6                           tbl_lvl_layout_hi:
+0CFE6 C9 C9 C9 C9 C9                .db >#lvl_layout_01, >#lvl_layout_02, >#lvl_layout_03, >#lvl_layout_04, >#lvl_layout_05
+0CFEB CA CA CB CB CB                .db >#lvl_layout_06, >#lvl_layout_07, >#lvl_layout_08, >#lvl_layout_09, >#lvl_layout_10
+0CFF0 CB CB CC CC CC                .db >#lvl_layout_11, >#lvl_layout_12, >#lvl_layout_13, >#lvl_layout_14, >#lvl_layout_15
+0CFF5 CD CD CD CE CE                .db >#lvl_layout_16, >#lvl_layout_17, >#lvl_layout_18, >#lvl_layout_19, >#lvl_layout_20
+0CFFA CE CE CF CF CF                .db >#lvl_layout_21, >#lvl_layout_22, >#lvl_layout_23, >#lvl_layout_24, >#lvl_layout_25
+0CFFF                           
+0CFFF                           tbl_lvl_layout_lo:
+0CFFF 07 22 57 8A FB                .db <#lvl_layout_01, <#lvl_layout_02, <#lvl_layout_03, <#lvl_layout_04, <#lvl_layout_05
+0D004 36 BF 00 37 7A                .db <#lvl_layout_06, <#lvl_layout_07, <#lvl_layout_08, <#lvl_layout_09, <#lvl_layout_10
+0D009 A9 FC 27 7A F1                .db <#lvl_layout_11, <#lvl_layout_12, <#lvl_layout_13, <#lvl_layout_14, <#lvl_layout_15
+0D00E 22 77 DE 33 72                .db <#lvl_layout_16, <#lvl_layout_17, <#lvl_layout_18, <#lvl_layout_19, <#lvl_layout_20
+0D013 BD FA 27 72 B7                .db <#lvl_layout_21, <#lvl_layout_22, <#lvl_layout_23, <#lvl_layout_24, <#lvl_layout_25
+0D018                           
+0D018                           ;; Ball start position (#$YX)
+0D018                           tbl_lvl_ball_startpos:
+0D018 9B 10 21 9B 11                .db #$9B, #$10, #$21, #$9B, #$11
+0D01D 81 89 47 1C 20                .db #$81, #$89, #$47, #$1C, #$20
+0D022 77 20 7D 6B 28                .db #$77, #$20, #$7D, #$6B, #$28
+0D027 9D 36 1B 01 59                .db #$9D, #$36, #$1B, #$01, #$59
+0D02C 90 47 9C 34 18                .db #$90, #$47, #$9C, #$34, #$18
+0D031                               
+0D031                           ;; Ball start direction, color and tile score
+0D031                           ;; #% ccc v tttt
+0D031                           ;;    ||| | ++++-- tile score
+0D031                           ;;    ||| +------- vertical direction, up (0) or down
+0D031                           ;;    +++--------- color (CBRYGM)
+0D031                           tbl_lvl_ball_init:
+0D031 30 30 30 20 50                .db #%00110000, #%00110000, #%00110000, #%00100000, #%01010000
+0D036 70 50 B0 80 50                .db #%01110000, #%01010000, #%10110000, #%10000000, #%01010000
+0D03B 50 50 A0 90 90                .db #%01010000, #%01010000, #%10100000, #%10010000, #%10010000
+0D040 20 50 80 10 10                .db #%00100000, #%01010000, #%10000000, #%00010000, #%00010000
+0D045 60 B0 20 90 60                .db #%01100000, #%10110000, #%00100000, #%10010000, #%01100000
+0D04A                           
+0D04A                           
+0D04A                           
+0D04A                           ;; Helper table to multiply values by 64
+0D04A                           tbl_Times64:
+0D04A 00 40 80 C0                   .db #$00, #$40, #$80, #$C0
+0D04E                           
+0D04E                           
+0D04E                           ;; Metatile ID to CHR data mapper
+0D04E                           tbl_GametileTopLeft:
+0D04E 40 42 46 44 38 48 4A 4E..     .db #$40, #$42, #$46, #$44, #$38, #$48, #$4A, #$4E, #$4C, #$38
+0D058                           
+0D058                           tbl_GametileTopRight:
+0D058 41 43 47 45 38 49 4B 4F..     .db #$41, #$43, #$47, #$45, #$38, #$49, #$4B, #$4F, #$4D, #$38
+0D062                           
+0D062                           tbl_GametileBottomLeft:
+0D062 50 52 56 54 38 58 5A 5E..     .db #$50, #$52, #$56, #$54, #$38, #$58, #$5A, #$5E, #$5C, #$38
+0D06C                           
+0D06C                           tbl_GametileBottomRight:
+0D06C 51 53 57 55 38 59 5B 5F..     .db #$51, #$53, #$57, #$55, #$38, #$59, #$5B, #$5F, #$5D, #$38
+0D076                           
+0D076                           ;; Metatile ID to RAM byte data mapper
+0D076                           tbl_GameTileRamByte:
+0D076 40 20 10 08 00                .db #%01000000, #%00100000, #%00010000, #%00001000, #%00000000
+0D07B                           
+0D07B                           ;; HUD text data
+0D07B                           tbl_HudText:
+0D07B 1D 0D 19 1C 0F 00 00 00       .db #_S, #_C, #_O, #_R, #_E, #_SPACE, #_SPACE, #_SPACE
+0D083 16 0F 20 0F 16 00 00          .db #_L, #_E, #_V, #_E, #_L, #_SPACE, #_SPACE
+0D08A 16 13 20 0F 1D 00 00 00       .db #_L, #_I, #_V, #_E, #_S, #_SPACE, #_SPACE, #_SPACE
+0D092 0C 19 18 1F 1D                .db #_B, #_O, #_N, #_U, #_S0D097                           
+0D097                           ;; NMI handler
+0D097                           NMI:
+0D097                               .include "interrupt/nmi.asm"
+0D097                           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+0D097                           ;;
+0D097                           ;; include/nmi.asm
+0D097                           ;;
+0D097                           ;; Non-maskable interrupt script. This script is being executed
+0D097                           ;; when vBlank hits.
+0D097                           ;;
+0D097                           ;;
+0D097                           
+0D097                               ;; Preserve accumulator through stack
+0D097 48                            PHA
+0D098                           
+0D098                               ;; Should NMI be skipped?
+0D098 A5 13                         LDA skip_nmi
+0D09A F0 03                         BEQ +
+0D09C 4C 2A D1                          JMP +skip_nmi
+0D09F                               +
+0D09F                           
+0D09F                               ;; When in NMI, skip additional NMI requests
+0D09F A9 01                         LDA #$01
+0D0A1 85 13                         STA skip_nmi
+0D0A3                           
+0D0A3                               ;; Preserve X, Y, and PC through stack
+0D0A3 8A                            TXA
+0D0A4 48                            PHA
+0D0A5 98                            TYA
+0D0A6 48                            PHA
+0D0A7 08                            PHP
+0D0A8                               
+0D0A8                               ;; Check forced NMI skip
+0D0A8 A5 14                         LDA force_skip_nmi
+0D0AA F0 03                         BEQ +
+0D0AC 4C 1B D1                          JMP +force_skip_nmi
+0D0AF                               +
+0D0AF                           
+0D0AF                               ;; Update PPU mask
+0D0AF                               ;LDA #$00
+0D0AF                               ;STA PPU_CTRL
+0D0AF A5 12                         LDA soft_ppu_mask
+0D0B1 8D 01 20                      STA PPU_MASK
+0D0B4                               
+0D0B4                               
+0D0B4                               ;; Additional PPU updates go here
+0D0B4                               .include "game/test/tile_update_nmi.asm"
+0D0B4                           
+0D0B4                               ;; Check if ppu_buffer needs updating
+0D0B4 A5 29                         LDA ppu_buffer_update
+0D0B6 D0 03                         BNE +
+0D0B8 4C FA D0                          JMP +no_ppu_buffer_update
+0D0BB                               +
+0D0BB                           
+0D0BB                               ;; Reset ppu control register and mask
+0D0BB A2 00                         LDX #$00
+0D0BD 8E 00 20                      STX PPU_CTRL
+0D0C0 8E 01 20                      STX PPU_MASK
+0D0C3                           
+0D0C3                               ;; Set up loop
+0D0C3                               -
+0D0C3                                   ;; Reset hi/lo latch
+0D0C3 2C 02 20                          BIT PPU_STATUS
+0D0C6                           
+0D0C6                                   ;; Write ppu_buffer hi and lo addresss to PPU_ADDR
+0D0C6 BD 00 03                          LDA ppu_buffer,x
+0D0C9 8D 06 20                          STA PPU_ADDR
+0D0CC E8                                INX
+0D0CD BD 00 03                          LDA ppu_buffer,x
+0D0D0 8D 06 20                          STA PPU_ADDR
+0D0D3                           
+0D0D3                                   ;; Write ppu_buffer data to PPU_ADDR
+0D0D3 E8                                INX
+0D0D4 BD 00 03                          LDA ppu_buffer,x
+0D0D7 8D 07 20                          STA PPU_DATA
+0D0DA                           
+0D0DA                                   ;; Check if updating is done (eg. X is at pointer)
+0D0DA E8                                INX
+0D0DB E4 2A                             CPX ppu_buffer_pointer
+0D0DD F0 03                             BEQ +
+0D0DF 4C C3 D0                      JMP -
+0D0E2                           +
+0D0E2                           
+0D0E2                               ;; Reset ppu buffer update and pointer
+0D0E2 A9 00                         LDA #$00
+0D0E4 85 29                         STA ppu_buffer_update
+0D0E6 85 2A                         STA ppu_buffer_pointer
+0D0E8                               
+0D0E8                               ;; Reset scrolling position
+0D0E8 8D 05 20                      STA PPU_SCROLL
+0D0EB 8D 05 20                      STA PPU_SCROLL
+0D0EE                           
+0D0EE                               ;; Restore ppu control register and mask
+0D0EE A9 90                         LDA #%10010000
+0D0F0 8D 00 20                      STA PPU_CTRL
+0D0F3 A5 12                         LDA soft_ppu_mask
+0D0F5 8D 01 20                      STA PPU_MASK
+0D0F8 A9 00                         LDA #$00
+0D0FA                           
+0D0FA                           ;; Continue other NMI stuff
+0D0FA                           +no_ppu_buffer_update:
+0D0FA                               .include "game/test/show_animation_nmi.asm"
+0D0FA                               ;; Reset sprite RAM, draw sprites
+0D0FA 8D 03 20                      STA OAM_ADDR
+0D0FD A9 02                         LDA #$02
+0D0FF 8D 14 40                      STA OAM_DMA
+0D102                           
+0D102 A0 04                         LDY #MAX_ANIMATIONS
+0D104 A2 00                         LDX #$00
+0D106                               -
+0D106 BD 30 03                          LDA explosion_framecounter,x
+0D109 F0 03                             BEQ +
+0D10B DE 30 03                              DEC explosion_framecounter,x
+0D10E                                   +
+0D10E E8                                INX
+0D10F 88                                DEY
+0D110 F0 03                             BEQ +done        
+0D112 4C 06 D1                      JMP -
+0D115                           +done:
+0D115                               
+0D115 A5 2D                         LDA nudge_counter
+0D117 F0 02                         BEQ +
+0D119 C6 2D                             DEC nudge_counter
+0D11B                               +
+0D11B                           
+0D11B                           ;; This is what happens when we forced nmi skip
+0D11B                           +force_skip_nmi:
+0D11B                           
+0D11B                               ;; Increase frame counters
+0D11B E6 15                         INC frame_counter
+0D11D                           
+0D11D                               ;; reset ball_update_position
+0D11D A9 00                         LDA #$00
+0D11F 85 25                         STA ball_update_position
+0D121                           
+0D121                               ;; Don't skip next NMI request
+0D121 A9 00                         LDA #$00
+0D123 85 13                         STA skip_nmi
+0D125                           
+0D125                               ;; Restore X, Y and PC from stack
+0D125 28                            PLP
+0D126 68                            PLA
+0D127 A8                            TAY
+0D128 68                            PLA
+0D129 AA                            TAX
+0D12A                           
+0D12A                           +skip_nmi:
+0D12A                               ;; Restore accumulator from stack
+0D12A 68                            PLA
+0D12B                           
+0D12B                               ;; Return
+0D12B 40                            RTI
+0D12C                           
+0D12C                           ;; IRQ handler (empty)
+0D12C                           IRQ:
+0D12C                               .include "interrupt/irq.asm"
+0D12C 40                            RTI0D12D                           
+0D12D                           ;; Interrupt vectors
+0D12D 00 00 00 00 00 00 00 00.. .org ADDR_VECTORS
+0FFFA 97 D0                         .dw NMI
 0FFFC 00 C0                         .dw RESET
-0FFFE 0A CF                         .dw IRQ
+0FFFE 2C D1                         .dw IRQ
 10000                           
 10000                           ;; CHR data (if any)
 10000 00 00 00 00 00 00 00 00.. .incbin "game/graphics/sprites.chr"
