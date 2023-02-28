@@ -191,11 +191,12 @@ colliding_tile   .dsb 1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Subroutines
 
+;; Subroutine to convert the ball's position to a tile type
+;; - Expects temp to be y-position of ball within game area
+;; - Expects temp+1 to be x-position of ball within game area
+;; - Puts result in accumulator and zp variable
+;; - Corrupts X-register
 sub_ConvertXYToTileType:
-    ;; - Expects temp to be y-position of ball within game area
-    ;; - Expects temp+1 to be x-position of ball within game area
-    ;; - Puts result in accumulator and zp variable
-    ;; - Corrupts X-register
     LDA temp
     LSR
     LSR

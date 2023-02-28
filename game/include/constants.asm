@@ -1,6 +1,7 @@
 ;; Starting address for screen tile RAM
 ADDR_SCREENTILERAM  = $0400
 
+
 ;; Ball bounding box constants
 BALL_HEIGHT  = #$08  ; Height of the ball graphic within the sprite(s)
 BALL_WIDTH   = #$08  ; Width of the ball graphic within the sprite(s)
@@ -9,10 +10,13 @@ BALL_LEFT    = #$04  ; Left offset of the ball graphic
 
 
 ;; Ball speed (high/low byte), tile and attribute
-BALL_SPEED_HI = #$02
-BALL_SPEED_LO = #$30
-BALL_TILE_CHR = #$01
-BALL_ATTR     = #%00000000
+BALL_SPEED_HI  = #$02        ; High byte of ball speed
+BALL_SPEED_LO  = #$30        ; Low byte of ball speed
+BALL_TILE_CHR  = #$01        ; CHR tile ID
+BALL_ATTR      = #%00000000  ; Attribute (no mirror, subpalette 0)
+BALL_LEFT_WGA  = #$FA        ; Left position within game area (#$04 minus #$10)
+BALL_TOP_WGA   = #$DA        ; Top position within game area (#$04 minus #$30)
+BALL_HALF_SIZE = #$04        ; Half the ball's size (8x8)
 
 
 ;; Ball flag helpers
@@ -27,6 +31,14 @@ UNFREEZE_BALL    = #%11111011
 BALL_MOVES_DOWN  = #%00010000
 MOVE_BALL_DOWN   = #%00010000
 MOVE_BALL_UP     = #%11101111
+
+
+;; Tile flag helpers
+TILE_IS_SOLID    = #%00000001
+IS_COLOR_BLOCK   = #%10000000
+IS_PAINT_BLOCK   = #%00010000
+IS_DEATH_BLOCK   = #%00100000
+IS_MOVE_BLOCK    = #%01000000
 
 
 ;; Screen load helpers

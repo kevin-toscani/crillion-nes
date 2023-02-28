@@ -7,6 +7,13 @@ ball_lives             .dsb 1   ; number of lives left
 ball_score             .dsb 6   ; decimal score, five bytes (0-9)
 ball_bonus             .dsb 3   ; decimal bonus points, three bytes (0-9)
 
+;; Ball bounding box, relative to the screen
+ball_left              .dsb 1
+ball_center            .dsb 1
+ball_right             .dsb 1
+ball_top               .dsb 1
+ball_middle            .dsb 1
+ball_bottom            .dsb 1
 
 ;; Update-position check
 ball_update_position   .dsb 1
@@ -53,3 +60,5 @@ nudge_counter          .dsb 1
 ;; Current level
 current_level          .dsb 1
 
+;; Tile type the ball is currently colliding with
+colliding_tile         .dsb 1

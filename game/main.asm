@@ -63,13 +63,21 @@
     ;; Upon pressing A, an explosion will happen on screen
     .include "game/test/show_animation.asm"
 
-    ;; On the game screen, the ball should move
+    ;; Check if we're on the game screen
     LDA screen_mode
     CMP #IS_GAME_SCREEN
     BEQ +
         JMP ++
     +
+
+    ;; We're on the game screen
+    ;; Move the ball
     .include "game/test/move_ball.asm"
+    
+    ;; Test collision detection
+    .include "game/test/collision_detection.asm"
+
+
     ++
     
     ;; Upon pressing START, (next level) design will be drawn
