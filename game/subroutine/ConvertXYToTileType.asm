@@ -6,16 +6,17 @@
 ;; - Corrupts X-register
 
 sub_ConvertXYToTileType:
-    LDA temp
-    LSR
-    LSR
-    LSR
-    LSR
-    STA temp
     LDA temp+1
+    LSR
+    LSR
+    LSR
+    LSR
+    STA temp+9
+    LDA temp
     AND #%11110000
     CLC
-    ADC temp
+    ADC temp+9
+    STA temp+9
     TAX
     LDA ADDR_SCREENTILERAM, x
     STA colliding_tile

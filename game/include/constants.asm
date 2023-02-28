@@ -5,8 +5,8 @@ ADDR_SCREENTILERAM  = $0400
 ;; Ball bounding box constants
 BALL_HEIGHT  = #$08  ; Height of the ball graphic within the sprite(s)
 BALL_WIDTH   = #$08  ; Width of the ball graphic within the sprite(s)
-BALL_TOP     = #$04  ; Top offset of the ball graphic
-BALL_LEFT    = #$04  ; Left offset of the ball graphic
+BALL_TOP     = #$00  ; Top offset of the ball graphic
+BALL_LEFT    = #$00  ; Left offset of the ball graphic
 
 
 ;; Ball speed (high/low byte), tile and attribute
@@ -14,8 +14,8 @@ BALL_SPEED_HI  = #$02        ; High byte of ball speed
 BALL_SPEED_LO  = #$30        ; Low byte of ball speed
 BALL_TILE_CHR  = #$01        ; CHR tile ID
 BALL_ATTR      = #%00000000  ; Attribute (no mirror, subpalette 0)
-BALL_LEFT_WGA  = #$FA        ; Left position within game area (#$04 minus #$10)
-BALL_TOP_WGA   = #$DA        ; Top position within game area (#$04 minus #$30)
+BALL_LEFT_WGA  = #$F0        ; Left position within game area (-#$10)
+BALL_TOP_WGA   = #$D0        ; Top position within game area (-#$30)
 BALL_HALF_SIZE = #$04        ; Half the ball's size (8x8)
 
 

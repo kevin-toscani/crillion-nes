@@ -67,10 +67,16 @@
     LDA screen_mode
     CMP #IS_GAME_SCREEN
     BEQ +
-        JMP ++
+        JMP +doneGameScreen
     +
 
     ;; We're on the game screen
+    ;; Check if position should be updated (ie. has nmi happened yet)
+    LDA ball_update_position
+    BEQ +
+        JMP +skipBallMovement
+    +
+    
     ;; Move the ball
     .include "game/test/move_ball.asm"
     
@@ -78,8 +84,26 @@
     .include "game/test/collision_detection.asm"
 
 
-    ++
-    
++skipBallMovement:
+    ;; Add to sprite buffer
+    LDX sprite_ram_pointer
+    LDA ball_ypos_hi
+    STA ADDR_SPRITERAM,x
+    INX
+    LDA #BALL_TILE_CHR
+    STA ADDR_SPRITERAM,x
+    INX
+    LDA #BALL_ATTR
+    STA ADDR_SPRITERAM,x
+    INX
+    LDA ball_xpos_hi
+    STA ADDR_SPRITERAM,x
+    INX
+    STX sprite_ram_pointer
+
+
++doneGameScreen:
+
     ;; Upon pressing START, (next level) design will be drawn
     .include "game/test/load_next_level.asm"
 

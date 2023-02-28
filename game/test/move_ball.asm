@@ -1,10 +1,4 @@
 
-    ;; check if position should be updated (ie. has nmi happened yet)
-    LDA ball_update_position
-    BEQ +
-        JMP +skipBallMovement
-    +
-
     ;; Check if ball goes up or down
     LDA ball_flags
     AND #BALL_MOVES_DOWN
@@ -171,23 +165,4 @@
 
     ;; Don't update position again until next frame
     INC ball_update_position
-
-
-
-+skipBallMovement:
-    ;; Add to sprite buffer
-    LDX sprite_ram_pointer
-    LDA ball_ypos_hi
-    STA ADDR_SPRITERAM,x
-    INX
-    LDA #BALL_TILE_CHR
-    STA ADDR_SPRITERAM,x
-    INX
-    LDA #BALL_ATTR
-    STA ADDR_SPRITERAM,x
-    INX
-    LDA ball_xpos_hi
-    STA ADDR_SPRITERAM,x
-    INX
-    STX sprite_ram_pointer
 
