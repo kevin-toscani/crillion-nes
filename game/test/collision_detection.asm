@@ -41,8 +41,8 @@
 
     ;; Tile is solid; nudge ball and evaluate tile type
     LDA ball_flags
-    ORA #NUDGE_BALL_LEFT
-    STA ball_flags
+    AND #NUDGE_BALL_LEFT
+    JSR sub_InitiateNudge
     JSR sub_EvaluateTileType
     JMP +checkTopCollision
 
@@ -64,11 +64,11 @@
 
     ;; Tile is solid; nudge ball and evaluate tile type
     LDA ball_flags
-    AND #NUDGE_BALL_LEFT
-    STA ball_flags
+    ORA #NUDGE_BALL_RIGHT
+    JSR sub_InitiateNudge
     JSR sub_EvaluateTileType
-    ;JMP +checkTopCollision
-
+    
+    
 +checkTopCollision:
     ;; Check if ball moves up
     LDA ball_flags

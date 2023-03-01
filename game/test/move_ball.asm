@@ -85,15 +85,10 @@
         CMP #BOUND_LEFT
         BCS +doneBallMovement
         
-        ;; Set flag to nudge right
+        ;; Set flag to nudge right and set nudge counter
         LDA ball_flags
         ORA #NUDGE_BALL_RIGHT
-        STA ball_flags
-        
-        ;; Set nudge timer
-        LDA #NUDGE_FRAMES
-        STA nudge_counter
-        
+        JSR sub_InitiateNudge
 
         JMP +doneBallMovement        
     +
@@ -118,14 +113,10 @@
         BCC +doneBallMovement
         BEQ +doneBallMovement
         
-        ;; Set flag to nudge right
+        ;; Set flag to nudge left and set nudge timer
         LDA ball_flags
         AND #NUDGE_BALL_LEFT
-        STA ball_flags
-        
-        ;; Set nudge timer
-        LDA #NUDGE_FRAMES
-        STA nudge_counter
+        JSR sub_InitiateNudge
     +
 
 

@@ -7,6 +7,7 @@
 .include "game/subroutine/DisableEnableRendering.asm"
 .include "game/subroutine/DrawIntroScreenLogoTile.asm"
 .include "game/subroutine/EvaluateTileType.asm"
+.include "game/subroutine/InitiateNudge.asm"
 .include "game/subroutine/JumpToPointer.asm"
 .include "game/subroutine/LoadGameScreen.asm"
 .include "game/subroutine/LoadIntroScreen.asm"
