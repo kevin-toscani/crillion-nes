@@ -108,7 +108,6 @@
     AND #MOVE_BALL_UP
     STA ball_flags
     JSR sub_EvaluateTileType
-    ;JMP +doneCheckingCollision
 
 +doneCheckingCollision:
 

@@ -767,7 +767,7 @@
 0C187                               +
 0C187                               
 0C187                               ;; Move the ball
-0C187                               .include "game/test/move_ball.asm"
+0C187                               .include "game/include/main/move_ball.asm"
 0C187                           
 0C187                               ;; Check if ball goes up or down
 0C187 A5 2C                         LDA ball_flags
@@ -929,7 +929,7 @@
 0C23E                           
 0C23E                               
 0C23E                               ;; Test collision detection
-0C23E                               .include "game/test/collision_detection.asm"
+0C23E                               .include "game/include/main/collision_detection.asm"
 0C23E                           
 0C23E                               ;; Get ball's x-left, x-center, x-right position
 0C23E A5 17                         LDA ball_xpos_hi
@@ -1040,7 +1040,6 @@
 0C2D3 29 EF                         AND #MOVE_BALL_UP
 0C2D5 85 2C                         STA ball_flags
 0C2D7 20 37 C4                      JSR sub_EvaluateTileType
-0C2DA                               ;JMP +doneCheckingCollision
 0C2DA                           
 0C2DA                           +doneCheckingCollision:
 0C2DA                           
@@ -2493,8 +2492,8 @@
 0C9BB 3F                            .db #$3F
 0C9BC                           
 0C9BC                           
-0C9BC                           ;; test animation table
-0C9BC                           .include "game/test/show_animation_table.asm"
+0C9BC                           ;; Animation frames table
+0C9BC                           .include "game/include/table/animation_frames.asm"
 0C9BC                           ;; CHR tile-id's per slide of explosion
 0C9BC                           explosion_slide0:
 0C9BC 00 00 00                      .db #$00, #$00, #$00
@@ -2564,8 +2563,8 @@
 0CA0C 0F 83 9E                      .db <#sub_LoadIntroScreen, <#sub_LoadGameScreen, <#sub_LoadWinScreen
 0CA0F                           
 0CA0F                           
-0CA0F                           ;; Test level data
-0CA0F                           .include "game/test/level_data.asm"
+0CA0F                           ;; Level data
+0CA0F                           .include "game/include/table/level_data.asm"
 0CA0F                           lvl_layout_01:
 0CA0F 61 21                         .db #$61, #%00100001
 0CA11 52 61                         .db #$52, #%01100001
@@ -2966,7 +2965,7 @@
 0CCF5 56 1A                         .db #$56, #%00011010
 0CCF7 66 14                         .db #$66, #%00010100
 0CCF9 86 10                         .db #$86, #%00010000
-0CCFB 96 5C                         .db #$96, #%01011100
+0CCFB 96 5A                         .db #$96, #%01011010
 0CCFD A6 12                         .db #$A6, #%00010010
 0CCFF C6 15                         .db #$C6, #%00010101
 0CD01 D6 E7                         .db #$D6, #%11100111
@@ -3619,7 +3618,7 @@
 0D1BC                               
 0D1BC                               
 0D1BC                               ;; Additional PPU updates go here
-0D1BC                               .include "game/test/tile_update_nmi.asm"
+0D1BC                               .include "game/interrupt/nmi.asm"
 0D1BC                           
 0D1BC                               ;; Check if ppu_buffer needs updating
 0D1BC A5 2F                         LDA ppu_buffer_update
@@ -3674,12 +3673,13 @@
 0D202                           
 0D202                           ;; Continue other NMI stuff
 0D202                           +no_ppu_buffer_update:
-0D202                               .include "game/test/show_animation_nmi.asm"
+0D202                           
 0D202                               ;; Reset sprite RAM, draw sprites
 0D202 8D 03 20                      STA OAM_ADDR
 0D205 A9 02                         LDA #$02
 0D207 8D 14 40                      STA OAM_DMA
 0D20A                           
+0D20A                               ;; Decrease explosion frame counters
 0D20A A0 04                         LDY #MAX_ANIMATIONS
 0D20C A2 00                         LDX #$00
 0D20E                               -
@@ -3693,6 +3693,7 @@
 0D21A 4C 0E D2                      JMP -
 0D21D                           +done:
 0D21D                               
+0D21D                               ;; Decrease nudge counter
 0D21D A5 33                         LDA nudge_counter
 0D21F F0 02                         BEQ +
 0D221 C6 33                             DEC nudge_counter

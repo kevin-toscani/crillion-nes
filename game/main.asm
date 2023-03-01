@@ -78,10 +78,10 @@
     +
     
     ;; Move the ball
-    .include "game/test/move_ball.asm"
+    .include "game/include/main/move_ball.asm"
     
     ;; Test collision detection
-    .include "game/test/collision_detection.asm"
+    .include "game/include/main/collision_detection.asm"
 
 
 +skipBallMovement:

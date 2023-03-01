@@ -95,8 +95,8 @@ tbl_IntroScreenData:
     .db #$3F
 
 
-;; test animation table
-.include "game/test/show_animation_table.asm"
+;; Animation frames table
+.include "game/include/table/animation_frames.asm"
 
 
 ;; Ball palette color table (CBRYGM)
@@ -115,8 +115,8 @@ tbl_LoadScreenLo:
     .db <#sub_LoadIntroScreen, <#sub_LoadGameScreen, <#sub_LoadWinScreen
 
 
-;; Test level data
-.include "game/test/level_data.asm"
+;; Level data
+.include "game/include/table/level_data.asm"
 
 
 ;; Helper table to multiply values by 64

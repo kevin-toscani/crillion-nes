@@ -41,8 +41,7 @@
     
     
     ;; Additional PPU updates go here
-    .include "game/test/tile_update_nmi.asm"
-    .include "game/test/show_animation_nmi.asm"
+    .include "game/interrupt/nmi.asm"
 
 ;; This is what happens when we forced nmi skip
 +force_skip_nmi:

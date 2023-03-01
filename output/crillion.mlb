@@ -145,7 +145,7 @@ P:0412:: no need for bottom check as ball moves up
 P:0414::; Tile is solid; move ball down and evaluate tile type
 P:0420::; No movement check needed: since ball is not moving up, it must move down\n; Check tile at bottom position
 P:042F::; Tile is solid; move ball up and evaluate tile type
-P:0438::JMP +doneCheckingCollision\n; Add to sprite buffer
+P:0438::; Add to sprite buffer
 P:0454::; Upon pressing START, (next level) design will be drawn\n; If START button is pressed
 P:045A::; Load the next level
 P:046A::; Sprite clean-up
@@ -329,7 +329,7 @@ P:0AB0::; Set PPU address $222D and draw
 P:0AB8::; Set PPU address $2281
 P:0ABA::; Draw the Crillion logo
 P:0B19::; End of intro
-P:0B1A:explosion_slide0:; test animation table\n; CHR tile-id's per slide of explosion
+P:0B1A:explosion_slide0:; Animation frames table\n; CHR tile-id's per slide of explosion
 P:0B23:explosion_slide1
 P:0B2C:explosion_slide2
 P:0B35:explosion_slide3
@@ -340,7 +340,7 @@ P:0B5B:tbl_BallColorDark:; Ball palette color table (CBRYGM)
 P:0B61:tbl_BallColorLight
 P:0B67:tbl_LoadScreenHi:; Screen mode drawing routine addresses
 P:0B6A:tbl_LoadScreenLo
-P:0B6D:lvl_layout_01:; Test level data
+P:0B6D:lvl_layout_01:; Level data
 P:0B88:lvl_layout_02
 P:0BBD:lvl_layout_03
 P:0BF0:lvl_layout_04
@@ -392,6 +392,8 @@ P:1348::; Reset ppu buffer update and pointer
 P:134E::; Reset scrolling position
 P:1354::; Restore ppu control register and mask
 P:1360::; Continue other NMI stuff\n; Reset sprite RAM, draw sprites
+P:1368::; Decrease explosion frame counters
+P:137B::; Decrease nudge counter
 P:1381::; This is what happens when we forced nmi skip\n; Increase frame counters
 P:1383::; reset ball_update_position
 P:1387::; Don't skip next NMI request
