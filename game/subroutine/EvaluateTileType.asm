@@ -33,31 +33,30 @@ sub_EvaluateTileType:
     LDA colliding_tile
     AND #IS_PAINT_BLOCK
     BEQ +checkIfDeathBlock
-        ;; It's a paint block. Update ball color (@TODO)
+        ;; It's a paint block. Update ball color
+        ;; Save x-register
+        TXA
+        PHA
 
-;        ;; Save x-register
-;        TXA
-;        PHA
-;
-;        ;; Get tile color
-;        LDA colliding_tile
-;        AND #%00001110
-;        ASL
-;        ASL
-;        ASL
-;        ASL
-;        STA temp
-;
-;        ;; Apply tile color to ball
-;        LDA ball_flags
-;        AND #%00011111
-;        ORA temp
-;        STA ball_flags
-;        JSR sub_ColorizeBall
-;
-;        ;; Restore x-register
-;        PLA
-;        TAX
+        ;; Get tile color
+        LDA colliding_tile
+        AND #%00001110
+        ASL
+        ASL
+        ASL
+        ASL
+        STA temp
+
+        ;; Apply tile color to ball
+        LDA ball_flags
+        AND #%00011111
+        ORA temp
+        STA ball_flags
+        JSR sub_ColorizeBall
+
+        ;; Restore x-register
+        PLA
+        TAX
 
         ;; Return
         RTS

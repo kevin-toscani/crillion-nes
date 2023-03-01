@@ -186,215 +186,219 @@ P:059B::; It's a color block. Check if the colors match
 P:05A0::; Colors don't match - return
 P:05A1::; Colors match. Destroy color block\n; - Add the tiles that need updating to ppu buffer\n; - Load destruction animation on tile\n; - Write #$00 in tile type ram (makes not-solid)\n; - Update attribute table accordingly through ppu buffer\n; - If there are no color blocks left:\n;   - Freeze ball\n;   - Initiate level-win state\n; (@TODO)
 P:05A2::; Check if collided tile is a paint block
-P:05A8::; It's a paint block. Update ball color (@TODO)\n        ;; Save x-register\n        TXA\n        PHA\n\n        ;; Get tile color\n        LDA colliding_tile\n        AND #%00001110\n        ASL\n        ASL\n        ASL\n        ASL\n        STA temp\n\n        ;; Apply tile color to ball\n        LDA ball_flags\n        AND #%00011111\n        ORA temp\n        STA ball_flags\n        JSR sub_ColorizeBall\n\n        ;; Restore x-register\n        PLA\n        TAX\n; Return
-P:05A9::; Check if collided tile is a death block
-P:05AF::; It is a death block. Kill player and return (@TODO)\n        LDA ball_flags\n        ORA #%00000101\n        STA ball_flags
-P:05B0::; Check if collided tile is a move block
-P:05B6::; It is a move block. Check if colors match
-P:05BB::; Colors don't match - return
-P:05BC::; Colors match.\n; - Check if next tile is a solid\n; - If not, move the tile:\n;   - Add the tiles that need updating to ppu buffer\n;   - Add move tile sprite over the original tile\n;   - Initiate moving the sprite that way for 16px\n;   - Write #$00 in tile type ram (makes not-solid)\n;   - Update attribute table accordingly through ppu buffer\n; - After moving the sprite, in a different routine:\n;   - Add move tile data on the new tile location\n;   - Write the original tile type data on new position in ram\n;   - Destroy sprite\n;   - Update attribute table accordingly through ppu buffer\n; (@TODO)
-P:05BD::; Return
-P:05BE:sub_InitiateNudge
-P:05C5:sub_JumpToPointer
-P:05C8:sub_LoadGameScreen:RTS must be handled by the routine (pointer) jumps to\n; Clear the screen
-P:05CB::; Clear collision and attribute data
-P:05D4::; Get pointer from current level
-P:05E0::; Set up the loop
-P:05E2::; Load (x,y) of current set of tiles
-P:05E4::; Check if level is done; if so, skip the loop
-P:05EB::; Store (x,y) and number of tiles and tile data in temp variable
-P:05F2::; Convert (x,y) to PPU address\n; temp+2 = PPU_hi = $20 + _y/4_ + carry from temp+3
-P:05FC::; temp+3 = PPU_lo = 2*x + $40*(y%4) + $C2
-P:0615::; Add carry to temp+2
-P:061B::; Convert tile data to loop count and tile type\n; temp+4 = color
-P:0621::; If color = 7, this is a wall
-P:0625::; temp+7 = first or second set in CHR (add 5 to offset)
-P:062D::; temp+5 = tile type
-P:0637::; It's a wall! Set CHR offset to 0, and tile type to 4.
-P:063F::; X = tile offset
-P:0643::; temp+6 = number of tiles
-P:064E::; Translate (x,y) to (y,x) for tile RAM
-P:0660::; Set up loop
-P:0664::; Write PPU address
-P:0671::; Write first and second tile
-P:067D::; Update PPU address
-P:068D::; Write third and fourth tile
-P:0699::; Push x-register to stack
-P:069B::; Update tile RAM (aka collision table)
-P:06AA::; Check if shade 1 should be drawn
-P:06B5::; Check if shade 2 should be drawn
-P:06DB::; Check if shade 3 should be drawn
-P:06F2::; Restore x-register from stack
-P:06F4::; Reset pointer for next tile
-P:0701::; Draw next metatile in this loop (if any left)
-P:0704::; Is it a row or a column?
-P:0708::; It is a column: move pointer down (+$40)
-P:0715::; Add 16 to temp (as a tile RAM pointer)
-P:071F::; It is a row: move pointer right (+$02)
-P:0726::; Add 1 to temp (as a tile RAM pointer)
-P:0728::; Next tile in the row/column
-P:072B::; Go to the next set of tiles
-P:0731::; Level loading is done\n; Top game bound: set PPU_ADDR offset and draw 28 tiles
-P:0740::; Bottom game bound: set PPU_ADDR offset and draw 28 tiles
-P:074F::; Left & right game bounds\n; Set PPU_ADDR and store in temp variables
-P:075D::; Set vertical bound tile and set up loop
-P:0761::; Show left tile
-P:0764::; Set PPU_ADDR to right bound by adding 29 (tiles) to low byte
-P:0773::; Show right tile
-P:0776::; Check if we're done yet
-P:0779::; Not done yet: add 3 to low byte for next left bound
-P:0780::; Apply carry to high byte
-P:0786::; Store next PPU_ADDR to draw at
-P:0791::; Draw the corners of the playing field
-P:07CD::; Draw the hud labels
-P:07E4::; Draw the current score
-P:07FD::; Draw the level number\n; (with primitive HEX>DEC)
-P:083C::; Draw lives (presumes lives to be capped at 9)
-P:084C::; Set and draw bonus
-P:086F::; Set attribute data to RAM\n; Byte 0-7 of attribute ram should be #%10100000
-P:087B::; Byte 8-55 of attribute ram are filled with game subpal data\n; Reset current attribute value
-P:087F::; Get first metatile in tile ram based on attribute index\n; metatile = (attr-8)*2 +(16*(attr-8)/8))
-P:0883:: attr - 8 (temp1)
-P:0885:: * 2
-P:0886:: temp = temp1 * 2
-P:0888:: temp1
-P:088A:: rounded down to 8's
-P:088C:: * 2
-P:088E:: + temp1 * 2
-P:0890:: first metatile
-P:0892::; Store first metatile in y-register
-P:0893::; If X MOD 8 == 7, don't apply bottom right metatile
-P:089A::; If X >= $30, don't apply bottom right metatile
-P:089E::; Add metatile1 subpalette to attribute value
-P:08A5::; Apply second metatile
-P:08A6::; If X MOD 8 == 0, don't apply bottom left metatile
-P:08AB::; If X >= $30, don't apply bottom left metatile
-P:08AF::; Add metatile2 subpalette to attribute value
-P:08C1::; Apply third metatile
-P:08C6::; If X MOD 8 == 7, don't apply top right metatile
-P:08CD::; If X < $10, don't apply top right metatile
-P:08D2::; Add metatile3 subpalette to attribute value
-P:08E4::; Apply fourth metatile
-P:08E5::; If X MOD 8 == 0, don't apply top left metatile
-P:08EA::; If X < $10, don't apply top left metatile
-P:08EF::; Add metatile4 subpalette to attribute value
-P:0900::; Check the next attribute, if any left
-P:0908::; Stream attribute RAM to PPU
-P:0922::; Set initial ball position
-P:0940::; Set initial ball color and direction
-P:094A::; Return
-P:094B:sub_Draw28HorizontalTiles:; Subroutine: draw 28 tiles in a row
-P:0954:sub_LoadIntroScreen:; Load intro palette
-P:096E::; Put ball in the middle
-P:0974::; Clear the screen
-P:0977::; Set up intro screen draw loop
-P:0979::; Get current byte from intro screen data
-P:097C::; If current byte is #$3F, we're done drawing.
-P:0983::; If highest bits are %11, draw a plain tile
-P:098A::; If highest bits are %01, set the PPU address\n; If not, draw two logo tiles
-P:0991::; Get bits 0-2 and store in a temp variable
-P:0998::; Get bits 3-5, shift over to get a value from 0-7
-P:09A0::; Draw the tile that corresponds with that value
-P:09A4::; Do the same for the value stored in temp
-P:09A9::; Next byte please
-P:09AD::; Just draw the tile value on screen
-P:09B3::; Next byte please
-P:09B7::; Reset the PPU latch
-P:09BA::; Sanitize and write the high byte of the PPU address
-P:09C2::; Write the low byte of the PPU address
-P:09C9::; PPU has been set up to draw tiles at the correct spot now.\n; Next byte please.
-P:09CD::; To color the 1.LEVEL: line green, we need to update two\n; values in the PPU attribute data.
-P:09E3:sub_LoadWinScreen
-P:09E4:sub_WriteByteToPPUBuffer:; Prevent updating until full 3-byte buffer is filled,\n; so that graphics won't glitch out if NMI happens during\n; updating the buffer
-P:09E8::; Check if buffer full; if so, wait a frame and force update
-P:09F3::; Add ppu_addr high byte to buffer
-P:09F8::; Add ppu_addr low byte to buffer
-P:09FE::; Add ppu_data to buffer
-P:0A04::; Update buffer pointer
-P:0A07::; Tell NMI to update next round
-P:0A09::; Return
-P:0A0A:tbl_IntroScreenPalette:; LUTs\n; Intro screen palette
-P:0A2A:tbl_IntroScreenLogoChr:; Intro: mapping logo index to chr tile
-P:0A32:tbl_IntroScreenData:; Intro screen data\n; Set PPU address $20AC and draw
-P:0A3C::; Set PPU address $20CF and draw
-P:0A40::; Set PPU address $2122 and draw
-P:0A5C::; Set PPU address $2147 and draw
-P:0A75::; Set PPU address $218B and draw
-P:0A82::; Set PPU address $21E6 and draw
-P:0A97::; Set PPU address $222D and draw
-P:0A9F::; Set PPU address $2281
-P:0AA1::; Draw the Crillion logo
-P:0B00::; End of intro
-P:0B01:explosion_slide0:; test animation table\n; CHR tile-id's per slide of explosion
-P:0B0A:explosion_slide1
-P:0B13:explosion_slide2
-P:0B1C:explosion_slide3
-P:0B25:explosion_slide4
-P:0B2E:explosion_anim_hi:; High and low bytes of animation slides
-P:0B38:explosion_anim_lo
-P:0B42:tbl_BallColorDark:; Ball palette color table (CBRYGM)
-P:0B48:tbl_BallColorLight
-P:0B4E:tbl_LoadScreenHi:; Screen mode drawing routine addresses
-P:0B51:tbl_LoadScreenLo
-P:0B54:lvl_layout_01:; Test level data
-P:0B6F:lvl_layout_02
-P:0BA4:lvl_layout_03
-P:0BD7:lvl_layout_04
-P:0C48:lvl_layout_05
-P:0C83:lvl_layout_06
-P:0D0C:lvl_layout_07
-P:0D4D:lvl_layout_08
-P:0D84:lvl_layout_09
-P:0DC7:lvl_layout_10
-P:0DF6:lvl_layout_11
-P:0E49:lvl_layout_12
-P:0E74:lvl_layout_13
-P:0EC7:lvl_layout_14
-P:0F3E:lvl_layout_15
-P:0F6F:lvl_layout_16
-P:0FC4:lvl_layout_17
-P:102B:lvl_layout_18
-P:1080:lvl_layout_19
-P:10BF:lvl_layout_20
-P:110A:lvl_layout_21
-P:1147:lvl_layout_22
-P:1174:lvl_layout_23
-P:11BF:lvl_layout_24
-P:1204:lvl_layout_25
-P:1233:tbl_lvl_layout_hi:; Level layout address pointers
-P:124C:tbl_lvl_layout_lo
-P:1265:tbl_lvl_ball_startpos:; Ball start position (#$YX)
-P:127E:tbl_lvl_ball_init:; Ball start direction, color and tile score\n; #% ccc v tttt\n;    ||| | ++++-- tile score\n;    ||| +------- vertical direction, up (0) or down\n;    +++--------- color (CBRYGM)
-P:1297:tbl_Times64:; Helper table to multiply values by 64
-P:129B:tbl_GametileTopLeft:; Metatile ID to CHR data mapper
-P:12A5:tbl_GametileTopRight
-P:12AF:tbl_GametileBottomLeft
-P:12B9:tbl_GametileBottomRight
-P:12C3:tbl_GameTileRamByte:; Metatile ID to RAM byte data mapper
-P:12C8:tbl_HudText:; HUD text data
-P:12E4:NMI:; NMI handler\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n;\n; include/nmi.asm\n;\n; Non-maskable interrupt script. This script is being executed\n; when vBlank hits.\n;\n;\n; Preserve accumulator through stack
-P:12E5::; Should NMI be skipped?
-P:12EC::; When in NMI, skip additional NMI requests
-P:12F0::; Preserve X, Y, and PC through stack
-P:12F5::; Check forced NMI skip
-P:12FC::; Update PPU mask\nLDA #$00\nSTA PPU_CTRL
-P:1301::; Additional PPU updates go here\n; Check if ppu_buffer needs updating
-P:1308::; Reset ppu control register and mask
-P:1310::; Set up loop\n; Reset hi/lo latch
-P:1313::; Write ppu_buffer hi and lo addresss to PPU_ADDR
-P:1320::; Write ppu_buffer data to PPU_ADDR
-P:1327::; Check if updating is done (eg. X is at pointer)
-P:132F::; Reset ppu buffer update and pointer
-P:1335::; Reset scrolling position
-P:133B::; Restore ppu control register and mask
-P:1347::; Continue other NMI stuff\n; Reset sprite RAM, draw sprites
-P:1368::; This is what happens when we forced nmi skip\n; Increase frame counters
-P:136A::; reset ball_update_position
-P:136E::; Don't skip next NMI request
-P:1372::; Restore X, Y and PC from stack
-P:1377::; Restore accumulator from stack
-P:1378::; Return
-P:1379:IRQ:; IRQ handler (empty)
+P:05A8::; It's a paint block. Update ball color\n; Save x-register
+P:05AA::; Get tile color
+P:05B4::; Apply tile color to ball
+P:05BF::; Restore x-register
+P:05C1::; Return
+P:05C2::; Check if collided tile is a death block
+P:05C8::; It is a death block. Kill player and return (@TODO)\n        LDA ball_flags\n        ORA #%00000101\n        STA ball_flags
+P:05C9::; Check if collided tile is a move block
+P:05CF::; It is a move block. Check if colors match
+P:05D4::; Colors don't match - return
+P:05D5::; Colors match.\n; - Check if next tile is a solid\n; - If not, move the tile:\n;   - Add the tiles that need updating to ppu buffer\n;   - Add move tile sprite over the original tile\n;   - Initiate moving the sprite that way for 16px\n;   - Write #$00 in tile type ram (makes not-solid)\n;   - Update attribute table accordingly through ppu buffer\n; - After moving the sprite, in a different routine:\n;   - Add move tile data on the new tile location\n;   - Write the original tile type data on new position in ram\n;   - Destroy sprite\n;   - Update attribute table accordingly through ppu buffer\n; (@TODO)
+P:05D6::; Return
+P:05D7:sub_InitiateNudge
+P:05DE:sub_JumpToPointer
+P:05E1:sub_LoadGameScreen:RTS must be handled by the routine (pointer) jumps to\n; Clear the screen
+P:05E4::; Clear collision and attribute data
+P:05ED::; Get pointer from current level
+P:05F9::; Set up the loop
+P:05FB::; Load (x,y) of current set of tiles
+P:05FD::; Check if level is done; if so, skip the loop
+P:0604::; Store (x,y) and number of tiles and tile data in temp variable
+P:060B::; Convert (x,y) to PPU address\n; temp+2 = PPU_hi = $20 + _y/4_ + carry from temp+3
+P:0615::; temp+3 = PPU_lo = 2*x + $40*(y%4) + $C2
+P:062E::; Add carry to temp+2
+P:0634::; Convert tile data to loop count and tile type\n; temp+4 = color
+P:063A::; If color = 7, this is a wall
+P:063E::; temp+7 = first or second set in CHR (add 5 to offset)
+P:0646::; temp+5 = tile type
+P:0650::; It's a wall! Set CHR offset to 0, and tile type to 4.
+P:0658::; X = tile offset
+P:065C::; temp+6 = number of tiles
+P:0667::; Translate (x,y) to (y,x) for tile RAM
+P:0679::; Set up loop
+P:067D::; Write PPU address
+P:068A::; Write first and second tile
+P:0696::; Update PPU address
+P:06A6::; Write third and fourth tile
+P:06B2::; Push x-register to stack
+P:06B4::; Update tile RAM (aka collision table)
+P:06C3::; Check if shade 1 should be drawn
+P:06CE::; Check if shade 2 should be drawn
+P:06F4::; Check if shade 3 should be drawn
+P:070B::; Restore x-register from stack
+P:070D::; Reset pointer for next tile
+P:071A::; Draw next metatile in this loop (if any left)
+P:071D::; Is it a row or a column?
+P:0721::; It is a column: move pointer down (+$40)
+P:072E::; Add 16 to temp (as a tile RAM pointer)
+P:0738::; It is a row: move pointer right (+$02)
+P:073F::; Add 1 to temp (as a tile RAM pointer)
+P:0741::; Next tile in the row/column
+P:0744::; Go to the next set of tiles
+P:074A::; Level loading is done\n; Top game bound: set PPU_ADDR offset and draw 28 tiles
+P:0759::; Bottom game bound: set PPU_ADDR offset and draw 28 tiles
+P:0768::; Left & right game bounds\n; Set PPU_ADDR and store in temp variables
+P:0776::; Set vertical bound tile and set up loop
+P:077A::; Show left tile
+P:077D::; Set PPU_ADDR to right bound by adding 29 (tiles) to low byte
+P:078C::; Show right tile
+P:078F::; Check if we're done yet
+P:0792::; Not done yet: add 3 to low byte for next left bound
+P:0799::; Apply carry to high byte
+P:079F::; Store next PPU_ADDR to draw at
+P:07AA::; Draw the corners of the playing field
+P:07E6::; Draw the hud labels
+P:07FD::; Draw the current score
+P:0816::; Draw the level number\n; (with primitive HEX>DEC)
+P:0855::; Draw lives (presumes lives to be capped at 9)
+P:0865::; Set and draw bonus
+P:0888::; Set attribute data to RAM\n; Byte 0-7 of attribute ram should be #%10100000
+P:0894::; Byte 8-55 of attribute ram are filled with game subpal data\n; Reset current attribute value
+P:0898::; Get first metatile in tile ram based on attribute index\n; metatile = (attr-8)*2 +(16*(attr-8)/8))
+P:089C:: attr - 8 (temp1)
+P:089E:: * 2
+P:089F:: temp = temp1 * 2
+P:08A1:: temp1
+P:08A3:: rounded down to 8's
+P:08A5:: * 2
+P:08A7:: + temp1 * 2
+P:08A9:: first metatile
+P:08AB::; Store first metatile in y-register
+P:08AC::; If X MOD 8 == 7, don't apply bottom right metatile
+P:08B3::; If X >= $30, don't apply bottom right metatile
+P:08B7::; Add metatile1 subpalette to attribute value
+P:08BE::; Apply second metatile
+P:08BF::; If X MOD 8 == 0, don't apply bottom left metatile
+P:08C4::; If X >= $30, don't apply bottom left metatile
+P:08C8::; Add metatile2 subpalette to attribute value
+P:08DA::; Apply third metatile
+P:08DF::; If X MOD 8 == 7, don't apply top right metatile
+P:08E6::; If X < $10, don't apply top right metatile
+P:08EB::; Add metatile3 subpalette to attribute value
+P:08FD::; Apply fourth metatile
+P:08FE::; If X MOD 8 == 0, don't apply top left metatile
+P:0903::; If X < $10, don't apply top left metatile
+P:0908::; Add metatile4 subpalette to attribute value
+P:0919::; Check the next attribute, if any left
+P:0921::; Stream attribute RAM to PPU
+P:093B::; Set initial ball position
+P:0959::; Set initial ball color and direction
+P:0963::; Return
+P:0964:sub_Draw28HorizontalTiles:; Subroutine: draw 28 tiles in a row
+P:096D:sub_LoadIntroScreen:; Load intro palette
+P:0987::; Put ball in the middle
+P:098D::; Clear the screen
+P:0990::; Set up intro screen draw loop
+P:0992::; Get current byte from intro screen data
+P:0995::; If current byte is #$3F, we're done drawing.
+P:099C::; If highest bits are %11, draw a plain tile
+P:09A3::; If highest bits are %01, set the PPU address\n; If not, draw two logo tiles
+P:09AA::; Get bits 0-2 and store in a temp variable
+P:09B1::; Get bits 3-5, shift over to get a value from 0-7
+P:09B9::; Draw the tile that corresponds with that value
+P:09BD::; Do the same for the value stored in temp
+P:09C2::; Next byte please
+P:09C6::; Just draw the tile value on screen
+P:09CC::; Next byte please
+P:09D0::; Reset the PPU latch
+P:09D3::; Sanitize and write the high byte of the PPU address
+P:09DB::; Write the low byte of the PPU address
+P:09E2::; PPU has been set up to draw tiles at the correct spot now.\n; Next byte please.
+P:09E6::; To color the 1.LEVEL: line green, we need to update two\n; values in the PPU attribute data.
+P:09FC:sub_LoadWinScreen
+P:09FD:sub_WriteByteToPPUBuffer:; Prevent updating until full 3-byte buffer is filled,\n; so that graphics won't glitch out if NMI happens during\n; updating the buffer
+P:0A01::; Check if buffer full; if so, wait a frame and force update
+P:0A0C::; Add ppu_addr high byte to buffer
+P:0A11::; Add ppu_addr low byte to buffer
+P:0A17::; Add ppu_data to buffer
+P:0A1D::; Update buffer pointer
+P:0A20::; Tell NMI to update next round
+P:0A22::; Return
+P:0A23:tbl_IntroScreenPalette:; LUTs\n; Intro screen palette
+P:0A43:tbl_IntroScreenLogoChr:; Intro: mapping logo index to chr tile
+P:0A4B:tbl_IntroScreenData:; Intro screen data\n; Set PPU address $20AC and draw
+P:0A55::; Set PPU address $20CF and draw
+P:0A59::; Set PPU address $2122 and draw
+P:0A75::; Set PPU address $2147 and draw
+P:0A8E::; Set PPU address $218B and draw
+P:0A9B::; Set PPU address $21E6 and draw
+P:0AB0::; Set PPU address $222D and draw
+P:0AB8::; Set PPU address $2281
+P:0ABA::; Draw the Crillion logo
+P:0B19::; End of intro
+P:0B1A:explosion_slide0:; test animation table\n; CHR tile-id's per slide of explosion
+P:0B23:explosion_slide1
+P:0B2C:explosion_slide2
+P:0B35:explosion_slide3
+P:0B3E:explosion_slide4
+P:0B47:explosion_anim_hi:; High and low bytes of animation slides
+P:0B51:explosion_anim_lo
+P:0B5B:tbl_BallColorDark:; Ball palette color table (CBRYGM)
+P:0B61:tbl_BallColorLight
+P:0B67:tbl_LoadScreenHi:; Screen mode drawing routine addresses
+P:0B6A:tbl_LoadScreenLo
+P:0B6D:lvl_layout_01:; Test level data
+P:0B88:lvl_layout_02
+P:0BBD:lvl_layout_03
+P:0BF0:lvl_layout_04
+P:0C61:lvl_layout_05
+P:0C9C:lvl_layout_06
+P:0D25:lvl_layout_07
+P:0D66:lvl_layout_08
+P:0D9D:lvl_layout_09
+P:0DE0:lvl_layout_10
+P:0E0F:lvl_layout_11
+P:0E62:lvl_layout_12
+P:0E8D:lvl_layout_13
+P:0EE0:lvl_layout_14
+P:0F57:lvl_layout_15
+P:0F88:lvl_layout_16
+P:0FDD:lvl_layout_17
+P:1044:lvl_layout_18
+P:1099:lvl_layout_19
+P:10D8:lvl_layout_20
+P:1123:lvl_layout_21
+P:1160:lvl_layout_22
+P:118D:lvl_layout_23
+P:11D8:lvl_layout_24
+P:121D:lvl_layout_25
+P:124C:tbl_lvl_layout_hi:; Level layout address pointers
+P:1265:tbl_lvl_layout_lo
+P:127E:tbl_lvl_ball_startpos:; Ball start position (#$YX)
+P:1297:tbl_lvl_ball_init:; Ball start direction, color and tile score\n; #% ccc v tttt\n;    ||| | ++++-- tile score\n;    ||| +------- vertical direction, up (0) or down\n;    +++--------- color (CBRYGM)
+P:12B0:tbl_Times64:; Helper table to multiply values by 64
+P:12B4:tbl_GametileTopLeft:; Metatile ID to CHR data mapper
+P:12BE:tbl_GametileTopRight
+P:12C8:tbl_GametileBottomLeft
+P:12D2:tbl_GametileBottomRight
+P:12DC:tbl_GameTileRamByte:; Metatile ID to RAM byte data mapper
+P:12E1:tbl_HudText:; HUD text data
+P:12FD:NMI:; NMI handler\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n;\n; include/nmi.asm\n;\n; Non-maskable interrupt script. This script is being executed\n; when vBlank hits.\n;\n;\n; Preserve accumulator through stack
+P:12FE::; Should NMI be skipped?
+P:1305::; When in NMI, skip additional NMI requests
+P:1309::; Preserve X, Y, and PC through stack
+P:130E::; Check forced NMI skip
+P:1315::; Update PPU mask\nLDA #$00\nSTA PPU_CTRL
+P:131A::; Additional PPU updates go here\n; Check if ppu_buffer needs updating
+P:1321::; Reset ppu control register and mask
+P:1329::; Set up loop\n; Reset hi/lo latch
+P:132C::; Write ppu_buffer hi and lo addresss to PPU_ADDR
+P:1339::; Write ppu_buffer data to PPU_ADDR
+P:1340::; Check if updating is done (eg. X is at pointer)
+P:1348::; Reset ppu buffer update and pointer
+P:134E::; Reset scrolling position
+P:1354::; Restore ppu control register and mask
+P:1360::; Continue other NMI stuff\n; Reset sprite RAM, draw sprites
+P:1381::; This is what happens when we forced nmi skip\n; Increase frame counters
+P:1383::; reset ball_update_position
+P:1387::; Don't skip next NMI request
+P:138B::; Restore X, Y and PC from stack
+P:1390::; Restore accumulator from stack
+P:1391::; Return
+P:1392:IRQ:; IRQ handler (empty)
 R:0000:ADDR_CHRROM
 R:0000:ADDR_ZEROPAGE
 R:0000:BALL_ATTR
@@ -444,7 +448,7 @@ R:000F:_E
 R:0010:BALL_MOVES_DOWN
 R:0010:BOUND_LEFT
 R:0010:BUTTON_START
-R:0010:IS_PAINT_BLOCK
+R:0010:IS_DEATH_BLOCK
 R:0010:MOVE_BALL_DOWN
 R:0010:_F
 R:0011:_G
@@ -463,7 +467,7 @@ R:001D:_S
 R:001E:_T
 R:001F:_U
 R:0020:BUTTON_SELECT
-R:0020:IS_DEATH_BLOCK
+R:0020:IS_PAINT_BLOCK
 R:0020:_V
 R:0021:_W
 R:0022:_X
