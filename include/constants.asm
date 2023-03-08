@@ -26,6 +26,9 @@ PPU_SCROLL = $2005
 PPU_ADDR   = $2006
 PPU_DATA   = $2007
 
+;; PPU flag helpers
+SPRITE_0_HIT = #%01000000
+
 ;; Object attribute model addresses
 OAM_ADDR   = $2003
 OAM_DATA   = $2004

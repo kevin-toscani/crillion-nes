@@ -58,17 +58,24 @@
 
 +screenLoaded:
 
-    ;; CONCEPT SCRIPTS
-    
-    ;; Upon pressing A, an explosion will happen on screen
-    .include "game/test/show_animation.asm"
-
     ;; Check if we're on the game screen
     LDA screen_mode
     CMP #IS_GAME_SCREEN
     BEQ +
-        JMP +doneGameScreen
+        JMP +checkNextScreen
     +
+
+    ;; Load sprite 0 in place
+    LDA #$22
+    STA ADDR_SPRITERAM
+    LDA #$0F
+    STA ADDR_SPRITERAM+1
+    LDA #$20
+    STA ADDR_SPRITERAM+2
+    LDA #$E2
+    STA ADDR_SPRITERAM+3
+    LDA #$04
+    STA sprite_ram_pointer
 
     ;; We're on the game screen
     ;; Check if position should be updated (ie. has nmi happened yet)
@@ -80,8 +87,11 @@
     ;; Move the ball
     .include "game/include/main/move_ball.asm"
     
-    ;; Test collision detection
+    ;; Do collision detection
     .include "game/include/main/collision_detection.asm"
+
+    ;; Testinging timed PPU scroll concept
+    .include "game/test/timed_ppuscroll_test.asm"
 
 
 +skipBallMovement:
@@ -100,13 +110,19 @@
     STA ADDR_SPRITERAM,x
     INX
     STX sprite_ram_pointer
+    JMP +doneScreenLoad
 
 
-+doneGameScreen:
++checkNextScreen:
 
     ;; Upon pressing START, (next level) design will be drawn
     .include "game/test/load_next_level.asm"
 
+
++doneScreenLoad:
+
+    ;; Upon pressing A, an explosion will happen on screen
+    .include "game/test/show_animation.asm"
 
 
     ;; Sprite clean-up
