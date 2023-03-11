@@ -30,6 +30,7 @@
         ;; Setup tile row loop
         LDY #22
         -tileLoop:
+        
             ;; Disable drawing
             LDA soft_ppu_mask
             AND #%11110111
@@ -57,7 +58,7 @@
                 +wasteMoreTime:
                 
                 STX temp+1     ;  3 down, 97 to go
-                LDX #$0B       ;  5 down, 95 to go
+                LDX #$09       ;  5 down, 95 to go
                 -wasteLoop:
                     NOP
                     ORA #$FF   ;  5+3L down,  95-3L to go
@@ -83,11 +84,6 @@
         DEY
     BNE -fadeLoop
     
-    ;; Turn off the screen
-    LDA soft_ppu_mask
-    AND #%11110111
-    STA PPU_MASK
-
     ;; Load the next level
     INC current_level
     LDA current_level

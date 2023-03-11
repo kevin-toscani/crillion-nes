@@ -1,5 +1,5 @@
 
-;; Intro screen palette
+;; Initial screen palette
 tbl_IntroScreenPalette:
     .db #$0F, #$2C, #$12, #$30
     .db #$0F, #$16, #$38, #$30
@@ -8,7 +8,7 @@ tbl_IntroScreenPalette:
 
     .db #$0F, #$2C, #$12, #$30
     .db #$0F, #$16, #$38, #$30
-    .db #$0F, #$29, #$14, #$30
+    .db #$0F, #$2C, #$14, #$30
     .db #$0F, #$00, #$10, #$30
 
 

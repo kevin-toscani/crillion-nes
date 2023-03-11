@@ -368,6 +368,8 @@ sub_LoadGameScreen:
     STA PPU_ADDR
     LDA #$3A
     STA PPU_DATA
+    LDA #$3F
+    STA PPU_DATA
 
     LDA #$23
     STA PPU_ADDR

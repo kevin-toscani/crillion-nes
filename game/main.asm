@@ -66,13 +66,13 @@
     +
 
     ;; Load sprite 0 in place
-    LDA #$22
+    LDA #$28
     STA ADDR_SPRITERAM
     LDA #$0F
     STA ADDR_SPRITERAM+1
-    LDA #$20
+    LDA #$22
     STA ADDR_SPRITERAM+2
-    LDA #$E2
+    LDA #$F8
     STA ADDR_SPRITERAM+3
     LDA #$04
     STA sprite_ram_pointer
