@@ -119,6 +119,12 @@ tbl_LoadScreenLo:
 .include "game/include/table/level_data.asm"
 
 
+;; Helper table to multiply values by 16
+tbl_Times16:
+    .db #$00, #$10, #$20, #$30, #$40, #$50, #$60, #$70
+    .db #$80, #$90, #$A0, #$B0, #$C0, #$D0, #$E0, #$F0
+    
+
 ;; Helper table to multiply values by 64
 tbl_Times64:
     .db #$00, #$40, #$80, #$C0

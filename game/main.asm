@@ -121,9 +121,8 @@
 
 +doneScreenLoad:
 
-    ;; Upon pressing A, an explosion will happen on screen
-    .include "game/test/show_animation.asm"
-
+    ;; Load animations (if any)
+    .include "game/include/main/load_animations.asm"
 
     ;; Sprite clean-up
     LDX sprite_ram_pointer

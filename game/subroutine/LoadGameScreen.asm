@@ -368,6 +368,7 @@ sub_LoadGameScreen:
     STA PPU_ADDR
     LDA #$3A
     STA PPU_DATA
+    ;; (added background tile for Sprite-0 hit)
     LDA #$3F
     STA PPU_DATA
 

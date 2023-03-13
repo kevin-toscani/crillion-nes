@@ -18,7 +18,7 @@ sub_ConvertXYToTileType:
     ADC temp+9
     STA temp+9
     TAX
-    LDA ADDR_SCREENTILERAM, x
+    LDA tile_type, x
     STA colliding_tile
     RTS
 
