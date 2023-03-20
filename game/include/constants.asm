@@ -10,8 +10,8 @@ BALL_LEFT    = #$00  ; Left offset of the ball graphic
 
 
 ;; Ball speed (high/low byte), tile and attribute
-BALL_SPEED_HI  = #$02        ; High byte of ball speed
-BALL_SPEED_LO  = #$30        ; Low byte of ball speed
+BALL_SPEED_HI  = #$01        ; High byte of ball speed
+BALL_SPEED_LO  = #$C0        ; Low byte of ball speed
 BALL_TILE_CHR  = #$01        ; CHR tile ID
 BALL_ATTR      = #%00000000  ; Attribute (no mirror, subpalette 0)
 BALL_LEFT_WGA  = #$F0        ; Left position within game area (-#$10)
@@ -73,7 +73,7 @@ SLIDE_SIZE      = #$09 ; total number of tiles in slide
 
 
 ;; Max number of nudge frames
-NUDGE_FRAMES    = #$03
+NUDGE_FRAMES    = #$05
 
 
 ;; Helper constant for when a level is done loading

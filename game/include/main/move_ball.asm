@@ -25,6 +25,8 @@
 
     ;; Change ball direction to "up"
     LDA #BOUND_BOTTOM
+    SEC
+    SBC #$01
     STA ball_ypos_hi
     LDA #$00
     STA ball_ypos_lo
@@ -52,6 +54,8 @@
 
     ;; Change ball direction to "down"
     LDA #BOUND_TOP
+    CLC
+    ADC #$01
     STA ball_ypos_hi
     LDA #$00
     STA ball_ypos_lo

@@ -47,5 +47,5 @@ foreach($lines as $line) {
 }
 
 $fh = fopen('output/crillion.mlb', 'w');
-fwrite($fh, implode("\n", $labels) . "\n");
+fwrite($fh, implode("\r\n", $labels) . "\r\n");
 fclose($fh);
