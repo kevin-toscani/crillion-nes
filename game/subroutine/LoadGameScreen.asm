@@ -681,6 +681,18 @@ sub_LoadGameScreen:
     STA ball_flags
     JSR sub_ColorizeBall
     
+    ;; Play background noise
+    LDA #$08
+    STA APU_STATUS
+    STA NOISE_LENGTH
+    LDA #$0E
+    STA current_noise
+    LDA #$00
+    STA max_noise
+    STA noise_counter
+    STA sweep_noise
+    JSR sub_BackgroundNoise
+
     ;; Return
     RTS
 

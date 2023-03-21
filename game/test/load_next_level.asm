@@ -2,6 +2,7 @@
     LDA buttons_pressed
     AND #BUTTON_START
     BEQ +continue
+        
         ;; Load the next level
         INC current_level
         LDA current_level

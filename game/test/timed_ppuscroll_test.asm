@@ -4,6 +4,11 @@
     LDA buttons_pressed
     AND #BUTTON_START
     BEQ +end
+
+    ;; Disable noise channel
+    LDA #$00
+    STA APU_STATUS
+    STA NOISE_VOLUME
     
     ;; Set up loop fading
     LDA #$00

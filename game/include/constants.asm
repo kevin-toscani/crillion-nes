@@ -80,6 +80,12 @@ NUDGE_FRAMES    = #$05
 LEVEL_END       = #$FF
 
 
+;; APU Noise registers
+NOISE_VOLUME    = $400C
+NOISE_PERIOD    = $400E
+NOISE_LENGTH    = $400F
+
+
 ;; Character map
 _SPACE = #$00
 _0     = #$01
