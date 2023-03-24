@@ -3,6 +3,10 @@ ball_xpos_hi           .dsb 1
 ball_xpos_lo           .dsb 1
 ball_ypos_hi           .dsb 1
 ball_ypos_lo           .dsb 1
+ball_ypos_hi_prev      .dsb 1
+ball_ypos_lo_prev      .dsb 1
+ball_xpos_hi_prev      .dsb 1
+ball_xpos_lo_prev      .dsb 1
 ball_lives             .dsb 1   ; number of lives left
 ball_score             .dsb 6   ; decimal score, five bytes (0-9)
 ball_bonus             .dsb 3   ; decimal bonus points, three bytes (0-9)

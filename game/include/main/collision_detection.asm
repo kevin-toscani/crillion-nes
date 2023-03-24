@@ -85,6 +85,10 @@
     BEQ +doneCheckingCollision ; no need for bottom check as ball moves up
 
     ;; Tile is solid; move ball down and evaluate tile type
+    LDA ball_ypos_lo_prev
+    STA ball_ypos_lo
+    LDA ball_ypos_hi_prev
+    STA ball_ypos_hi
     LDA ball_flags
     ORA #MOVE_BALL_DOWN
     STA ball_flags
@@ -104,6 +108,10 @@
     BEQ +doneCheckingCollision
 
     ;; Tile is solid; move ball up and evaluate tile type
+    LDA ball_ypos_lo_prev
+    STA ball_ypos_lo
+    LDA ball_ypos_hi_prev
+    STA ball_ypos_hi
     LDA ball_flags
     AND #MOVE_BALL_UP
     STA ball_flags

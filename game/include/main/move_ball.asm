@@ -8,12 +8,14 @@
 +moveBallDown:
     ;; update the low byte
     LDA ball_ypos_lo
+    STA ball_ypos_lo_prev
     CLC
     ADC #BALL_SPEED_LO
     STA ball_ypos_lo
 
     ;; update the high byte with carry
     LDA ball_ypos_hi
+    STA ball_ypos_hi_prev
     ADC #BALL_SPEED_HI
     STA ball_ypos_hi
     
@@ -39,12 +41,14 @@
 +moveBallUp:
     ;; update the low byte
     LDA ball_ypos_lo
+    STA ball_ypos_lo_prev
     SEC
     SBC #BALL_SPEED_LO
     STA ball_ypos_lo
 
     ;; update the high byte with carry
     LDA ball_ypos_hi
+    STA ball_ypos_hi_prev
     SBC #BALL_SPEED_HI
     STA ball_ypos_hi
     

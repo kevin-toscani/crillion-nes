@@ -11,7 +11,7 @@ BALL_LEFT    = #$00  ; Left offset of the ball graphic
 
 ;; Ball speed (high/low byte), tile and attribute
 BALL_SPEED_HI  = #$01        ; High byte of ball speed
-BALL_SPEED_LO  = #$C0        ; Low byte of ball speed
+BALL_SPEED_LO  = #$F0        ; Low byte of ball speed
 BALL_TILE_CHR  = #$01        ; CHR tile ID
 BALL_ATTR      = #%00000000  ; Attribute (no mirror, subpalette 0)
 BALL_LEFT_WGA  = #$F0        ; Left position within game area (-#$10)
