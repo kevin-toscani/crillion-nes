@@ -115,8 +115,9 @@
 
 +checkNextScreen:
 
-    ;; Upon pressing START, (next level) design will be drawn
-    .include "game/test/load_next_level.asm"
+    ;; Upon pressing LEFT or RIGHT, increment the level number with 4
+    ;; Upon pressing START, the selected level will start
+    .include "game/include/main/select_level.asm"
 
 
 +doneScreenLoad:

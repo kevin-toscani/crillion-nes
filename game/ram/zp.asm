@@ -38,11 +38,6 @@ ball_flags             .dsb 1
 screen_mode            .dsb 1
 
 
-;; Start level pointer
-;; You can start the game at level 1, 5, 9, 13 or 17.
-;; This is the pointer that tells you at which level to start.
-startlevel_pointer     .dsb 1 
-
 
 ;; PPU buffer variables
 ppu_buffer_update      .dsb 1
@@ -57,7 +52,7 @@ sprite_ram_pointer     .dsb 1
 ;; Nudge counter
 nudge_counter          .dsb 1
 
-;; Current level
+;; Current level (doubles as level select variable)
 current_level          .dsb 1
 
 ;; Tile type the ball is currently colliding with

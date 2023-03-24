@@ -1,5 +1,3 @@
-;; game initialization goes here
-
     ;; Tell game to load the intro screen
     LDA #LOAD_INTRO_SCREEN
     STA screen_mode
@@ -8,6 +6,7 @@
     LDA #$05
     STA ball_lives
 
-    ;; Start at level -1 for now, because [START] increments level number
-    LDA #$FF
+    ;; Start at level 1
+    LDA #$00
     STA current_level
+
