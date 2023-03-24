@@ -4242,7 +4242,7 @@
 0D500 A5 2D                         LDA screen_mode
 0D502 29 01                         AND #IS_GAME_SCREEN
 0D504 F0 21                         BEQ +
-0D506                                   .include "game/test/background_noise.asm"
+0D506                                   .include "game/include/main/background_sound.asm"
 0D506                               ;; At random times, set max_noise period to $03-$0A
 0D506 A5 35                         LDA max_noise
 0D508 D0 1D                         BNE +
@@ -4311,7 +4311,9 @@
 0D567 85 35                         STA max_noise
 0D569 85 36                         STA sweep_noise
 0D56B                           
-0D56B                           +endNoise:0D56B                               +
+0D56B                           +endNoise:
+0D56B                           
+0D56B                               +
 0D56B                           
 0D56B                           ;; This is what happens when we forced nmi skip
 0D56B                           +force_skip_nmi:

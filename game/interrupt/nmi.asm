@@ -82,5 +82,5 @@
     LDA screen_mode
     AND #IS_GAME_SCREEN
     BEQ +
-        .include "game/test/background_noise.asm"
+        .include "game/include/main/background_sound.asm"
     +
