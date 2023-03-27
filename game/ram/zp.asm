@@ -68,3 +68,6 @@ max_noise              .dsb 1
 sweep_noise            .dsb 1
 current_noise          .dsb 1
 noise_counter          .dsb 1
+
+;; Additional NMI check for timed PPU fade
+check_nmi              .dsb 1

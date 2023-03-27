@@ -18,7 +18,7 @@
         STY temp+8
 
         ;; Wait for NMI to pass
-        JSR sub_WaitForVBlank
+        JSR sub_WaitForNMI
         
         ;; Now wait for No-sprite 0
         -

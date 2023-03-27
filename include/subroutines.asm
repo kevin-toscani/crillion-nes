@@ -5,7 +5,8 @@
 ;; Read controller input
 .include "subroutine/ReadController.asm"
 
-;; vBlank wait
+;; vBlank/NMI wait
+.include "subroutine/WaitForNMI.asm"
 .include "subroutine/WaitForVBlank.asm"
 
 ;; Game specific subroutines

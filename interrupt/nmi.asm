@@ -56,6 +56,7 @@
     ;; Don't skip next NMI request
     LDA #$00
     STA skip_nmi
+    STA check_nmi
 
     ;; Restore X, Y and PC from stack
     PLP
