@@ -1,5 +1,6 @@
 ;; additional game-specific subroutines go here
 
+.include "game/subroutine/AddAccumulatorToScore.asm"
 .include "game/subroutine/BackgroundNoise.asm"
 .include "game/subroutine/ClearScreen.asm"
 .include "game/subroutine/ColorizeBall.asm"

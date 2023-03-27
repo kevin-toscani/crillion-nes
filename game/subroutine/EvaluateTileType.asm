@@ -61,7 +61,7 @@ sub_EvaluateTileType:
     ;; (this will also be a subroutine eventually)
     ;; TILE 1: if metatile on top left is solid, draw
     ;; null tile, else draw random noise tile
-    LDA #%00
+    LDA #$00
     STA ppu_buffer_update
     
     LDA temp
@@ -391,8 +391,15 @@ sub_EvaluateTileType:
     ;; - Write #$00 in tile type ram (makes not-solid)
     LDA #$00
     STA tile_type, x
-   
-    
+
+
+    ;; Add (80 + level number) to score
+    LDA current_level
+    CLC
+    ADC #81
+    JSR sub_AddAccumulatorToScore
+
+
     ;; - If there are no color blocks left:
     ;;   - Freeze ball
     ;;   - Initiate level-win state

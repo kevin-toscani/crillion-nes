@@ -9,6 +9,7 @@ ball_xpos_hi_prev      .dsb 1
 ball_xpos_lo_prev      .dsb 1
 ball_lives             .dsb 1   ; number of lives left
 ball_score             .dsb 6   ; decimal score, five bytes (0-9)
+add_to_score           .dsb 6
 ball_bonus             .dsb 3   ; decimal bonus points, three bytes (0-9)
 
 ;; Ball bounding box, relative to the screen
