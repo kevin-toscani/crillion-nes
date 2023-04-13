@@ -3,7 +3,7 @@
 ## Table of to-do's
 - Kill block
 - Move block
-- Bonus counter
+- ~~Bonus counter~~
 - End level routine
 - Bonus score routine
 - End game routine
@@ -32,9 +32,9 @@
 - If the metasprite is in the desired spot
 - Draw move block and shade tiles in the new spot
 
-## Bonus counter
-**Summary:** decrease the bonus counter over time until it reaches zero  
-**Elaboration:**
+## ~~Bonus counter~~
+~~**Summary:** decrease the bonus counter over time until it reaches zero~~  
+~~**Elaboration:**~~
 - ~~Every 6 frames~~
 - ~~If **not** all bonus timer digits are 0~~
 - ~~Subtract one from the lowest bonus timer digit (LBD)~~
