@@ -89,8 +89,11 @@
     
     ;; Do collision detection
     .include "game/include/main/collision_detection.asm"
+    
+    ;; Update bonus
+    .include "game/include/main/update_bonus.asm"
 
-    ;; Testinging timed PPU scroll concept
+    ;; Testing timed PPU scroll concept
     .include "game/test/timed_ppuscroll_test.asm"
 
 

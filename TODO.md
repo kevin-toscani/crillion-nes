@@ -15,7 +15,7 @@
 - If the ball collides with the kill block:
 - Set ball in "killed" state
 - Play explosion animation
-- After * frames, decrease the lives counter
+- After \* frames, decrease the lives counter
 - If lives = 0, initiate game over routine
 - If lives > 0, restart the current level
 
@@ -35,11 +35,12 @@
 ## Bonus counter
 **Summary:** decrease the bonus counter over time until it reaches zero  
 **Elaboration:**
-- Every * frames
-- If all bonus timer digits are 0
-- Subtract one from the lowest bonus timer digit (LBD)
-- If LBD < 0, set to 9 and subtract one from the middle bonus timer digit (MBD)
-- If MBD < 0, set to 9 and subtract one from the highest bonus timer digit
+- ~~Every 6 frames~~
+- ~~If **not** all bonus timer digits are 0~~
+- ~~Subtract one from the lowest bonus timer digit (LBD)~~
+- ~~If LBD < 0, set to 9 and subtract one from the middle bonus timer digit (MBD)~~
+- ~~If MBD < 0, set to 9 and subtract one from the highest bonus timer digit~~
+- ~~Update bonus score to PPU buffer~~
 
 ## End level routine
 **Summary:** if all color blocks are destroyed, end the current level and load the next one.  
@@ -50,8 +51,8 @@
 - Set the game in freeze state
 - Set null tile color to yellow
 - Play the end level sweep sound effect
-- After * frames, set null tile color to dark blue
-- After * frames, initiate bonus score routine (BSR)
+- After \* frames, set null tile color to dark blue
+- After \* frames, initiate bonus score routine (BSR)
 - \* frames after BSR, initiate blinds routine
 - After blinds routine
 - If the current level is the last one
@@ -62,7 +63,7 @@
 ## Bonus score routine
 **Summary:** convert the bonus timer value to the player's score  
 **Elaboration:**
-- Every * frames
+- Every \* frames
 - Subtract one from bonus timer
 - Add 10? to game score
 - Play a random frequency beep
@@ -72,10 +73,10 @@
 ## End game routine
 **Summary:** play an end game animation and show game over message  
 **Elaboration:**
-- Every * frames
+- Every \* frames
 - Rotate the background color palette
 - Play a frequency sweep
-- After * frames
+- After \* frames
 - Initiate game over routine
 
 ## Game over routine

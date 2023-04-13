@@ -72,9 +72,9 @@ SLIDE_WIDTH     = #$03 ; slide width in tiles
 SLIDE_SIZE      = #$09 ; total number of tiles in slide
 
 
-;; Max number of nudge frames
+;; Max number of nudge and bonus frames
 NUDGE_FRAMES    = #$05
-
+BONUS_FRAMES    = #$06
 
 ;; Helper constant for when a level is done loading
 LEVEL_END       = #$FF

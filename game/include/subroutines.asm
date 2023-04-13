@@ -14,5 +14,5 @@
 .include "game/subroutine/LoadGameScreen.asm"
 .include "game/subroutine/LoadIntroScreen.asm"
 .include "game/subroutine/LoadWinScreen.asm"
-.include "game/subroutine/WriteByteToPPU.asm"
+.include "game/subroutine/WriteByteToPPUBuffer.asm"
 

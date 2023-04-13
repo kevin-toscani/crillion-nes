@@ -681,6 +681,10 @@ sub_LoadGameScreen:
     STA ball_flags
     JSR sub_ColorizeBall
     
+    ;; Reset bonus counter
+    LDA #BONUS_FRAMES
+    STA bonus_counter
+    
     ;; Play background noise
     LDA #$08
     STA APU_STATUS

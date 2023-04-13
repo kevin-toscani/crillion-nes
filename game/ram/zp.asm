@@ -54,8 +54,9 @@ explosion_pointer      .dsb 1
 ;; Sprite RAM pointer to keep track of sprites to update
 sprite_ram_pointer     .dsb 1
 
-;; Nudge counter
+;; Counters
 nudge_counter          .dsb 1
+bonus_counter          .dsb 1
 
 ;; Current level (doubles as level select variable)
 current_level          .dsb 1

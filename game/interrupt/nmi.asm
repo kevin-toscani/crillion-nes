@@ -77,6 +77,12 @@
     BEQ +
         DEC nudge_counter
     +
+
+    ;; Decrease bonus counter
+    LDA bonus_counter
+    BEQ +
+        DEC bonus_counter
+    +
     
     ;; Test background noise
     LDA screen_mode
