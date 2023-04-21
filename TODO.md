@@ -8,6 +8,7 @@
 - Bonus score routine
 - End game routine
 - Game over routine
+- Finetuning
 
 ## Kill block
 **Summary:** if ball touches kill block, kill ball.  
@@ -87,3 +88,8 @@
 - Overwrite high score with player score
 - If player presses either A or START
 - Initiate start screen routine (no hard reset as that resets the high score as well)
+
+## Finetuning
+**Summary:** various minor flaws and fixes
+**Elaboration:**
+- Improve timing on blinds effect
