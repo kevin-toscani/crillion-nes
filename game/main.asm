@@ -99,6 +99,9 @@
     
     ;; Update bonus
     .include "game/include/main/update_bonus.asm"
+    
+    ;; Input test for beeps
+    .include "game/test/input_beeps.asm"
 
 
 +skipBallMovement:

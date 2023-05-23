@@ -65,11 +65,12 @@ current_level          .dsb 1
 ;; Tile type the ball is currently colliding with
 colliding_tile         .dsb 1
 
-;; Background noise variables
+;; Sound control variables
 max_noise              .dsb 1
 sweep_noise            .dsb 1
 current_noise          .dsb 1
 noise_counter          .dsb 1
+do_beeps               .dsb 1
 
 ;; Additional NMI check for timed PPU fade
 check_nmi              .dsb 1

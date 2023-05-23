@@ -80,10 +80,17 @@ BONUS_FRAMES    = #$06
 LEVEL_END       = #$FF
 
 
-;; APU Noise registers
+;; APU registers
+PULSE1_VOLUME   = $4000
+PULSE1_SWEEP    = $4001
+PULSE1_TIMER_LO = $4002
+PULSE1_TIMER_HI = $4003
+PULSE1_LENGTH   = $4004
+
 NOISE_VOLUME    = $400C
 NOISE_PERIOD    = $400E
 NOISE_LENGTH    = $400F
+
 
 
 ;; Character map

@@ -97,4 +97,7 @@
         .include "game/include/main/background_sound.asm"
     +
 
+    ;; Test: random bleeps
+    .include "game/test/random_descending_bleeps.asm"
+    
 

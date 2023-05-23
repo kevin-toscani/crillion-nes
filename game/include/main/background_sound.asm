@@ -20,7 +20,7 @@
 
     ;; if sweep noise = $00: constant noise
     ;; else if sweep noise > $80: decrease pitch
-    ;; else: inrease pitch
+    ;; else: increase pitch
     LDA sweep_noise
     BEQ +constantNoise
     BMI +decreaseNoise
