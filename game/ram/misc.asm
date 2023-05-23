@@ -1,8 +1,8 @@
 ;; miscellaneous (non-zeropage) ram variables go here
 
 .enum ADDR_OTHERRAM
-    ;; PPU buffer (3x16 bytes, as a capped max for NMI)
-    ppu_buffer                .dsb 48
+    ;; PPU buffer (3x32 bytes, as a capped max for NMI)
+    ppu_buffer                .dsb 96
 
     ;; _framecounter, counts from ANIMATION_SPEED to 0 per slide
     explosion_framecounter    .dsb 4
