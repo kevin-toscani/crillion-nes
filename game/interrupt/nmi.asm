@@ -71,7 +71,7 @@
         BEQ +done        
     JMP -
 +done:
-    
+
     ;; Decrease nudge counter
     LDA nudge_counter
     BEQ +
@@ -83,8 +83,14 @@
     BEQ +
         DEC bonus_counter
     +
-    
-    ;; Test background noise
+
+    ;; Decrease kill counter
+    LDA kill_counter
+    BEQ +
+        DEC kill_counter
+    +
+
+    ;; Play background noise
     LDA screen_mode
     AND #IS_GAME_SCREEN
     BEQ +

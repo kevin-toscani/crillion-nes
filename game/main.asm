@@ -83,7 +83,14 @@
     BEQ +
         JMP +skipBallMovement
     +
-    
+
+    ;; Check if ball is frozen
+    LDA ball_flags
+    AND #BALL_IS_FROZEN
+    BEQ +
+        JMP +skipBallMovement
+    +
+
     ;; Move the ball
     .include "game/include/main/move_ball.asm"
     
@@ -93,11 +100,18 @@
     ;; Update bonus
     .include "game/include/main/update_bonus.asm"
 
+
++skipBallMovement:
     ;; Testing timed PPU scroll concept
     .include "game/test/timed_ppuscroll_test.asm"
 
-
-+skipBallMovement:
+    ;; Check if ball is dead
+    LDA ball_flags
+    AND #BALL_IS_DEAD
+    BEQ +
+        JMP +ballIsDead
+    +
+    
     ;; Add to sprite buffer
     LDX sprite_ram_pointer
     LDA ball_ypos_hi
@@ -114,6 +128,25 @@
     INX
     STX sprite_ram_pointer
     JMP +doneScreenLoad
+
+
++ballIsDead:
+    ;; Check if kill counter has reset
+    LDA kill_counter
+    BEQ +
+        JMP +doneScreenLoad
+    +
+    
+    ;; Take a live
+    DEC ball_lives
+    BNE +
+        ;; If no lives left, reset game
+        JMP RESET
+        ;; Replace reset with game over sequence initiation [@TODO]
+    +
+    
+    ;; Reload current level
+    JMP lbl_initiate_level_load ; declared in game/test/timed_ppuscroll_test.asm
 
 
 +checkNextScreen:

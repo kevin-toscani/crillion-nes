@@ -57,6 +57,7 @@ sprite_ram_pointer     .dsb 1
 ;; Counters
 nudge_counter          .dsb 1
 bonus_counter          .dsb 1
+kill_counter           .dsb 1
 
 ;; Current level (doubles as level select variable)
 current_level          .dsb 1

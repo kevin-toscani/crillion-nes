@@ -3,8 +3,11 @@
     ;; If B button is pressed
     LDA buttons_pressed
     AND #BUTTON_START
-    BEQ +end
+    BNE +
+        JMP +end
+    +
 
+lbl_initiate_level_load:
     ;; Disable noise channel
     LDA #$00
     STA APU_STATUS
@@ -89,8 +92,20 @@
         DEY
     BNE -fadeLoop
     
-    ;; Load the next level
-    INC current_level
+    ;; Load the next level if ball not dead
+    LDA ball_flags
+    AND #BALL_IS_DEAD
+    BNE +
+        INC current_level
+        JMP +loadLevel
+    +
+    
+    ;; Revive ball
+    LDA ball_flags
+    AND #REVIVE_BALL
+    STA ball_flags
+
++loadLevel:
     LDA current_level
     CMP #25
     BNE +

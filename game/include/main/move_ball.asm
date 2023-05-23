@@ -165,3 +165,4 @@
     ;; Don't update position again until next frame
     INC ball_update_position
 
++doneBallHandling:

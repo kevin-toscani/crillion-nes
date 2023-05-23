@@ -447,12 +447,53 @@ sub_EvaluateTileType:
     LDA colliding_tile
     AND #IS_DEATH_BLOCK
     BEQ +checkIfMoveBlock
-        ;; It is a death block. Kill player and return (@TODO)
-;        LDA ball_flags
-;        ORA #%00000101
-;        STA ball_flags
+
+        ;; It is a death block
+        ;; Freeze and kill player
+        LDA ball_flags
+        ORA #%00000101
+        STA ball_flags
+        
+        ;; Get free explosion slot
+        LDX explosion_pointer
+        BNE +
+            LDX #MAX_ANIMATIONS
+        +
+        DEX
+        STX explosion_pointer
+
+        ;; Load explosion data into RAM
+        LDA #$00
+        STA explosion_currentframe,x
+
+        LDA #ANIMATION_SPEED
+        STA explosion_framecounter,x
+
+        LDA ball_xpos_hi
+        SEC
+        SBC #$08
+        STA explosion_x,x
+
+        LDA ball_ypos_hi
+        SEC
+        SBC #$06
+        STA explosion_y,x
+
+        LDA #$01 ; subpalette 1 is for ball explosions
+        STA explosion_attributes,x
+
+        LDA #$01
+        STA explosion_active,x
+
+        ;; Set kill counter
+        LDA #$60
+        STA kill_counter
+
+        ;; Return
         RTS
-    +checkIfMoveBlock:
+
+
++checkIfMoveBlock:
 
     ;; Check if collided tile is a move block
     LDA colliding_tile
@@ -478,7 +519,7 @@ sub_EvaluateTileType:
         ;;   - Write the original tile type data on new position in ram
         ;;   - Destroy sprite
         ;;   - Update attribute table accordingly through ppu buffer
-        ;; (@TODO)
+        ;; [@TODO]
         RTS
     +done:
 
