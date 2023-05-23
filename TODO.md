@@ -13,12 +13,12 @@
 ## Kill block
 **Summary:** if ball touches kill block, kill ball.  
 **Elaboration:**
-- If the ball collides with the kill block:
-- Set ball in "killed" state
-- Play explosion animation
-- After \* frames, decrease the lives counter
+- ~~If the ball collides with the kill block:~~
+- ~~Set ball in "killed" state~~
+- ~~Play explosion animation~~
+- ~~After \* frames, decrease the lives counter~~
 - If lives = 0, initiate game over routine
-- If lives > 0, restart the current level
+- ~~If lives > 0, restart the current level~~
 
 ## Move block
 **Summary:** if the ball touches a move block with the same color, and the move block has room to move in the pushed direction, move the block one spot in that direction.  
@@ -89,7 +89,8 @@
 - If player presses either A or START
 - Initiate start screen routine (no hard reset as that resets the high score as well)
 
-## Finetuning
+## Finetuning and bugfixing
 **Summary:** various minor flaws and fixes
 **Elaboration:**
 - Improve timing on blinds effect
+- ~~Fix bug where PPU buffer overflows into animation RAM~~
