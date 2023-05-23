@@ -3,9 +3,10 @@ sub_LoadGameScreen:
     ;; Clear the screen
     JSR sub_ClearScreen
     
-    ;; Clear collision and attribute data
+    ;; Clear collision and attribute data; reset blocks left in the process
     LDX #$00
     TXA
+    STA blocks_left
     -
         STA tile_type,x
         INX
@@ -170,9 +171,14 @@ sub_LoadGameScreen:
         ;; Push x-register to stack
         TXA
         PHA
-        
-        ;; Update tile RAM (aka collision table)
+
+        ;; If current block is color block, add one to blocks left
         LDX temp+5
+        BNE +
+            INC blocks_left
+        +
+
+        ;; Update tile RAM (aka collision table)
         LDA tbl_GameTileRamByte,x
         ORA temp+4
         ASL

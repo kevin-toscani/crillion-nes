@@ -54,7 +54,7 @@ explosion_pointer      .dsb 1
 ;; Sprite RAM pointer to keep track of sprites to update
 sprite_ram_pointer     .dsb 1
 
-;; Counters
+;; Counters (actually Timers, should refactor [@TODO])
 nudge_counter          .dsb 1
 bonus_counter          .dsb 1
 kill_counter           .dsb 1
@@ -64,6 +64,9 @@ current_level          .dsb 1
 
 ;; Tile type the ball is currently colliding with
 colliding_tile         .dsb 1
+
+;; Number of blocks left on screen
+blocks_left            .dsb 1
 
 ;; Sound control variables
 max_noise              .dsb 1

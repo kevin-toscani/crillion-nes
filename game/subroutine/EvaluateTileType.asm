@@ -23,7 +23,7 @@ sub_EvaluateTileType:
     ;; Colors match. Destroy color block
     LDY ppu_buffer_pointer
     
-    ;; (this will be a subroutine)
+    ;; (this should be a subroutine)
     ;; Get PPU address from YX index
     ;; PPU_lo = #$C2 +  2*x + $40*(y%4)     = temp+1
     ;; PPU_hi = (Y/4) + $20 + carry(PPU_lo) = temp
@@ -58,7 +58,7 @@ sub_EvaluateTileType:
     STA temp
 
     
-    ;; (this will also be a subroutine eventually)
+    ;; (this should also be a subroutine eventually)
     ;; TILE 1: if metatile on top left is solid, draw
     ;; null tile, else draw random noise tile
     LDA #$00
@@ -402,8 +402,13 @@ sub_EvaluateTileType:
 
     ;; - If there are no color blocks left:
     ;;   - Freeze ball
-    ;;   - Initiate level-win state
-    ;; [@TODO]
+    ;;   - Initiate level-win state [@TODO]
+    DEC blocks_left
+    BNE +
+        LDA ball_flags
+        ORA #FREEZE_BALL
+        STA ball_flags
+    +
     
     RTS
 
