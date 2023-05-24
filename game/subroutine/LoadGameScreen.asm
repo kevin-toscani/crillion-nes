@@ -172,13 +172,8 @@ sub_LoadGameScreen:
         TXA
         PHA
 
-        ;; If current block is color block, add one to blocks left
-        LDX temp+5
-        BNE +
-            INC blocks_left
-        +
-
         ;; Update tile RAM (aka collision table)
+        LDX temp+5
         LDA tbl_GameTileRamByte,x
         ORA temp+4
         ASL
@@ -291,6 +286,17 @@ sub_LoadGameScreen:
 
 ;; Level loading is done
 +doneLevelLoad:
+
+    ;; Count number of color blocks
+    LDX #160
+    -
+        LDA tile_type-1,x
+        AND #%10000000
+        BEQ +
+            INC blocks_left
+        +
+        DEX
+    BNE -
 
     ;; Top game bound: set PPU_ADDR offset and draw 28 tiles
     LDA #$20
