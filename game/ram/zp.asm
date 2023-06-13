@@ -28,7 +28,7 @@ ball_update_position   .dsb 1
 ;; where it moves to, is not solid. This variable holds the metatile
 ;; offset of the position where the lock block should move to, so
 ;; we can check if it is solid or not.
-lock_block_space_to_check  .dsb 1
+move_block_space_to_check  .dsb 1
 
 
 ;; Ball flags

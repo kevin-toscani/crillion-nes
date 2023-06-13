@@ -207,7 +207,7 @@ sub_EvaluateTileType:
     TXA
     PHA
     CLC
-    ADC lock_block_space_to_check
+    ADC move_block_space_to_check
     TAX
     
     AND #%00001111

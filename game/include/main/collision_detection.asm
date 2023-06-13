@@ -41,7 +41,7 @@
 
     ;; Nudge ball and evaluate tile type
     LDA #$01
-    STA lock_block_space_to_check
+    STA move_block_space_to_check
     LDA ball_flags
     AND #NUDGE_BALL_LEFT
     JSR sub_InitiateNudge
@@ -66,7 +66,7 @@
 
     ;; Tile is solid; nudge ball and evaluate tile type
     LDA #$FF
-    STA lock_block_space_to_check
+    STA move_block_space_to_check
     LDA ball_flags
     ORA #NUDGE_BALL_RIGHT
     JSR sub_InitiateNudge
@@ -98,7 +98,7 @@
     STA ball_flags
 
     LDA #$F0 ; which is -16
-    STA lock_block_space_to_check
+    STA move_block_space_to_check
     JSR sub_EvaluateTileType
     JMP +doneCheckingCollision
 
@@ -124,7 +124,7 @@
     STA ball_flags
 
     LDA #$10
-    STA lock_block_space_to_check
+    STA move_block_space_to_check
     JSR sub_EvaluateTileType
 
 +doneCheckingCollision:
