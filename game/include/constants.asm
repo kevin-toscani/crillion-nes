@@ -8,7 +8,6 @@ BALL_WIDTH   = #$08  ; Width of the ball graphic within the sprite(s)
 BALL_TOP     = #$00  ; Top offset of the ball graphic
 BALL_LEFT    = #$00  ; Left offset of the ball graphic
 
-
 ;; Ball speed (high/low byte), tile and attribute
 BALL_SPEED_HI  = #$01        ; High byte of ball speed
 BALL_SPEED_LO  = #$F0        ; Low byte of ball speed

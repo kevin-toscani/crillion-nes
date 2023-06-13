@@ -23,6 +23,13 @@ ball_bottom            .dsb 1
 ;; Update-position check
 ball_update_position   .dsb 1
 
+;; Lock block space helper variable
+;; When the ball hits a lock block, it should only move if the space
+;; where it moves to, is not solid. This variable holds the metatile
+;; offset of the position where the lock block should move to, so
+;; we can check if it is solid or not.
+lock_block_space_to_check  .dsb 1
+
 
 ;; Ball flags
 ;; #% c c c v . f n a

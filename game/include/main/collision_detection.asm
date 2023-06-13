@@ -39,7 +39,9 @@
     AND #TILE_IS_SOLID
     BEQ +checkTopCollision ; no need for left check as ball moves right
 
-    ;; Tile is solid; nudge ball and evaluate tile type
+    ;; Nudge ball and evaluate tile type
+    LDA #$01
+    STA lock_block_space_to_check
     LDA ball_flags
     AND #NUDGE_BALL_LEFT
     JSR sub_InitiateNudge
@@ -63,6 +65,8 @@
     BEQ +checkTopCollision
 
     ;; Tile is solid; nudge ball and evaluate tile type
+    LDA #$FF
+    STA lock_block_space_to_check
     LDA ball_flags
     ORA #NUDGE_BALL_RIGHT
     JSR sub_InitiateNudge
@@ -92,6 +96,9 @@
     LDA ball_flags
     ORA #MOVE_BALL_DOWN
     STA ball_flags
+
+    LDA #$F0 ; which is -16
+    STA lock_block_space_to_check
     JSR sub_EvaluateTileType
     JMP +doneCheckingCollision
 
@@ -115,6 +122,9 @@
     LDA ball_flags
     AND #MOVE_BALL_UP
     STA ball_flags
+
+    LDA #$10
+    STA lock_block_space_to_check
     JSR sub_EvaluateTileType
 
 +doneCheckingCollision:

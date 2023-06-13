@@ -1,4 +1,3 @@
-
 ;; Subroutine to evaluate the colliding tile type and take its
 ;; corresponding action (move block, kill player, ...)
 ;; - Expects X-register to be the tile_type offset
@@ -20,7 +19,7 @@ sub_EvaluateTileType:
         RTS
     +
 
-    ;; Colors matchl destroy color block
+    ;; Colors match; destroy color block
     
     ;; Convert the metatile offset value (which is in the X register)
     ;; to its corresponding address in PPU
@@ -192,31 +191,84 @@ sub_EvaluateTileType:
     ;; Check if collided tile is a move block
     LDA colliding_tile
     AND #IS_MOVE_BLOCK
-    BEQ +done
-        ;; It is a move block. Check if colors match
-        JSR sub_ColorsMatch
-        BEQ +
-            ;; Colors don't match - return
-            RTS
-        +
-
-        ;; Colors match.
-        ;; - Check if next tile is a solid
-        ;; - If not, move the tile:
-        ;;   - Add the tiles that need updating to ppu buffer
-        ;;   - Add move tile sprite over the original tile
-        ;;   - Initiate moving the sprite that way for 16px
-        ;;   - Write #$00 in tile type ram (makes not-solid)
-        ;;   - Update attribute table accordingly through ppu buffer
-        ;; - After moving the sprite, in a different routine:
-        ;;   - Add move tile data on the new tile location
-        ;;   - Write the original tile type data on new position in ram
-        ;;   - Destroy sprite
-        ;;   - Update attribute table accordingly through ppu buffer
-        ;; [@TODO]
+    BNE +
         RTS
-    +done:
+    +
 
+    ;; It is a move block. Check if colors match
+    JSR sub_ColorsMatch
+    BEQ +
+        RTS
+    +
+
+    ;; Colors match
+    ;; - Check if next tile is within the playground
+    ;; (push X onto stack as well)
+    TXA
+    PHA
+    CLC
+    ADC lock_block_space_to_check
+    TAX
+    
+    AND #%00001111
+    CMP #$0E
+    BCC +
+        JMP +restoreX
+    +
+    TXA
+    AND #%11110000
+    CMP #$A0
+    BNE +
+        JMP +restoreX
+    +
+    CMP #$F0
+    BNE +
+        JMP +restoreX
+    +
+    
+    ;; Check if the next tile is solid
+    LDA tile_type,x
+    AND #TILE_IS_SOLID
+    BEQ +
+        JMP +restoreX
+    +
+    
+    ;; Move block has room to move
+    ;; Pull original X from stack
+    PLA
+    TAX        
+    
+    ;; Move the tile:
+    ;; - Add the tiles that need updating to ppu buffer, and
+    ;;   update attribute table accordingly through ppu buffer
+    JSR sub_GetPPUAddrFromYXIndex
+    JSR sub_RemoveBlockFromScreen
+
+
+    ;; [@TODO]
+    ;; - Add move tile sprite over the original tile
+    ;; - Initiate moving the sprite that way for 16px
+
+
+    ;; - Write #$00 in tile type ram (makes not-solid)
+    LDA #$00
+    STA tile_type, x
+
+
+    ;; - After moving the sprite, in a different routine:
+    ;;   - Add move tile data on the new tile location
+    ;;   - Write the original tile type data on new position in ram
+    ;;   - Destroy sprite
+    ;;   - Update attribute table accordingly through ppu buffer
+    ;; [@TODO]
+        
+        
     ;; Return
     RTS
 
+
+;; Pull X register from stack before returning
++restoreX:
+    PLA
+    TAX
+    RTS
