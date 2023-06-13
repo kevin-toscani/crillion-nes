@@ -46,7 +46,7 @@
 ;; This is what happens when we forced nmi skip
 +force_skip_nmi:
 
-    ;; Increase frame counters
+    ;; Increase frame timers
     INC frame_counter
 
     ;; reset ball_update_position

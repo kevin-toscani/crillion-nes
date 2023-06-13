@@ -14,7 +14,7 @@ sub_ReadController:
     LDA #$01
     STA JOYPAD_1
 
-    ;; Set up ring counter
+    ;; Set up ring timer
     STA buttons_held
 
     ;; Clear strobe bit
@@ -27,7 +27,7 @@ sub_ReadController:
         LSR
         ROL buttons_held
 
-    ;; Check if ring counter is done
+    ;; Check if ring timer is done
     BCC -
 
     ;; Return from subroutine

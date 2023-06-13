@@ -8,14 +8,14 @@
     ADC ball_bonus+2
     BEQ +done
 
-    ;; Check if bonus counter is done yet
-    LDA bonus_counter
+    ;; Check if bonus timer is done yet
+    LDA bonus_timer
     BNE +done
 
-    ;; Bonus counter is done
-    ;; Reset bonus counter
+    ;; Bonus timer is done
+    ;; Reset bonus timer
     LDA #BONUS_FRAMES
-    STA bonus_counter
+    STA bonus_timer
     
     ;; Subtract one from ball bonus ones
     DEC ball_bonus+2

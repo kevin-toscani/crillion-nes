@@ -61,10 +61,10 @@ explosion_pointer      .dsb 1
 ;; Sprite RAM pointer to keep track of sprites to update
 sprite_ram_pointer     .dsb 1
 
-;; Counters (actually Timers, should refactor [@TODO])
-nudge_counter          .dsb 1
-bonus_counter          .dsb 1
-kill_counter           .dsb 1
+;; Counters 
+nudge_timer            .dsb 1
+bonus_timer            .dsb 1
+kill_timer             .dsb 1
 
 ;; Current level (doubles as level select variable)
 current_level          .dsb 1
@@ -79,7 +79,7 @@ blocks_left            .dsb 1
 max_noise              .dsb 1
 sweep_noise            .dsb 1
 current_noise          .dsb 1
-noise_counter          .dsb 1
+noise_timer            .dsb 1
 do_beeps               .dsb 1
 
 ;; Additional NMI check for timed PPU fade

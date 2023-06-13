@@ -10,7 +10,7 @@
         ;; Check the explosion framecounter
         LDA explosion_framecounter,x
         BNE +
-            ;; Framecounter is 0
+            ;; Frametimer is 0
             ;; Reset to animation speed
             LDA #ANIMATION_SPEED
             STA explosion_framecounter,x
@@ -126,7 +126,7 @@
                 ADC #$08
                 STA temp+2
 
-                ;; Reset row counter
+                ;; Reset row timer
                 LDA #$00
                 STA temp
             +

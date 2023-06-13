@@ -693,9 +693,9 @@ sub_LoadGameScreen:
     STA ball_flags
     JSR sub_ColorizeBall
     
-    ;; Reset bonus counter
+    ;; Reset bonus timer
     LDA #BONUS_FRAMES
-    STA bonus_counter
+    STA bonus_timer
     
     ;; Play background noise
     LDA #$08
@@ -705,7 +705,7 @@ sub_LoadGameScreen:
     STA current_noise
     LDA #$00
     STA max_noise
-    STA noise_counter
+    STA noise_timer
     STA sweep_noise
     JSR sub_BackgroundNoise
 

@@ -134,8 +134,8 @@
 
 
 +ballIsDead:
-    ;; Check if kill counter has reset
-    LDA kill_counter
+    ;; Check if kill timer has reset
+    LDA kill_timer
     BEQ +
         JMP +doneScreenLoad
     +

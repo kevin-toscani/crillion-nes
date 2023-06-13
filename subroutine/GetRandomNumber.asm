@@ -5,7 +5,7 @@
 ;; Simple and fast random number generator by White Flame.
 ;;
 ;; Set random_seed to an arbitrary number to randomize between
-;; gaming sessions, for instance using the frame counter upon
+;; gaming sessions, for instance using the frame timer upon
 ;; pressing START on the intro screen.
 ;;
 ;;     ;; IF START PRESSED:

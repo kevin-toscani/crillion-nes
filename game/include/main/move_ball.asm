@@ -71,7 +71,7 @@
 +checkHorizontalMovement:
 
     ;; Check if ball is being nudged
-    LDA nudge_counter
+    LDA nudge_timer
     BNE +doneBallMovement
 
     ;; Check if left button is held
@@ -93,7 +93,7 @@
         CMP #BOUND_LEFT
         BCS +doneBallMovement
         
-        ;; Set flag to nudge right and set nudge counter
+        ;; Set flag to nudge right and set nudge timer
         LDA ball_flags
         ORA #NUDGE_BALL_RIGHT
         JSR sub_InitiateNudge
@@ -131,7 +131,7 @@
 +doneBallMovement:
 
     ;; Check nudge
-    LDA nudge_counter
+    LDA nudge_timer
     BEQ +doneBallNudging
         LDA ball_flags
         AND #NUDGE_BALL_RIGHT

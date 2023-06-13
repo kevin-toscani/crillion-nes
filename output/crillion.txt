@@ -326,7 +326,7 @@
 00036                           ;; where it moves to, is not solid. This variable holds the metatile
 00036                           ;; offset of the position where the lock block should move to, so
 00036                           ;; we can check if it is solid or not.
-00036                           lock_block_space_to_check  .dsb 1
+00036                           move_block_space_to_check  .dsb 1
 00037                           
 00037                           
 00037                           ;; Ball flags
@@ -359,10 +359,10 @@
 0003C                           ;; Sprite RAM pointer to keep track of sprites to update
 0003C                           sprite_ram_pointer     .dsb 1
 0003D                           
-0003D                           ;; Counters (actually Timers, should refactor [@TODO])
-0003D                           nudge_counter          .dsb 1
-0003E                           bonus_counter          .dsb 1
-0003F                           kill_counter           .dsb 1
+0003D                           ;; Counters 
+0003D                           nudge_timer            .dsb 1
+0003E                           bonus_timer            .dsb 1
+0003F                           kill_timer             .dsb 1
 00040                           
 00040                           ;; Current level (doubles as level select variable)
 00040                           current_level          .dsb 1
@@ -377,7 +377,7 @@
 00043                           max_noise              .dsb 1
 00044                           sweep_noise            .dsb 1
 00045                           current_noise          .dsb 1
-00046                           noise_counter          .dsb 1
+00046                           noise_timer            .dsb 1
 00047                           do_beeps               .dsb 1
 00048                           
 00048                           ;; Additional NMI check for timed PPU fade
@@ -701,7 +701,7 @@
 0C11E                           +checkHorizontalMovement:
 0C11E                           
 0C11E                               ;; Check if ball is being nudged
-0C11E A5 3D                         LDA nudge_counter
+0C11E A5 3D                         LDA nudge_timer
 0C120 D0 41                         BNE +doneBallMovement
 0C122                           
 0C122                               ;; Check if left button is held
@@ -723,7 +723,7 @@
 0C135 C9 10                             CMP #BOUND_LEFT
 0C137 B0 2A                             BCS +doneBallMovement
 0C139                                   
-0C139                                   ;; Set flag to nudge right and set nudge counter
+0C139                                   ;; Set flag to nudge right and set nudge timer
 0C139 A5 37                             LDA ball_flags
 0C13B 09 02                             ORA #NUDGE_BALL_RIGHT
 0C13D 20 2F C7                          JSR sub_InitiateNudge
@@ -761,7 +761,7 @@
 0C163                           +doneBallMovement:
 0C163                           
 0C163                               ;; Check nudge
-0C163 A5 3D                         LDA nudge_counter
+0C163 A5 3D                         LDA nudge_timer
 0C165 F0 23                         BEQ +doneBallNudging
 0C167 A5 37                             LDA ball_flags
 0C169 29 02                             AND #NUDGE_BALL_RIGHT
@@ -841,7 +841,7 @@
 0C1C3                           
 0C1C3                               ;; Nudge ball and evaluate tile type
 0C1C3 A9 01                         LDA #$01
-0C1C5 85 36                         STA lock_block_space_to_check
+0C1C5 85 36                         STA move_block_space_to_check
 0C1C7 A5 37                         LDA ball_flags
 0C1C9 29 FD                         AND #NUDGE_BALL_LEFT
 0C1CB 20 2F C7                      JSR sub_InitiateNudge
@@ -866,7 +866,7 @@
 0C1E9                           
 0C1E9                               ;; Tile is solid; nudge ball and evaluate tile type
 0C1E9 A9 FF                         LDA #$FF
-0C1EB 85 36                         STA lock_block_space_to_check
+0C1EB 85 36                         STA move_block_space_to_check
 0C1ED A5 37                         LDA ball_flags
 0C1EF 09 02                         ORA #NUDGE_BALL_RIGHT
 0C1F1 20 2F C7                      JSR sub_InitiateNudge
@@ -898,7 +898,7 @@
 0C218 85 37                         STA ball_flags
 0C21A                           
 0C21A A9 F0                         LDA #$F0 ; which is -16
-0C21C 85 36                         STA lock_block_space_to_check
+0C21C 85 36                         STA move_block_space_to_check
 0C21E 20 F2 C5                      JSR sub_EvaluateTileType
 0C221 4C 48 C2                      JMP +doneCheckingCollision
 0C224                           
@@ -924,7 +924,7 @@
 0C23F 85 37                         STA ball_flags
 0C241                           
 0C241 A9 10                         LDA #$10
-0C243 85 36                         STA lock_block_space_to_check
+0C243 85 36                         STA move_block_space_to_check
 0C245 20 F2 C5                      JSR sub_EvaluateTileType
 0C248                           
 0C248                           +doneCheckingCollision:
@@ -942,14 +942,14 @@
 0C24E 65 2E                         ADC ball_bonus+2
 0C250 F0 33                         BEQ +done
 0C252                           
-0C252                               ;; Check if bonus counter is done yet
-0C252 A5 3E                         LDA bonus_counter
+0C252                               ;; Check if bonus timer is done yet
+0C252 A5 3E                         LDA bonus_timer
 0C254 D0 2F                         BNE +done
 0C256                           
-0C256                               ;; Bonus counter is done
-0C256                               ;; Reset bonus counter
+0C256                               ;; Bonus timer is done
+0C256                               ;; Reset bonus timer
 0C256 A9 06                         LDA #BONUS_FRAMES
-0C258 85 3E                         STA bonus_counter
+0C258 85 3E                         STA bonus_timer
 0C25A                               
 0C25A                               ;; Subtract one from ball bonus ones
 0C25A C6 2E                         DEC ball_bonus+2
@@ -1155,8 +1155,8 @@
 0C34C                           
 0C34C                           
 0C34C                           +ballIsDead:
-0C34C                               ;; Check if kill counter has reset
-0C34C A5 3F                         LDA kill_counter
+0C34C                               ;; Check if kill timer has reset
+0C34C A5 3F                         LDA kill_timer
 0C34E F0 03                         BEQ +
 0C350 4C A9 C3                          JMP +doneScreenLoad
 0C353                               +
@@ -1255,7 +1255,7 @@
 0C3B3                                   ;; Check the explosion framecounter
 0C3B3 BD 60 03                          LDA explosion_framecounter,x
 0C3B6 D0 26                             BNE +
-0C3B8                                       ;; Framecounter is 0
+0C3B8                                       ;; Frametimer is 0
 0C3B8                                       ;; Reset to animation speed
 0C3B8 A9 04                                 LDA #ANIMATION_SPEED
 0C3BA 9D 60 03                              STA explosion_framecounter,x
@@ -1371,7 +1371,7 @@
 0C43B 69 08                                     ADC #$08
 0C43D 85 02                                     STA temp+2
 0C43F                           
-0C43F                                           ;; Reset row counter
+0C43F                                           ;; Reset row timer
 0C43F A9 00                                     LDA #$00
 0C441 85 00                                     STA temp
 0C443                                       +
@@ -1415,7 +1415,7 @@
 0C45F                           ;; Simple and fast random number generator by White Flame.
 0C45F                           ;;
 0C45F                           ;; Set random_seed to an arbitrary number to randomize between
-0C45F                           ;; gaming sessions, for instance using the frame counter upon
+0C45F                           ;; gaming sessions, for instance using the frame timer upon
 0C45F                           ;; pressing START on the intro screen.
 0C45F                           ;;
 0C45F                           ;;     ;; IF START PRESSED:
@@ -1464,7 +1464,7 @@
 0C46D A9 01                         LDA #$01
 0C46F 8D 16 40                      STA JOYPAD_1
 0C472                           
-0C472                               ;; Set up ring counter
+0C472                               ;; Set up ring timer
 0C472 85 0F                         STA buttons_held
 0C474                           
 0C474                               ;; Clear strobe bit
@@ -1477,7 +1477,7 @@
 0C47B 4A                                LSR
 0C47C 26 0F                             ROL buttons_held
 0C47E                           
-0C47E                               ;; Check if ring counter is done
+0C47E                               ;; Check if ring timer is done
 0C47E 90 F8                         BCC -
 0C480                           
 0C480                               ;; Return from subroutine
@@ -2024,9 +2024,9 @@
 0C6AE A9 01                             LDA #$01
 0C6B0 9D 74 03                          STA explosion_active,x
 0C6B3                           
-0C6B3                                   ;; Set kill counter
+0C6B3                                   ;; Set kill timer
 0C6B3 A9 60                             LDA #$60
-0C6B5 85 3F                             STA kill_counter
+0C6B5 85 3F                             STA kill_timer
 0C6B7                           
 0C6B7                                   ;; Return
 0C6B7 60                                RTS
@@ -2053,7 +2053,7 @@
 0C6C5 8A                            TXA
 0C6C6 48                            PHA
 0C6C7 18                            CLC
-0C6C8 65 36                         ADC lock_block_space_to_check
+0C6C8 65 36                         ADC move_block_space_to_check
 0C6CA AA                            TAX
 0C6CB                               
 0C6CB 29 0F                         AND #%00001111
@@ -2168,7 +2168,7 @@
 0C72F                           sub_InitiateNudge:
 0C72F 85 37                         STA ball_flags
 0C731 A9 05                         LDA #NUDGE_FRAMES
-0C733 85 3D                         STA nudge_counter
+0C733 85 3D                         STA nudge_timer
 0C735 60                            RTS
 0C736                           
 0C736                           .include "game/subroutine/JumpToPointer.asm"
@@ -2871,9 +2871,9 @@
 0CACB 85 37                         STA ball_flags
 0CACD 20 67 C5                      JSR sub_ColorizeBall
 0CAD0                               
-0CAD0                               ;; Reset bonus counter
+0CAD0                               ;; Reset bonus timer
 0CAD0 A9 06                         LDA #BONUS_FRAMES
-0CAD2 85 3E                         STA bonus_counter
+0CAD2 85 3E                         STA bonus_timer
 0CAD4                               
 0CAD4                               ;; Play background noise
 0CAD4 A9 08                         LDA #$08
@@ -2883,7 +2883,7 @@
 0CADE 85 45                         STA current_noise
 0CAE0 A9 00                         LDA #$00
 0CAE2 85 43                         STA max_noise
-0CAE4 85 46                         STA noise_counter
+0CAE4 85 46                         STA noise_timer
 0CAE6 85 44                         STA sweep_noise
 0CAE8 20 EF C4                      JSR sub_BackgroundNoise
 0CAEB                           
@@ -4646,7 +4646,7 @@
 0D697 A9 02                         LDA #$02
 0D699 8D 14 40                      STA OAM_DMA
 0D69C                           
-0D69C                               ;; Decrease explosion frame counters
+0D69C                               ;; Decrease explosion frame timers
 0D69C A0 04                         LDY #MAX_ANIMATIONS
 0D69E A2 00                         LDX #$00
 0D6A0                               -
@@ -4660,22 +4660,22 @@
 0D6AC 4C A0 D6                      JMP -
 0D6AF                           +done:
 0D6AF                           
-0D6AF                               ;; Decrease nudge counter
-0D6AF A5 3D                         LDA nudge_counter
+0D6AF                               ;; Decrease nudge timer
+0D6AF A5 3D                         LDA nudge_timer
 0D6B1 F0 02                         BEQ +
-0D6B3 C6 3D                             DEC nudge_counter
+0D6B3 C6 3D                             DEC nudge_timer
 0D6B5                               +
 0D6B5                           
-0D6B5                               ;; Decrease bonus counter
-0D6B5 A5 3E                         LDA bonus_counter
+0D6B5                               ;; Decrease bonus timer
+0D6B5 A5 3E                         LDA bonus_timer
 0D6B7 F0 02                         BEQ +
-0D6B9 C6 3E                             DEC bonus_counter
+0D6B9 C6 3E                             DEC bonus_timer
 0D6BB                               +
 0D6BB                           
-0D6BB                               ;; Decrease kill counter
-0D6BB A5 3F                         LDA kill_counter
+0D6BB                               ;; Decrease kill timer
+0D6BB A5 3F                         LDA kill_timer
 0D6BD F0 02                         BEQ +
-0D6BF C6 3F                             DEC kill_counter
+0D6BF C6 3F                             DEC kill_timer
 0D6C1                               +
 0D6C1                           
 0D6C1                               ;; Play background noise
@@ -4720,7 +4720,7 @@
 0D6F9 A9 00                             LDA #$00
 0D6FB 85 44                             STA sweep_noise
 0D6FD A9 0A                             LDA #$0A
-0D6FF 85 46                             STA noise_counter
+0D6FF 85 46                             STA noise_timer
 0D701                               +
 0D701 4C 2C D7                      JMP +endNoise
 0D704                           
@@ -4729,13 +4729,13 @@
 0D704 A5 43                         LDA max_noise
 0D706 F0 24                         BEQ +endNoise
 0D708                           
-0D708 A5 46                         LDA noise_counter
+0D708 A5 46                         LDA noise_timer
 0D70A D0 07                         BNE +
 0D70C A9 80                             LDA #$80
 0D70E 85 44                             STA sweep_noise
 0D710 4C 2C D7                          JMP +endNoise
 0D713                               +
-0D713 C6 46                         DEC noise_counter
+0D713 C6 46                         DEC noise_timer
 0D715 4C 2C D7                      JMP +endNoise
 0D718                           
 0D718                           ;; Sweep noise down to initial pitch
@@ -4790,7 +4790,7 @@
 0D75E                           ;; This is what happens when we forced nmi skip
 0D75E                           +force_skip_nmi:
 0D75E                           
-0D75E                               ;; Increase frame counters
+0D75E                               ;; Increase frame timers
 0D75E E6 15                         INC frame_counter
 0D760                           
 0D760                               ;; reset ball_update_position

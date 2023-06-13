@@ -178,9 +178,9 @@ sub_EvaluateTileType:
         LDA #$01
         STA explosion_active,x
 
-        ;; Set kill counter
+        ;; Set kill timer
         LDA #$60
-        STA kill_counter
+        STA kill_timer
 
         ;; Return
         RTS

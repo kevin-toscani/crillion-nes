@@ -35,7 +35,7 @@
         LDA #$00
         STA sweep_noise
         LDA #$0A
-        STA noise_counter
+        STA noise_timer
     +
     JMP +endNoise
 
@@ -44,13 +44,13 @@
     LDA max_noise
     BEQ +endNoise
 
-    LDA noise_counter
+    LDA noise_timer
     BNE +
         LDA #$80
         STA sweep_noise
         JMP +endNoise
     +
-    DEC noise_counter
+    DEC noise_timer
     JMP +endNoise
 
 ;; Sweep noise down to initial pitch

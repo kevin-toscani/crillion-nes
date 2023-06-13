@@ -58,7 +58,7 @@
     LDA #$02
     STA OAM_DMA
 
-    ;; Decrease explosion frame counters
+    ;; Decrease explosion frame timers
     LDY #MAX_ANIMATIONS
     LDX #$00
     -
@@ -72,22 +72,22 @@
     JMP -
 +done:
 
-    ;; Decrease nudge counter
-    LDA nudge_counter
+    ;; Decrease nudge timer
+    LDA nudge_timer
     BEQ +
-        DEC nudge_counter
+        DEC nudge_timer
     +
 
-    ;; Decrease bonus counter
-    LDA bonus_counter
+    ;; Decrease bonus timer
+    LDA bonus_timer
     BEQ +
-        DEC bonus_counter
+        DEC bonus_timer
     +
 
-    ;; Decrease kill counter
-    LDA kill_counter
+    ;; Decrease kill timer
+    LDA kill_timer
     BEQ +
-        DEC kill_counter
+        DEC kill_timer
     +
 
     ;; Play background noise
