@@ -4,13 +4,13 @@
     ;; PPU buffer (3x32 bytes, as a capped max for NMI)
     ppu_buffer                .dsb 96
 
-    ;; _framecounter, counts from ANIMATION_SPEED to 0 per slide
-    explosion_framecounter    .dsb 4
+    ;; Explosion timer, counts from ANIMATION_SPEED to 0 per slide
+    explosion_timer           .dsb 4
 
-    ;; _currentframe, keeps track which anim frame we're at
+    ;; Explosion currentframe, keeps track which anim frame we're at
     explosion_currentframe    .dsb 4
 
-    ;; _attributes, to distinguish between ball and wall explosion
+    ;; Explosion attributes, to distinguish between ball and wall explosion
     explosion_attributes      .dsb 4
 
     ;; x- and y-coordinate of the explosion
@@ -19,6 +19,20 @@
 
     ;; active flag to see if animation is/should be shown
     explosion_active          .dsb 4
+    
+    ;; move block variables (similar to explosions)
+    move_block_x              .dsb 4
+    move_block_y              .dsb 4
+    move_block_timer          .dsb 4 ; doubles as move_block_active
+
+    ;; move block flags
+    ;; #% ccc .. h d
+    ;;    ||| || | +-- direction: up/left (1) or right/down (0) 
+    ;;    ||| || +---- direction: horizontal (1) or vertical (0)
+    ;;    ||| ++------ (unused)
+    ;;    +++--------- color (0-6)
+    move_block_flags          .dsb 4
+    
 .ende
 
 

@@ -25,8 +25,6 @@ sub_EvaluateTileType:
     ;; to its corresponding address in PPU
     JSR sub_GetPPUAddrFromYXIndex
 
-
-    
     ;; Remove color block from screen by drawing a total
     ;; of 7 tiles over it (shade included)
     JSR sub_RemoveBlockFromScreen
@@ -51,7 +49,7 @@ sub_EvaluateTileType:
     STA explosion_currentframe,x
 
     LDA #ANIMATION_SPEED
-    STA explosion_framecounter,x
+    STA explosion_timer,x
 
     LDA temp+2
     AND #%00001111
@@ -160,7 +158,7 @@ sub_EvaluateTileType:
         STA explosion_currentframe,x
 
         LDA #ANIMATION_SPEED
-        STA explosion_framecounter,x
+        STA explosion_timer,x
 
         LDA ball_xpos_hi
         SEC
@@ -238,24 +236,65 @@ sub_EvaluateTileType:
     PLA
     TAX        
     
-    ;; Move the tile:
-    ;; - Add the tiles that need updating to ppu buffer, and
-    ;;   update attribute table accordingly through ppu buffer
+    ;; Add the tiles that need updating to ppu buffer, and
+    ;; update attribute table accordingly through ppu buffer
     JSR sub_GetPPUAddrFromYXIndex
     JSR sub_RemoveBlockFromScreen
 
-
-    ;; [@TODO]
-    ;; - Add move tile sprite over the original tile
-    ;; - Initiate moving the sprite that way for 16px
-
-
-    ;; - Write #$00 in tile type ram (makes not-solid)
+    ;; Write #$00 in tile type ram (makes not-solid)
     LDA #$00
     STA tile_type, x
 
+    ;; Add move tile sprite over the original tile
+    ;; - Store x in temp variable
+    STX temp+3
+    
+    ;; - Update move block pointer
+    LDX move_block_pointer
+    BNE +
+        LDX #MAX_ANIMATIONS
+    +
+    DEX
+    STX move_block_pointer
+    
+    ;; - Set move block X position
+    LDA temp+3
+    AND #%00001111
+    TAY
+    INY
+    LDA tbl_Times16,y
+    STA move_block_x,x
+    
+    ;; - Set move block Y position
+    LDA temp+3
+    AND #%11110000
+    CLC
+    ADC #$30
+    STA move_block_y,x
+    
+    ;; - Set timer to 16 frames
+    LDA #$10
+    STA move_block_timer,x
+    
+    ;; - Set move direction
+    LDA move_block_space_to_check
+    AND #%10000001
+    CLC
+    ROL
+    ADC #$00
+    STA temp+4
+    
+    ;; - Set block color as ball color and add direction
+    LDA ball_flags
+    AND #BALL_COLOR
+    ORA temp+4
+    STA move_block_flags,x
+    
+    ;; - Restore original X
+    LDX temp+3
+    
 
-    ;; - After moving the sprite, in a different routine:
+    ;; - In a different routine:
     ;;   - Add move tile data on the new tile location
     ;;   - Write the original tile type data on new position in ram
     ;;   - Destroy sprite

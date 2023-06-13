@@ -58,17 +58,23 @@
     LDA #$02
     STA OAM_DMA
 
-    ;; Decrease explosion frame timers
+    ;; Decrease explosion and move block timers
     LDY #MAX_ANIMATIONS
     LDX #$00
     -
-        LDA explosion_framecounter,x
+        LDA explosion_timer,x
         BEQ +
-            DEC explosion_framecounter,x
+            DEC explosion_timer,x
         +
+
+        LDA move_block_timer,x
+        BEQ +
+            DEC move_block_timer,x
+        +
+        
         INX
         DEY
-        BEQ +done        
+        BEQ +done
     JMP -
 +done:
 

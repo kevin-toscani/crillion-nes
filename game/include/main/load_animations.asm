@@ -8,12 +8,12 @@
         +
 
         ;; Check the explosion framecounter
-        LDA explosion_framecounter,x
+        LDA explosion_timer,x
         BNE +
             ;; Frametimer is 0
             ;; Reset to animation speed
             LDA #ANIMATION_SPEED
-            STA explosion_framecounter,x
+            STA explosion_timer,x
 
             ;; Set next animation frame, and check if we're done yet
             INC explosion_currentframe,x

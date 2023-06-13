@@ -28,6 +28,12 @@ ball_update_position   .dsb 1
 ;; where it moves to, is not solid. This variable holds the metatile
 ;; offset of the position where the lock block should move to, so
 ;; we can check if it is solid or not.
+;;
+;; UP:    #%11110000 F0
+;; DOWN:  #%00010000 10
+;; LEFT:  #%11111111 FF
+;; RIGHT: #%00000001 01
+;;        #%d......h
 move_block_space_to_check  .dsb 1
 
 
@@ -57,6 +63,9 @@ ppu_buffer_pointer     .dsb 1
 
 ;; Pointer to keep track of the number of explosions
 explosion_pointer      .dsb 1
+
+;; Pointer to keep track of the number of move blocks
+move_block_pointer     .dsb 1
 
 ;; Sprite RAM pointer to keep track of sprites to update
 sprite_ram_pointer     .dsb 1
