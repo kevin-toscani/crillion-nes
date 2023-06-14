@@ -31,7 +31,7 @@
     ;;    ||| ||| | +-- direction: up/left (1) or right/down (0) 
     ;;    ||| ||| +---- direction: horizontal (1) or vertical (0)
     ;;    ||| +++----- (unused)
-    ;;    +++--------- color (1-6)
+    ;;    +++--------- color (1-6, also unused)
     move_block_flags          .dsb 4
     
 .ende
