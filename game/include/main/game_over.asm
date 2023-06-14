@@ -1,8 +1,12 @@
 lbl_GameOver:
 
+    ;; Disable noise channel
+    LDA #$00
+    STA APU_STATUS
+    STA NOISE_VOLUME
+    
     ;; Do blinds effect
     JSR sub_BlindsEffect
-
 
     ;; Disable draw after HUD to disable screen
     JSR sub_WaitForNMI
@@ -16,7 +20,6 @@ lbl_GameOver:
     BEQ -
     LDA #$00
     STA PPU_MASK
-
 
     ;; Remove game area from view
     BIT PPU_STATUS
@@ -34,12 +37,16 @@ lbl_GameOver:
         BNE -yLoop
         DEX
     BNE -xLoop
-    JSR sub_WaitForNMI
-
+    
+    ;; Pause for a little while
+    LDX #$18
+    -
+        JSR sub_WaitForNMI
+        DEX
+    BNE -
             
     ;; Do flash effect
     JSR sub_FlashEffect
-
 
     ;; Draw GAME OVER tiles over game screen
     LDA #$21
@@ -57,7 +64,6 @@ lbl_GameOver:
         CPX #$0A
     BNE -gameOverTileLoop
     
-    
     ;; Update GAME OVER attributes on game screen
     LDA #$23
     STA temp
@@ -73,7 +79,7 @@ lbl_GameOver:
     BNE -
     JSR sub_WaitForNMI
     
-    
+   
     ;; If player score is larger than high score
     ;; Overwrite high score with player score
     ;; [@TODO]

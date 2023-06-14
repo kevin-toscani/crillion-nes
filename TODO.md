@@ -95,3 +95,6 @@
 - Improve timing on blinds effect
 - ~~Fix bug where PPU buffer overflows into animation RAM~~
 - Add a high score system
+- Fix level 11 (unbeatable)
+- Fix level 15 (too hard)
+
