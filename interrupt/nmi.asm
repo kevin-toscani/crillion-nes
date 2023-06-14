@@ -49,9 +49,9 @@
     ;; Increase frame timers
     INC frame_counter
 
-    ;; reset ball_update_position
+    ;; reset sprites_update_position
     LDA #$00
-    STA ball_update_position
+    STA sprites_update_position
 
     ;; Don't skip next NMI request
     LDA #$00

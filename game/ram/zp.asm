@@ -21,7 +21,7 @@ ball_middle            .dsb 1
 ball_bottom            .dsb 1
 
 ;; Update-position check
-ball_update_position   .dsb 1
+sprites_update_position  .dsb 1
 
 ;; Lock block space helper variable
 ;; When the ball hits a lock block, it should only move if the space
@@ -29,10 +29,10 @@ ball_update_position   .dsb 1
 ;; offset of the position where the lock block should move to, so
 ;; we can check if it is solid or not.
 ;;
-;; UP:    #%11110000 F0
-;; DOWN:  #%00010000 10
-;; LEFT:  #%11111111 FF
-;; RIGHT: #%00000001 01
+;; UP:    #%11110000 #$F0
+;; DOWN:  #%00010000 #$10
+;; LEFT:  #%11111111 #$FF
+;; RIGHT: #%00000001 #$01
 ;;        #%d......h
 move_block_space_to_check  .dsb 1
 

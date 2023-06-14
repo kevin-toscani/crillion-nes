@@ -79,9 +79,9 @@
 
     ;; We're on the game screen
     ;; Check if position should be updated (ie. has nmi happened yet)
-    LDA ball_update_position
+    LDA sprites_update_position
     BEQ +
-        JMP +skipBallMovement
+        JMP +skipSpriteMovement
     +
 
     ;; Check if ball is frozen
@@ -105,6 +105,10 @@
 
 
 +skipBallMovement:
+    ;; Move blocks a pixel up/down/left/right
+    .include "game/include/main/move_blocks.asm"
+
++skipSpriteMovement:
     ;; Testing timed PPU scroll concept
     .include "game/test/timed_ppuscroll_test.asm"
 
@@ -115,7 +119,7 @@
         JMP +ballIsDead
     +
     
-    ;; Add to sprite buffer
+    ;; Add ball to sprite buffer
     LDX sprite_ram_pointer
     LDA ball_ypos_hi
     STA ADDR_SPRITERAM,x
@@ -130,14 +134,13 @@
     STA ADDR_SPRITERAM,x
     INX
     STX sprite_ram_pointer
-    JMP +doneScreenLoad
-
+    JMP +drawBlocks
 
 +ballIsDead:
     ;; Check if kill timer has reset
     LDA kill_timer
     BEQ +
-        JMP +doneScreenLoad
+        JMP +drawBlocks
     +
     
     ;; Take a live
@@ -150,6 +153,13 @@
     
     ;; Reload current level
     JMP lbl_initiate_level_load ; declared in game/test/timed_ppuscroll_test.asm
+
+
++drawBlocks:
+    ;; Draw moving block(s, if any)
+    .include "game/include/main/draw_blocks.asm"
+    JMP +doneScreenLoad
+
 
 
 +checkNextScreen:

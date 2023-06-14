@@ -163,6 +163,6 @@
     +doneBallNudging:
 
     ;; Don't update position again until next frame
-    INC ball_update_position
+    ;; (moved to after move block routine)
 
 +doneBallHandling:

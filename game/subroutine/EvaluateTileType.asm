@@ -271,6 +271,7 @@ sub_EvaluateTileType:
     CLC
     ADC #$30
     STA move_block_y,x
+    DEC move_block_y,x
     
     ;; - Set timer to 16 frames
     LDA #$10
