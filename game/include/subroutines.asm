@@ -11,6 +11,7 @@
 .include "game/subroutine/DrawMoveTile.asm"
 .include "game/subroutine/DrawTileTemp018.asm"
 .include "game/subroutine/EvaluateTileType.asm"
+.include "game/subroutine/GameOver.asm"
 .include "game/subroutine/GetPPUAddrFromYXIndex.asm"
 .include "game/subroutine/InitiateNudge.asm"
 .include "game/subroutine/JumpToPointer.asm"

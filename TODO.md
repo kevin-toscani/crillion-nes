@@ -1,8 +1,8 @@
 # To-do list
 
 ## Table of to-do's
-- Kill block
-- Move block
+- ~~Kill block~~
+- ~~Move block~~
 - ~~Bonus counter~~
 - End level routine
 - Bonus score routine
@@ -17,7 +17,7 @@
 - ~~Set ball in "killed" state~~
 - ~~Play explosion animation~~
 - ~~After \* frames, decrease the lives counter~~
-- If lives = 0, initiate game over routine
+- ~~If lives = 0, initiate game over routine~~
 - ~~If lives > 0, restart the current level~~
 
 ## Move block

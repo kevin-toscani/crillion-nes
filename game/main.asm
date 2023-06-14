@@ -146,9 +146,8 @@
     ;; Take a live
     DEC ball_lives
     BNE +
-        ;; If no lives left, reset game
-        JMP RESET
-        ;; Replace reset with game over sequence initiation [@TODO]
+        ;; If no lives left, initiate game over sequence
+        JSR sub_GameOver
     +
     
     ;; Reload current level
