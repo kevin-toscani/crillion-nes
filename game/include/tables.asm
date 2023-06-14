@@ -154,3 +154,6 @@ tbl_HudText:
     .db #_L, #_I, #_V, #_E, #_S, #_SPACE, #_SPACE, #_SPACE
     .db #_B, #_O, #_N, #_U, #_S
 
+;; Move block top left tile based on color
+tbl_MoveBlockTopLeftTile:
+    .db #$00, #$4A, #$42, #$4A, #$42, #$4A, #$42

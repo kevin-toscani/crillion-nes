@@ -8,6 +8,16 @@
     LDA move_block_timer,x
     BEQ +checkNext
     
+    ;; Check if block is done moving
+    CMP #$01
+    BNE +
+        ;; If so, draw a tile and remove the sprite
+        JSR sub_DrawMoveTile
+        LDA #$00
+        STA move_block_timer,x
+        JMP +checkNext
+    +
+    
     ;; Check in which direction the block is moving
     ;; 0 = down, 1 = up, 2 = right, 3 = left
     LDA move_block_flags,x

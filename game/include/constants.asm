@@ -17,6 +17,9 @@ BALL_LEFT_WGA  = #$F0        ; Left position within game area (-#$10)
 BALL_TOP_WGA   = #$D0        ; Top position within game area (-#$30)
 BALL_HALF_SIZE = #$04        ; Half the ball's size (8x8)
 
+;; Move block offset within game area
+MOVE_BLOCK_LEFT_WGA  = #$F8   ; Left position within game area (-#$08)
+MOVE_BLOCK_TOP_WGA   = #$D8   ; Top position within game area (-#$28)
 
 ;; Ball flag helpers
 BALL_IS_DEAD     = #%00000001

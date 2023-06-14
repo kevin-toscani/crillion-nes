@@ -241,9 +241,13 @@ sub_EvaluateTileType:
     JSR sub_GetPPUAddrFromYXIndex
     JSR sub_RemoveBlockFromScreen
 
+    ;; Store original tile type in temp variable
+    LDA tile_type,x
+    STA temp+8
+
     ;; Write #$00 in tile type ram (makes not-solid)
     LDA #$00
-    STA tile_type, x
+    STA tile_type,x
 
     ;; Add move tile sprite over the original tile
     ;; - Store x in temp variable
@@ -256,7 +260,11 @@ sub_EvaluateTileType:
     +
     DEX
     STX move_block_pointer
-    
+
+    ;; = Set move block tile type
+    LDA temp+8
+    STA move_block_tile_type,x
+
     ;; - Set move block X position
     LDA temp+3
     AND #%00001111
@@ -273,8 +281,8 @@ sub_EvaluateTileType:
     STA move_block_y,x
     DEC move_block_y,x
     
-    ;; - Set timer to 16 frames
-    LDA #$10
+    ;; - Set timer to 16 (+1) frames
+    LDA #$11
     STA move_block_timer,x
     
     ;; - Set move direction
@@ -293,16 +301,7 @@ sub_EvaluateTileType:
     
     ;; - Restore original X
     LDX temp+3
-    
 
-    ;; - In a different routine:
-    ;;   - Add move tile data on the new tile location
-    ;;   - Write the original tile type data on new position in ram
-    ;;   - Destroy sprite
-    ;;   - Update attribute table accordingly through ppu buffer
-    ;; [@TODO]
-        
-        
     ;; Return
     RTS
 

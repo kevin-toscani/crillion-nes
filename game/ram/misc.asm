@@ -24,12 +24,13 @@
     move_block_x              .dsb 4
     move_block_y              .dsb 4
     move_block_timer          .dsb 4 ; doubles as move_block_active
+    move_block_tile_type      .dsb 4
 
     ;; move block flags
-    ;; #% ccc .. h d
-    ;;    ||| || | +-- direction: up/left (1) or right/down (0) 
-    ;;    ||| || +---- direction: horizontal (1) or vertical (0)
-    ;;    ||| ++------ (unused)
+    ;; #% ccc ... h d
+    ;;    ||| ||| | +-- direction: up/left (1) or right/down (0) 
+    ;;    ||| ||| +---- direction: horizontal (1) or vertical (0)
+    ;;    ||| +++----- (unused)
     ;;    +++--------- color (1-6)
     move_block_flags          .dsb 4
     

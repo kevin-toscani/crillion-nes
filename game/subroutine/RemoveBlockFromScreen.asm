@@ -216,36 +216,8 @@ sub_RemoveBlockFromScreen:
 
 
     ;; Update attribute table accordingly through ppu buffer
-    LDA #$23
-    STA ppu_buffer,y
-    INY
+    JSR sub_SetTileAttributeAddress
     
-    TXA
-    AND #%11110000
-    LSR
-    LSR
-    LSR
-    LSR
-    CLC
-    ADC #1
-    LSR
-    ASL
-    ASL
-    ASL
-    CLC
-    ADC #$C8
-    STA temp
-    TXA
-    AND #%00001111
-    CLC
-    ADC #$01
-    LSR
-    CLC
-    ADC temp
-    STA temp
-    STA ppu_buffer,y
-    INY
-       
     TXA
     AND #%00010000
     BEQ +
@@ -280,7 +252,6 @@ sub_RemoveBlockFromScreen:
     INY
     PLA
     TAX
-
 
     ;; Tell PPU to update tiles and attributes next frame
     STY ppu_buffer_pointer
