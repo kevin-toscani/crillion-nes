@@ -7,12 +7,12 @@
 - End level routine
 - Bonus score routine
 - End game routine
-- Game over routine
-- Finetuning
+- ~~Game over routine~~
+- Finetuning/Wishlist
 
-## Kill block
-**Summary:** if ball touches kill block, kill ball.  
-**Elaboration:**
+## ~~Kill block~~
+~~**Summary:** if ball touches kill block, kill ball.~~  
+~~**Elaboration:**~~
 - ~~If the ball collides with the kill block:~~
 - ~~Set ball in "killed" state~~
 - ~~Play explosion animation~~
@@ -20,7 +20,7 @@
 - ~~If lives = 0, initiate game over routine~~
 - ~~If lives > 0, restart the current level~~
 
-## Move block
+## ~~Move block~~
 ~~**Summary:** if the ball touches a move block with the same color, and the move block has room to move in the pushed direction, move the block one spot in that direction.~~  
 ~~**Elaboration:**~~
 - ~~If the ball collides with the move block~~
@@ -80,17 +80,18 @@
 - After \* frames
 - Initiate game over routine
 
-## Game over routine
-**Summary:** show game over message and reset game on button press  
-**Elaboration:**
-- Draw GAME OVER tiles over game screen
-- If player score is larger than high score
-- Overwrite high score with player score
-- If player presses either A or START
-- Initiate start screen routine (no hard reset as that resets the high score as well)
+## ~~Game over routine~~
+~~**Summary:** show game over message and reset game on button press~~  
+~~**Elaboration:**~~
+- ~~Blind out the screen~~
+- ~~Flash the screen~~
+- ~~Draw GAME OVER tiles over game screen~~
+- ~~If player presses either A or START~~
+- ~~Initiate start screen routine (no hard reset as that resets the high score as well)~~
 
-## Finetuning and bugfixing
-**Summary:** various minor flaws and fixes
+## Finetuning/Wishlist
+**Summary:** various minor flaws and fixes, and things that are not required but would be nice to have.  
 **Elaboration:**
 - Improve timing on blinds effect
 - ~~Fix bug where PPU buffer overflows into animation RAM~~
+- Add a high score system

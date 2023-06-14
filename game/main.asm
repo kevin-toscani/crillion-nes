@@ -147,7 +147,7 @@
     DEC ball_lives
     BNE +
         ;; If no lives left, initiate game over sequence
-        JSR sub_GameOver
+        JMP lbl_GameOver
     +
     
     ;; Reload current level

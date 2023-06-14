@@ -2,6 +2,7 @@
 
 .include "game/subroutine/AddAccumulatorToScore.asm"
 .include "game/subroutine/BackgroundNoise.asm"
+.include "game/subroutine/BlindsEffect.asm"
 .include "game/subroutine/ClearScreen.asm"
 .include "game/subroutine/ColorizeBall.asm"
 .include "game/subroutine/ColorsMatch.asm"
@@ -11,7 +12,7 @@
 .include "game/subroutine/DrawMoveTile.asm"
 .include "game/subroutine/DrawTileTemp018.asm"
 .include "game/subroutine/EvaluateTileType.asm"
-.include "game/subroutine/GameOver.asm"
+.include "game/subroutine/FlashEffect.asm"
 .include "game/subroutine/GetPPUAddrFromYXIndex.asm"
 .include "game/subroutine/InitiateNudge.asm"
 .include "game/subroutine/JumpToPointer.asm"

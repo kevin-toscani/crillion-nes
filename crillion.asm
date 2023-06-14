@@ -43,6 +43,9 @@ MainGameLoop:
     .include "game/main.asm"
     JMP MainGameLoop
 
+;; Game over sequence is outside main game loop
+.include "game/include/main/game_over.asm"
+
 ;; Subroutines
 .include "include/subroutines.asm"
 

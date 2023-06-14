@@ -8,7 +8,7 @@ sub_WriteByteToPPUBuffer:
 
     ;; Check if buffer full; if so, wait a frame and force update
     LDY ppu_buffer_pointer
-    CPY #$30
+    CPY #$60
     BNE +
         INC ppu_buffer_update
         JSR sub_WaitForVBlank

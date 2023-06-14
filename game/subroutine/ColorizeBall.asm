@@ -3,7 +3,7 @@
 ;;  Subroutine: ColorizeBall
 ;;
 ;;  Applies the color set through ball_flags to the ball sprite.
-;;
+;;  Expects ball_flags to be in the accumulator
 ;;
 
 
