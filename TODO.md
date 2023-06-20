@@ -97,4 +97,5 @@
 - Add a high score system
 - Fix level 11 (unbeatable)
 - Fix level 15 (too hard)
+- Pause ball before each level start
 
