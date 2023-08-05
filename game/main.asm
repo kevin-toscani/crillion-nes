@@ -100,8 +100,11 @@
     ;; Update bonus
     .include "game/include/main/update_bonus.asm"
     
-    ;; Input test for beeps
-    .include "game/test/input_beeps.asm"
+    ;; Input test for beeps (disabled)
+    ;; .include "game/test/input_beeps.asm"
+
+    ;; Input test for explosion sound effect (disabled)
+    ;; .include "game/test/input_explosion.asm"
 
 
 +skipBallMovement:

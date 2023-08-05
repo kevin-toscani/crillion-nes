@@ -103,7 +103,10 @@
         .include "game/include/main/background_sound.asm"
     +
 
-    ;; Test: random bleeps
+    ;; Test: random bleeps (disabled)
     .include "game/test/random_descending_bleeps.asm"
+    
+    ;; Test: explosion sound
+    .include "game/test/nmi_explosion.asm"
     
 

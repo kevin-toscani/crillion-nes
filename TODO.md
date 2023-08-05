@@ -16,6 +16,7 @@
 - ~~If the ball collides with the kill block:~~
 - ~~Set ball in "killed" state~~
 - ~~Play explosion animation~~
+- ~~Play explosion sound effect~~
 - ~~After \* frames, decrease the lives counter~~
 - ~~If lives = 0, initiate game over routine~~
 - ~~If lives > 0, restart the current level~~

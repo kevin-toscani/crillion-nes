@@ -175,6 +175,9 @@ sub_EvaluateTileType:
 
         LDA #$01
         STA explosion_active,x
+        
+        ;; Play explosion sound effect
+        STA explosion_sfx_timer
 
         ;; Set kill timer
         LDA #$60
