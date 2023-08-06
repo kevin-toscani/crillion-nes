@@ -2,6 +2,12 @@
 ;; Level layout tables
 ;; (see ext_assets/LevelDesign.xlsx for more info)
 
+ifdef TESTING
+lvl_test:
+    .db #$64, #%00000001
+    .db #LEVEL_END
+endif
+
 lvl_layout_01:
     .db #$61, #%00100001
     .db #$52, #%01100001
@@ -946,6 +952,9 @@ lvl_layout_25:
 
 ;; Level layout address pointers
 tbl_lvl_layout_hi:
+ifdef TESTING
+    .db >#lvl_test
+endif
     .db >#lvl_layout_01, >#lvl_layout_02, >#lvl_layout_03, >#lvl_layout_04, >#lvl_layout_05
     .db >#lvl_layout_06, >#lvl_layout_07, >#lvl_layout_08, >#lvl_layout_09, >#lvl_layout_10
     .db >#lvl_layout_11, >#lvl_layout_12, >#lvl_layout_13, >#lvl_layout_14, >#lvl_layout_15
@@ -953,6 +962,9 @@ tbl_lvl_layout_hi:
     .db >#lvl_layout_21, >#lvl_layout_22, >#lvl_layout_23, >#lvl_layout_24, >#lvl_layout_25
 
 tbl_lvl_layout_lo:
+ifdef TESTING
+    .db <#lvl_test
+endif
     .db <#lvl_layout_01, <#lvl_layout_02, <#lvl_layout_03, <#lvl_layout_04, <#lvl_layout_05
     .db <#lvl_layout_06, <#lvl_layout_07, <#lvl_layout_08, <#lvl_layout_09, <#lvl_layout_10
     .db <#lvl_layout_11, <#lvl_layout_12, <#lvl_layout_13, <#lvl_layout_14, <#lvl_layout_15
@@ -961,11 +973,15 @@ tbl_lvl_layout_lo:
 
 ;; Ball start position (#$YX)
 tbl_lvl_ball_startpos:
+ifdef TESTING
+    .db #$29
+endif
     .db #$9B, #$10, #$21, #$9B, #$11
     .db #$81, #$89, #$47, #$1C, #$20
     .db #$77, #$20, #$7D, #$6B, #$28
     .db #$9D, #$36, #$1B, #$01, #$59
     .db #$90, #$47, #$9C, #$34, #$18
+
     
 ;; Ball start direction, color and tile score
 ;; #% ccc v tttt
@@ -973,6 +989,9 @@ tbl_lvl_ball_startpos:
 ;;    ||| +------- vertical direction, up (0) or down
 ;;    +++--------- color (CBRYGM)
 tbl_lvl_ball_init:
+ifdef TESTING
+    .db #%00100000
+endif
     .db #%00110000, #%00110000, #%00110000, #%00100000, #%01010000
     .db #%01110000, #%01010000, #%10110000, #%10000000, #%00110000
     .db #%01010000, #%01010000, #%10100000, #%10010000, #%10010000

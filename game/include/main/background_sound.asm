@@ -1,4 +1,13 @@
 
+    ;; If ball is frozen, no background sound should play
+    LDA ball_flags
+    AND #BALL_IS_FROZEN
+    BEQ +
+        LDA #$30
+        STA NOISE_VOLUME
+        JMP +endNoise
+    +
+    
     ;; At random times, set max_noise period to $03-$0A
     LDA max_noise
     BNE +

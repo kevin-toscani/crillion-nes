@@ -58,7 +58,6 @@
     
 
 +screenLoaded:
-
     ;; Check if we're on the game screen
     LDA screen_mode
     CMP #IS_GAME_SCREEN
@@ -113,8 +112,8 @@
     .include "game/include/main/move_blocks.asm"
 
 +skipSpriteMovement:
-    ;; Testing timed PPU scroll concept
-    .include "game/test/timed_ppuscroll_test.asm"
+    ;; Testing timed PPU scroll concept (disabled)
+    ;; .include "game/test/timed_ppuscroll_test.asm"
 
     ;; Check if ball is dead
     LDA ball_flags
@@ -155,7 +154,7 @@
     +
     
     ;; Reload current level
-    JMP lbl_initiate_level_load ; declared in game/test/timed_ppuscroll_test.asm
+    JMP lbl_InitiateLevelLoad
 
 
 +drawBlocks:

@@ -88,13 +88,10 @@ sub_EvaluateTileType:
 
 
     ;; - If there are no color blocks left:
-    ;;   - Freeze ball
-    ;;   - Initiate level-win state [@TODO]
+    ;;   - Initiate level-win state
     DEC blocks_left
     BNE +
-        LDA ball_flags
-        ORA #FREEZE_BALL
-        STA ball_flags
+        JMP lbl_LevelWin
     +
     
     RTS

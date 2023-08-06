@@ -39,12 +39,15 @@ RESET:
     .include "interrupt/reset.asm"
 
 ;; Main game loop
-MainGameLoop:
+lbl_MainGameLoop:
     .include "game/main.asm"
-    JMP MainGameLoop
+    JMP lbl_MainGameLoop
 
-;; Game over sequence is outside main game loop
+;; Following sequences are outside main game loop
 .include "game/include/main/game_over.asm"
+.include "game/include/main/level_win.asm"
+.include "game/include/main/initiate_level_load.asm"
+
 
 ;; Subroutines
 .include "include/subroutines.asm"
@@ -66,6 +69,7 @@ IRQ:
     .dw RESET
     .dw IRQ
 
-;; CHR data (if any)
+;; CHR data
 .incbin "game/graphics/sprites.chr"
 .incbin "game/graphics/backgrounds.chr"
+

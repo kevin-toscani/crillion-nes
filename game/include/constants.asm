@@ -1,4 +1,7 @@
 
+;; TEST MODE (comment to disable)
+TESTING = #1
+
 ;; Starting address for screen tile RAM
 ADDR_SCREENTILERAM  = $0400
 

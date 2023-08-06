@@ -22,5 +22,6 @@
 .include "game/subroutine/LoadWinScreen.asm"
 .include "game/subroutine/RemoveBlockFromScreen.asm"
 .include "game/subroutine/SetTileAttributeAddress.asm"
+.include "game/subroutine/WaitXFrames.asm"
 .include "game/subroutine/WriteByteToPPUBuffer.asm"
 
