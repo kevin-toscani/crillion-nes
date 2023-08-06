@@ -1,3 +1,4 @@
+
     ;; Set up loop
     LDX #$00
     -loop_load_animation:
@@ -148,3 +149,4 @@
 
     JMP -loop_load_animation
 +done:
+

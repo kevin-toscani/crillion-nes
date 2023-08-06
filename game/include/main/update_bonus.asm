@@ -1,11 +1,10 @@
-;; update_bonus.asm
+
+;; Update the bonus counter on screen
 
     ;; If bonus = 000, skip decreasing
     LDA ball_bonus
-    CLC
-    ADC ball_bonus+1
-    CLC
-    ADC ball_bonus+2
+    ORA ball_bonus+1
+    ORA ball_bonus+2
     BEQ +done
 
     ;; Check if bonus timer is done yet
@@ -55,3 +54,4 @@
     BPL -updateNextDigit
         
 +done:
+

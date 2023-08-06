@@ -1,3 +1,5 @@
+
+;; Apply flashing light effect to background color
 sub_FlashEffect:
     LDX #$00
     STX temp+1
@@ -18,3 +20,4 @@ sub_FlashEffect:
     BNE -flashLoop
     
     RTS
+

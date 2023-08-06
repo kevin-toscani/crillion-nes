@@ -1,3 +1,6 @@
+
+;; Subroutines to disable or enable screen rendering
+
 sub_DisableRendering:
     ;; Force NMI skip, disable rendering
 	LDA #$01
@@ -23,3 +26,4 @@ sub_EnableRendering:
     STA PPU_MASK
     JSR sub_WaitForVBlank
     RTS
+

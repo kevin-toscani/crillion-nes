@@ -1,3 +1,4 @@
+
 ;; Ball variables
 ball_xpos_hi           .dsb 1
 ball_xpos_lo           .dsb 1
@@ -94,3 +95,4 @@ explosion_sfx_timer    .dsb 1
 
 ;; Additional NMI check for timed PPU fade
 check_nmi              .dsb 1
+

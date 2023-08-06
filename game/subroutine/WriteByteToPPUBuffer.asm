@@ -1,3 +1,7 @@
+
+;; Write the byte in temp+2 and the ppu address (temp)
+;; to a buffer, so NMI can update it before the next frame
+
 sub_WriteByteToPPUBuffer:
 
     ;; Prevent updating until full 3-byte buffer is filled,
@@ -37,3 +41,4 @@ sub_WriteByteToPPUBuffer:
 
     ;; Return
     RTS
+

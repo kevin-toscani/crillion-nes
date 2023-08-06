@@ -1,4 +1,7 @@
 
+;; Set the correct tile attribute address based on game tile (x) 
+;; into the correct ppu buffer slot (y)
+
 sub_SetTileAttributeAddress:
     LDA #$23
     STA ppu_buffer,y
@@ -11,7 +14,7 @@ sub_SetTileAttributeAddress:
     LSR
     LSR
     CLC
-    ADC #1
+    ADC #$01
     LSR
     ASL
     ASL
@@ -31,3 +34,4 @@ sub_SetTileAttributeAddress:
     INY
        
     RTS
+

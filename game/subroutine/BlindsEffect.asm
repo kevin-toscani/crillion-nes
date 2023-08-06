@@ -1,4 +1,5 @@
 
+;; Do the blinds effect (i.e. wipe the screen line by line)
 sub_BlindsEffect:
 
     ;; Set up loop fading
@@ -81,3 +82,4 @@ sub_BlindsEffect:
     BNE -fadeLoop
     
     RTS
+

@@ -1,3 +1,5 @@
+
+;; Game over sequence
 lbl_GameOver:
 
     ;; Disable noise channel
@@ -92,3 +94,4 @@ lbl_GameOver:
         AND #%10010000
     BEQ -checkController
     JMP lbl_SoftReset
+

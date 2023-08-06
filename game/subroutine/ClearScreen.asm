@@ -1,3 +1,4 @@
+
 ;; Subroutine to clear the screen
 ;; If it's a game screen, add noise
 
@@ -94,3 +95,4 @@ sub_ClearScreen:
     BNE -
     
     RTS
+

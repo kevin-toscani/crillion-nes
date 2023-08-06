@@ -1,3 +1,4 @@
+
 ;; Draw the move tile as follows:
 ;;
 ;;  1 2
@@ -233,3 +234,4 @@ sub_DrawMoveTile:
 
     ;; Return
     RTS
+

@@ -1,3 +1,5 @@
+
+;; Load the game screen, based on level number
 sub_LoadGameScreen:
 
     ;; Clear the screen
@@ -721,3 +723,4 @@ sub_Draw28HorizontalTiles:
         DEX
     BNE -
     RTS
+

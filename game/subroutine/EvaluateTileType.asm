@@ -1,3 +1,4 @@
+
 ;; Subroutine to evaluate the colliding tile type and take its
 ;; corresponding action (move block, kill player, ...)
 ;; - Expects X-register to be the tile_type offset
@@ -314,3 +315,4 @@ sub_EvaluateTileType:
     PLA
     TAX
     RTS
+

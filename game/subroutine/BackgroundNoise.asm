@@ -1,4 +1,5 @@
 
+;; Play background noise
 sub_BackgroundNoise:
     LDA #$32
     STA NOISE_VOLUME
@@ -6,3 +7,4 @@ sub_BackgroundNoise:
     STA NOISE_PERIOD
     STA current_noise
     RTS
+

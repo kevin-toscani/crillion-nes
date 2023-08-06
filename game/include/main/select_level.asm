@@ -1,3 +1,5 @@
+
+    ;; Change level number on start screen
     LDA buttons_pressed
     AND #BUTTON_LEFT | #BUTTON_RIGHT
     BEQ +checkStartPress

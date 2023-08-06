@@ -1,3 +1,5 @@
+
+    ;; TEST SCRIPT: while holding down SELECT, play pulse sounds at random frequencies
     LDA buttons_pressed
     AND #BUTTON_SELECT
     BEQ +
@@ -11,3 +13,4 @@
         LDA #$02
         STA do_beeps
     +
+

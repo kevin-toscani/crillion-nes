@@ -1,3 +1,5 @@
+
+;; Remove a block from screen
 sub_RemoveBlockFromScreen:
 
     ;; Get current buffer location
@@ -260,3 +262,4 @@ sub_RemoveBlockFromScreen:
  
     ;; We're done - return
     RTS
+

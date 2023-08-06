@@ -1,3 +1,4 @@
+
 ;; miscellaneous (non-zeropage) ram variables go here
 
 .enum ADDR_OTHERRAM

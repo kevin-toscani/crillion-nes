@@ -1,4 +1,6 @@
+
 ;; Random bleepy noises
+
     LDA do_beeps
     BEQ +continue
     
@@ -26,3 +28,4 @@
     STA PULSE1_TIMER_HI
 
 +continue:
+

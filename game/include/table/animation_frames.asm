@@ -1,3 +1,4 @@
+
 ;; CHR tile-id's per slide of explosion
 explosion_slide0:
     .db #$00, #$00, #$00

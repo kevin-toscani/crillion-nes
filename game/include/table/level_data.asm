@@ -1,3 +1,7 @@
+
+;; Level layout tables
+;; (see ext_assets/LevelDesign.xlsx for more info)
+
 lvl_layout_01:
     .db #$61, #%00100001
     .db #$52, #%01100001

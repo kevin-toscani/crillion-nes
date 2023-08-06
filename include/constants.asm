@@ -1,3 +1,4 @@
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; include/constants.asm
@@ -55,3 +56,4 @@ BUTTON_RIGHT  = #%00000001
 
 ;; Custom game constants
 .include "game/include/constants.asm"
+

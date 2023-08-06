@@ -1,6 +1,7 @@
-;; Timed updates (test)
 
-    ;; If B button is pressed
+;; TEST SCRIPT: On pressing START, load the next level
+
+    ;; If START button is pressed
     LDA buttons_pressed
     AND #BUTTON_START
     BNE +
@@ -39,5 +40,5 @@ lbl_initiate_level_load:
     LDA #LOAD_GAME_SCREEN
     STA screen_mode
 
-
 +end:
+

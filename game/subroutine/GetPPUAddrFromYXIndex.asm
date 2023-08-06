@@ -1,12 +1,12 @@
-sub_GetPPUAddrFromYXIndex:
 
-    ;; Get the PPU address from YX index
-    ;; - Expects YX index (aka tile offset) to be in the X register
-    ;; - Writes the 16-bit PPU address in temp (hi) and temp+1 (lo)
-    
-    ;; PPU_lo = #$C2 +  2*x + $40*(y%4)     = temp+1
-    ;; PPU_hi = (Y/4) + $20 + carry(PPU_lo) = temp
-    
+;; Get the PPU address from YX index
+;; - Expects YX index (aka tile offset) to be in the X register
+;; - Writes the 16-bit PPU address in temp (hi) and temp+1 (lo)
+
+;; PPU_lo = #$C2 +  2*x + $40*(y%4)     = temp+1
+;; PPU_hi = (Y/4) + $20 + carry(PPU_lo) = temp
+
+sub_GetPPUAddrFromYXIndex:
     TXA
     AND #%11000000
     CLC
@@ -43,3 +43,4 @@ sub_GetPPUAddrFromYXIndex:
     STA temp
 
     RTS
+

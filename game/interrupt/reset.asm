@@ -1,3 +1,8 @@
+
+;; Softer reset
+;; After game over, the game JMPs here to prevent
+;; resetting the high score
+
 lbl_SoftReset:
 
     ;; Tell game to load the intro screen
@@ -17,3 +22,4 @@ lbl_SoftReset:
     STA ball_score+3
     STA ball_score+4
     STA ball_score+5
+

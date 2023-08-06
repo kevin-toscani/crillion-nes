@@ -1,3 +1,4 @@
+
     ;; At random times, set max_noise period to $03-$0A
     LDA max_noise
     BNE +

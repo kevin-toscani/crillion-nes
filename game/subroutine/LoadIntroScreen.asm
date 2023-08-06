@@ -1,3 +1,5 @@
+
+;; Load the intro screen
 sub_LoadIntroScreen:
 
     ;; Load intro palette

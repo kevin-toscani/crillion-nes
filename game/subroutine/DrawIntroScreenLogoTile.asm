@@ -1,3 +1,5 @@
+
+;; Draw a tile from the logo on the intro screen
 sub_drawIntroScreenLogoTile:
     LDA tbl_IntroScreenLogoChr,y
     CMP #$60
@@ -9,3 +11,4 @@ sub_drawIntroScreenLogoTile:
     +
     STA PPU_DATA
     RTS
+
