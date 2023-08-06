@@ -51,16 +51,17 @@
 - ~~Decrease the number of color blocks~~
 - ~~If the number of color blocks is zero~~
 - ~~Set the game in freeze state~~
-- Set null tile color to yellow
-- Play the end level sweep sound effect
-- After \* frames, set null tile color to dark blue
+- Hide ball
+- ~~Set null tile color to yellow~~
+- Meanwhile, play end level sweep sound effect
+- ~~After \* frames, set null tile color to dark blue~~
 - After \* frames, initiate bonus score routine (BSR)
-- \* frames after BSR, initiate blinds routine
-- After blinds routine
+- ~~\* frames after BSR, initiate blinds routine~~
+- ~~After blinds routine~~
 - If the current level is the last one
 - Initiate end game routine
-- Load next level
-- Unfreeze ball
+- ~~Load next level~~
+- ~~Unfreeze ball~~
 
 ## Bonus score routine
 **Summary:** convert the bonus timer value to the player's score  
@@ -90,14 +91,19 @@
 - ~~If player presses either A or START~~
 - ~~Initiate start screen routine (no hard reset as that resets the high score as well)~~
 
+## Level design updates
+- Fix level 11 (unbeatable)
+- Fix level 15 (too hard)
+
 ## Finetuning/Wishlist
 **Summary:** various minor flaws and fixes, and things that are not required but would be nice to have.  
 **Elaboration:**
 - Improve timing on blinds effect
 - ~~Fix bug where PPU buffer overflows into animation RAM~~
 - Add a high score system
-- Fix level 11 (unbeatable)
-- Fix level 15 (too hard)
 - Pause ball before each level start
 - Fix move block recoloring flaw
+- Add thud to color block destruction
 
+## Reference video
+https://www.youtube.com/watch?v=5pBsyOKlrrc
