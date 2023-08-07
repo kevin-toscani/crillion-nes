@@ -91,7 +91,10 @@ sweep_noise            .dsb 1
 current_noise          .dsb 1
 noise_timer            .dsb 1
 do_beeps               .dsb 1
-explosion_sfx_timer    .dsb 1
+
+;; Sound effect variables
+sfx_address            .dsb 2
+sfx_timer              .dsb 1
 
 ;; Additional NMI check for timed PPU fade
 check_nmi              .dsb 1

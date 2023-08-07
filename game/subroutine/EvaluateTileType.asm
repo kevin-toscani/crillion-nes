@@ -16,7 +16,12 @@ sub_EvaluateTileType:
     ;; It's a color block. Check if the colors match
     JSR sub_ColorsMatch
     BEQ +
-        ;; Colors don't match - return
+        ;; Colors don't match
+        ;; Play bounce sound effect
+        LDX #SFX_BOUNCE
+        JSR sub_PreloadSfxFromX
+        
+        ;; Return
         RTS
     +
 
@@ -85,6 +90,11 @@ sub_EvaluateTileType:
     CLC
     ADC #81
     JSR sub_AddAccumulatorToScore
+
+
+    ;; Play thud sound effect
+    LDX #SFX_THUD
+    JSR sub_PreloadSfxFromX
 
 
     ;; - If there are no color blocks left:
@@ -175,7 +185,8 @@ sub_EvaluateTileType:
         STA explosion_active,x
         
         ;; Play explosion sound effect
-        STA explosion_sfx_timer
+        LDX #SFX_EXPLOSION
+        JSR sub_PreloadSfxFromX
 
         ;; Set kill timer
         LDA #$60

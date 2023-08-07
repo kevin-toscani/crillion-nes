@@ -104,8 +104,8 @@
     +
 
     ;; Test: random bleeps (disabled)
-    .include "game/test/random_descending_bleeps.asm"
+    ;.include "game/test/random_descending_bleeps.asm"
     
-    ;; Test: explosion sound
-    .include "game/test/nmi_explosion.asm"
+    ;; Play sound effect
+    .include "game/include/main/nmi_sfx.asm"
     

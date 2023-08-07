@@ -167,20 +167,6 @@ tbl_GameOver:
 tbl_BackgroundFade:
     .db #$00, #$10, #$20, #$30, #$30, #$30, #$20, #$10, #$00, #$0F
 
-
-;; Explosion sound effect frames
-;; #% ffff vvvv
-;;    |||| ++++---- volume (0=low, 15=high)
-;;    ++++-------- frequency (0=low, 15=high)
-;;
-;; #$FF = end of sfx
-tbl_ExplosionSfx:
-    .db #$00
-    .db #$04, #$18, #$3C, #$2F, #$3F, #$2F, #$1F, #$1F
-    .db #$0F, #$1F, #$1F, #$0F, #$0F, #$0F, #$1F, #$1F
-    .db #$2F, #$1F, #$1F, #$2F, #$2F, #$1F, #$1F, #$0F
-    .db #$0F, #$1F, #$0F, #$1F, #$1F, #$2F, #$0F, #$1E
-    .db #$1D, #$0C, #$0B, #$0A, #$19, #$18, #$27, #$06
-    .db #$15, #$14, #$03, #$02, #$01
-    .db #$FF ;end sfx byte
+;; Sound effects
+.include "game/include/table/sfx.asm"
 

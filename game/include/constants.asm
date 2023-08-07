@@ -98,6 +98,11 @@ NOISE_PERIOD    = $400E
 NOISE_LENGTH    = $400F
 
 
+;; Sound effects
+SFX_EXPLOSION   = #0
+SFX_THUD        = #1
+SFX_BOUNCE      = #2
+
 
 ;; Character map
 _SPACE = #$00

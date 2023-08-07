@@ -20,6 +20,7 @@
 .include "game/subroutine/LoadGameScreen.asm"
 .include "game/subroutine/LoadIntroScreen.asm"
 .include "game/subroutine/LoadWinScreen.asm"
+.include "game/subroutine/PreloadSfxFromX.asm"
 .include "game/subroutine/RemoveBlockFromScreen.asm"
 .include "game/subroutine/SetTileAttributeAddress.asm"
 .include "game/subroutine/WaitXFrames.asm"

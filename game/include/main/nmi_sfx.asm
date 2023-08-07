@@ -1,14 +1,13 @@
 
     ;; Get current explosion sfx frame; if not set, skip this
-    LDX explosion_sfx_timer
+    LDY sfx_timer
     BEQ +done
     
         ;; Check if explosion sfx is done; if so, disable and skip
-        LDA tbl_ExplosionSfx, x
-        CMP #$FF
+        LDA (sfx_address),y
         BNE +
             LDA #$00
-            STA explosion_sfx_timer
+            STA sfx_timer
             JMP +done
         +
         
@@ -18,7 +17,7 @@
         STA NOISE_VOLUME
         
         ;; Set high nibble as frequency
-        LDA tbl_ExplosionSfx, x
+        LDA (sfx_address),y
         LSR
         LSR
         LSR
@@ -27,6 +26,6 @@
         STA NOISE_PERIOD
         
         ;; Next frame
-        INC explosion_sfx_timer
+        INC sfx_timer
     +done
 
