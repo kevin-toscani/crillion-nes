@@ -104,6 +104,7 @@
 - Pause ball before each level start
 - Fix move block recoloring flaw
 - Add thud to color block destruction
+- Finish (or at least discard) explosion animation before next level starts
 
 ## Reference video
 https://www.youtube.com/watch?v=5pBsyOKlrrc
