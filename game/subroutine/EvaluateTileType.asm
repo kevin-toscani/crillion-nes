@@ -106,8 +106,9 @@ sub_EvaluateTileType:
     
     RTS
 
-+checkIfPaintBlock:
 
+
++checkIfPaintBlock:
 
     ;; Check if collided tile is a paint block
     LDA colliding_tile
@@ -134,13 +135,20 @@ sub_EvaluateTileType:
         STA ball_flags
         JSR sub_ColorizeBall
 
+        ;; Play bounce sound effect
+        LDX #SFX_BOUNCE
+        JSR sub_PreloadSfxFromX
+
         ;; Restore x-register
         PLA
         TAX
 
         ;; Return
         RTS
-    +checkIfDeathBlock:
+        
+        
+        
++checkIfDeathBlock:
 
     ;; Check if collided tile is a death block
     LDA colliding_tile
@@ -196,18 +204,33 @@ sub_EvaluateTileType:
         RTS
 
 
+
 +checkIfMoveBlock:
 
     ;; Check if collided tile is a move block
     LDA colliding_tile
     AND #IS_MOVE_BLOCK
     BNE +
+        ;; Tile is not a move block
+        ;; Therefore, it is a solid wall
+        
+        ;; Play bounce sound effect
+        LDX #SFX_BOUNCE
+        JSR sub_PreloadSfxFromX
+
+        ;; Return
         RTS
     +
 
     ;; It is a move block. Check if colors match
     JSR sub_ColorsMatch
     BEQ +
+        ;; Colors do not match
+        ;; Play bounce sound effect
+        LDX #SFX_BOUNCE
+        JSR sub_PreloadSfxFromX
+
+        ;; Return
         RTS
     +
 
@@ -223,24 +246,24 @@ sub_EvaluateTileType:
     AND #%00001111
     CMP #$0E
     BCC +
-        JMP +restoreX
+        JMP +dontMoveBlock
     +
     TXA
     AND #%11110000
     CMP #$A0
     BNE +
-        JMP +restoreX
+        JMP +dontMoveBlock
     +
     CMP #$F0
     BNE +
-        JMP +restoreX
+        JMP +dontMoveBlock
     +
     
     ;; Check if the next tile is solid
     LDA tile_type,x
     AND #TILE_IS_SOLID
     BEQ +
-        JMP +restoreX
+        JMP +dontMoveBlock
     +
     
     ;; Move block has room to move
@@ -318,9 +341,17 @@ sub_EvaluateTileType:
     RTS
 
 
-;; Pull X register from stack before returning
-+restoreX:
+;; Do not move the move block
++dontMoveBlock:
+
+    ;; Play bounce sound effect
+    LDX #SFX_BOUNCE
+    JSR sub_PreloadSfxFromX
+
+    ;; Restore X from stack
     PLA
     TAX
+    
+    ;; Return
     RTS
 

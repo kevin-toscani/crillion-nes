@@ -103,7 +103,9 @@
 - Add a high score system
 - Pause ball before each level start
 - Fix move block recoloring flaw
-- Add thud to color block destruction
+- ~~Add thud sfx to color block destruction~~
+- ~~Add bounce sfx to color rebound~~
+- ~~Add bounce sfx to all block rebounds~~
 - Finish (or at least discard) explosion animation before next level starts
 
 ## Reference video
