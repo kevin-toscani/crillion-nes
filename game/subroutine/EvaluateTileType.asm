@@ -186,11 +186,10 @@ sub_EvaluateTileType:
         SBC #$06
         STA explosion_y,x
 
-        LDA #$01 ; subpalette 1 is for ball explosions
-        STA explosion_attributes,x
-
         LDA #$01
-        STA explosion_active,x
+        STA explosion_attributes,x  ; set subpalette 1 for ball explosion
+        STA explosion_active,x      ; set explosion animation to active
+        STA noise_muted             ; mute background noise
         
         ;; Play explosion sound effect
         LDX #SFX_EXPLOSION

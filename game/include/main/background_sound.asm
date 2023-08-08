@@ -1,7 +1,6 @@
 
-    ;; If ball is frozen, no background sound should play
-    LDA ball_flags
-    AND #BALL_IS_FROZEN
+    ;; If noise is muted, no noise should play
+    LDA noise_muted
     BEQ +
         LDA #$30
         STA NOISE_VOLUME
@@ -25,7 +24,6 @@
         STA sweep_noise
         LDA #$34
         STA NOISE_VOLUME
-
     +
 
     ;; if sweep noise = $00: constant noise

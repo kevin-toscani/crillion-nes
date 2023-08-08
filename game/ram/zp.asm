@@ -71,10 +71,11 @@ move_block_pointer     .dsb 1
 ;; Sprite RAM pointer to keep track of sprites to update
 sprite_ram_pointer     .dsb 1
 
-;; Counters 
+;; Timers 
 nudge_timer            .dsb 1
 bonus_timer            .dsb 1
 kill_timer             .dsb 1
+unfreeze_timer         .dsb 1
 
 ;; Current level (doubles as level select variable)
 current_level          .dsb 1
@@ -92,6 +93,7 @@ current_noise          .dsb 1
 noise_timer            .dsb 1
 do_beeps               .dsb 1
 soft_pulse1            .dsb 1
+noise_muted            .dsb 1
 
 ;; Sound effect variables
 sfx_address            .dsb 2

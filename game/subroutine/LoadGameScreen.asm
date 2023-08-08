@@ -709,7 +709,17 @@ sub_LoadGameScreen:
     STA max_noise
     STA noise_timer
     STA sweep_noise
+    STA noise_muted
     JSR sub_BackgroundNoise
+
+    ;; Freeze the ball
+    LDA ball_flags
+    ORA #FREEZE_BALL
+    STA ball_flags
+    
+    ;; Start unfreeze timer
+    LDA #$30
+    STA unfreeze_timer
 
     ;; Return
     RTS

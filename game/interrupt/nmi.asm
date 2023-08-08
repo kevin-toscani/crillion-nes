@@ -95,6 +95,17 @@
     BEQ +
         DEC kill_timer
     +
+    
+    ;; Decrease and handle unfreeze timer
+    LDA unfreeze_timer
+    BEQ +
+        DEC unfreeze_timer
+        BNE +
+        
+        LDA ball_flags
+        AND #UNFREEZE_BALL
+        STA ball_flags
+    +
 
     ;; Play background noise
     LDA screen_mode

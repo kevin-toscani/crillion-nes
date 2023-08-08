@@ -8,8 +8,8 @@ lbl_LevelWin:
     STA ball_flags
 
     ;; Disable noise channel
-    LDA #$00
-    STA NOISE_VOLUME
+    LDA #$01
+    STA noise_muted
     
     ;; Wait a few frames
     LDX #$18
@@ -108,8 +108,7 @@ lbl_LevelWin:
     ;; Stop random beeping
     LDA #$02
     STA do_beeps
-
-
+    
     ;; Wait a few frames
     LDX #$30
     JSR sub_WaitXFrames
