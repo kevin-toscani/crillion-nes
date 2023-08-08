@@ -106,7 +106,7 @@
 - ~~Add thud sfx to color block destruction~~
 - ~~Add bounce sfx to color rebound~~
 - ~~Add bounce sfx to all block rebounds~~
-- Finish (or at least discard) explosion animation before next level starts
+- Move animation loader to subroutine and call it within sub_WaitXFrames to ensure animations to finish before level end
 
 ## Reference video
 https://www.youtube.com/watch?v=5pBsyOKlrrc
