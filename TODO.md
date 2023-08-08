@@ -2,7 +2,6 @@
 
 ## Table of to-do's
 - End level routine
-- Bonus score routine
 - End game routine
 - Finetuning/Wishlist
 
@@ -17,23 +16,13 @@
 - ~~Set null tile color to yellow~~
 - Meanwhile, play end level sweep sound effect
 - ~~After \* frames, set null tile color to dark blue~~
-- After \* frames, initiate bonus score routine (BSR)
+- ~~After \* frames, initiate bonus score routine (BSR)~~
 - ~~\* frames after BSR, initiate blinds routine~~
 - ~~After blinds routine~~
 - If the current level is the last one
 - Initiate end game routine
 - ~~Load next level~~
 - ~~Unfreeze ball~~
-
-## Bonus score routine
-**Summary:** convert the bonus timer value to the player's score  
-**Elaboration:**
-- Every \* frames
-- Subtract one from bonus timer
-- Add 10? to game score
-- Play a random frequency beep
-- If bonus timer is zero
-- Return to end level routine
 
 ## End game routine
 **Summary:** play an end game animation and show game over message  
@@ -55,7 +44,6 @@
 - Add a high score system
 - Pause ball before each level start
 - Fix move block recoloring flaw
-- Move animation loader to subroutine and call it within sub_WaitXFrames to ensure animations to finish before level end
 - Fix blank screen during game over sequence
 
 ## Reference video

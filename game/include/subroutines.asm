@@ -17,6 +17,7 @@
 .include "game/subroutine/GetPPUAddrFromYXIndex.asm"
 .include "game/subroutine/InitiateNudge.asm"
 .include "game/subroutine/JumpToPointer.asm"
+.include "game/subroutine/LoadAnimations.asm"
 .include "game/subroutine/LoadGameScreen.asm"
 .include "game/subroutine/LoadIntroScreen.asm"
 .include "game/subroutine/LoadWinScreen.asm"

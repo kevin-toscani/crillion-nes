@@ -174,13 +174,6 @@
 +doneScreenLoad:
 
     ;; Load animations (if any)
-    .include "game/include/main/load_animations.asm"
-
-    ;; Sprite clean-up
-    LDX sprite_ram_pointer
-    LDA #$EF
-    -
-        STA ADDR_SPRITERAM,x
-        INX
-    BNE -
+    ;; and sprite clean-up
+    JSR sub_LoadAnimations
 

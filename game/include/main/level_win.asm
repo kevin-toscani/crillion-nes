@@ -24,6 +24,13 @@ lbl_LevelWin:
     STA temp+2
     JSR sub_WriteByteToPPUBuffer
     
+    ;; Quick and dirty way to remove ball from screen
+    LDA #$EF
+    STA ADDR_SPRITERAM+4
+    STA ADDR_SPRITERAM+5
+    STA ADDR_SPRITERAM+6
+    STA ADDR_SPRITERAM+7
+    
     ;; Initiate frequency beeps (@TODO)
     
     ;; Wait a few frames
@@ -61,7 +68,8 @@ lbl_LevelWin:
         BNE +fullBonus
         LDA ball_bonus+2
         CMP #BONUS_COUNTDOWN_PER_FRAME
-        BCS +partBonus
+        BCC +partBonus
+
         +fullBonus:
         LDA #BONUS_COUNTDOWN_PER_FRAME
         +partBonus:

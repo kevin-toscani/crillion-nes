@@ -1,4 +1,6 @@
 
+sub_LoadAnimations:
+
     ;; Set up loop
     LDX #$00
     -loop_load_animation:
@@ -22,22 +24,9 @@
             CMP #ANIM_SLIDES
             BNE +
 
-            ;; If we're done, inactivate current explosion, clean
-            ;; up sprite RAM and go to the next one
+            ;; If we're done, inactivate current explosion, go to the next one
             LDA #$00
             STA explosion_active,x
-            
-            LDA #SLIDE_SIZE
-            ASL
-            ASL
-            TAY
-            LDA #$EF
-            -
-                DEY
-                STA ADDR_SPRITERAM,y
-                CPY #00
-            BNE -
-            
             JMP +next
         +
 
@@ -104,7 +93,7 @@
             ;; Check if all sprites are done
             INY
             CPY #SLIDE_SIZE
-            BEQ +done
+            BEQ +updateSpriteRamPointer
 
             ;; Update x value
             LDA temp+3
@@ -134,7 +123,7 @@
 
         JMP -loop_load_sprite
 
-    +done:
+    +updateSpriteRamPointer:
         STX sprite_ram_pointer
 
         ;; Retrieve x-register from stack
@@ -145,8 +134,17 @@
         ;; Check if all animations have been updated
         INX
         CPX #MAX_ANIMATIONS
-        BEQ +done
+        BEQ +cleanUpSpriteRam
 
     JMP -loop_load_animation
-+done:
 
++cleanUpSpriteRam:
+    LDX sprite_ram_pointer
+    LDA #$EF
+    -
+        STA ADDR_SPRITERAM,x
+        INX
+    BNE -
+    
+    RTS
+    
