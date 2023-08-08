@@ -155,6 +155,10 @@ sub_EvaluateTileType:
     AND #IS_DEATH_BLOCK
     BEQ +checkIfMoveBlock
 
+;; Also, when the player presses select during gameplay,
+;; insta-selfdestruct the ball.
+sub_Selfdestruct:
+
         ;; It is a death block
         ;; Freeze and kill player
         LDA ball_flags

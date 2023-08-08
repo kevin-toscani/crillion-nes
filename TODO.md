@@ -12,9 +12,9 @@
 - ~~Decrease the number of color blocks~~
 - ~~If the number of color blocks is zero~~
 - ~~Set the game in freeze state~~
-- Hide ball
+- ~~Hide ball~~
 - ~~Set null tile color to yellow~~
-- Meanwhile, play end level sweep sound effect
+- Play end level sweep sound effect
 - ~~After \* frames, set null tile color to dark blue~~
 - ~~After \* frames, initiate bonus score routine (BSR)~~
 - ~~\* frames after BSR, initiate blinds routine~~
@@ -38,11 +38,11 @@
 - Fix level 15 (too hard)
 
 ## Finetuning/Wishlist
-**Summary:** various minor flaws and fixes, and things that are not required but would be nice to have.  
+**Summary:** various minor flaws and fixes, and things that are not required but would be nice to have.
 **Elaboration:**
+- Add Select as a self destruct button
 - Improve timing on blinds effect
 - Add a high score system
-- Pause ball before each level start
 - Fix move block recoloring flaw
 - Fix blank screen during game over sequence
 
