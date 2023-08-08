@@ -33,10 +33,6 @@
 - After \* frames
 - Initiate game over routine
 
-## Level design updates
-- Fix level 11 (unbeatable)
-- Fix level 15 (too hard)
-
 ## Finetuning/Wishlist
 **Summary:** various minor flaws and fixes, and things that are not required but would be nice to have.
 **Elaboration:**

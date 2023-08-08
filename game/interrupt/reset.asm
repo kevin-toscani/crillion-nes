@@ -15,11 +15,18 @@ lbl_SoftReset:
 
     ;; Start at level 1
     LDA #$00
-    STA current_level
     STA ball_score
     STA ball_score+1
     STA ball_score+2
     STA ball_score+3
     STA ball_score+4
     STA ball_score+5
+
+ifdef TESTING
+    LDA #$FF
+    STA ball_lives
+    LDA #15
+endif
+
+    STA current_level
 
