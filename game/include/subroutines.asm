@@ -23,6 +23,7 @@
 .include "game/subroutine/PreloadSfxFromX.asm"
 .include "game/subroutine/RemoveBlockFromScreen.asm"
 .include "game/subroutine/SetTileAttributeAddress.asm"
+.include "game/subroutine/SubtractXFromBonus.asm"
 .include "game/subroutine/WaitXFrames.asm"
 .include "game/subroutine/WriteByteToPPUBuffer.asm"
 

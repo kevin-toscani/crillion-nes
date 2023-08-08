@@ -103,8 +103,8 @@
         .include "game/include/main/background_sound.asm"
     +
 
-    ;; Test: random bleeps (disabled)
-    ;.include "game/test/random_descending_bleeps.asm"
+    ;; Play bonus to score bleeps
+    .include "game/include/main/bonus_to_score_bleeps.asm"
     
     ;; Play sound effect
     .include "game/include/main/nmi_sfx.asm"

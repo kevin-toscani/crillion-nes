@@ -82,6 +82,9 @@ SLIDE_SIZE      = #$09 ; total number of tiles in slide
 NUDGE_FRAMES    = #$05
 BONUS_FRAMES    = #$08
 
+;; How many bonus points get subtracted per frame after a level
+BONUS_COUNTDOWN_PER_FRAME = #$09
+
 ;; Helper constant for when a level is done loading
 LEVEL_END       = #$FF
 

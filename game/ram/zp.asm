@@ -91,6 +91,7 @@ sweep_noise            .dsb 1
 current_noise          .dsb 1
 noise_timer            .dsb 1
 do_beeps               .dsb 1
+soft_pulse1            .dsb 1
 
 ;; Sound effect variables
 sfx_address            .dsb 2

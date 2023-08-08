@@ -19,7 +19,7 @@
 +beep:
     LDA #$01
     STA APU_STATUS
-    LDA #$B8
+    LDA soft_pulse1
     STA PULSE1_VOLUME
     JSR sub_GetRandomNumber
     STA PULSE1_TIMER_LO

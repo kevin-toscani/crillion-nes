@@ -164,9 +164,14 @@ tbl_GameOver:
     .db #_SPACE, #_SPACE
     .db #_O, #_V, #_E, #_R
 
+;; Background fade pallette table
 tbl_BackgroundFade:
     .db #$00, #$10, #$20, #$30, #$30, #$30, #$20, #$10, #$00, #$0F
 
 ;; Sound effects
 .include "game/include/table/sfx.asm"
+
+;; Lookup table to convert bonus ticks to score
+tbl_BonusToScore:
+    .db #00, #10, #20, #30, #40, #50, #60, #70, #80, #90
 
