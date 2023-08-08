@@ -40,7 +40,6 @@
 ## Finetuning/Wishlist
 **Summary:** various minor flaws and fixes, and things that are not required but would be nice to have.
 **Elaboration:**
-- Add Select as a self destruct button
 - Improve timing on blinds effect
 - Add a high score system
 - Fix move block recoloring flaw
