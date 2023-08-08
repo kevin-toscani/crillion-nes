@@ -1,48 +1,10 @@
 # To-do list
 
 ## Table of to-do's
-- ~~Kill block~~
-- ~~Move block~~
-- ~~Bonus counter~~
 - End level routine
 - Bonus score routine
 - End game routine
-- ~~Game over routine~~
 - Finetuning/Wishlist
-
-## ~~Kill block~~
-~~**Summary:** if ball touches kill block, kill ball.~~  
-~~**Elaboration:**~~
-- ~~If the ball collides with the kill block:~~
-- ~~Set ball in "killed" state~~
-- ~~Play explosion animation~~
-- ~~Play explosion sound effect~~
-- ~~After \* frames, decrease the lives counter~~
-- ~~If lives = 0, initiate game over routine~~
-- ~~If lives > 0, restart the current level~~
-
-## ~~Move block~~
-~~**Summary:** if the ball touches a move block with the same color, and the move block has room to move in the pushed direction, move the block one spot in that direction.~~  
-~~**Elaboration:**~~
-- ~~If the ball collides with the move block~~
-- ~~Ricochet the ball off the move block~~
-- ~~If the ball has the same color as the move block~~
-- ~~Check the spot on the other side of the move block. If that spot is empty~~
-- ~~Replace the move block with null tiles~~
-- ~~Create a metasprite in the move block's position~~
-- ~~Move the metasprite in the pushed direction~~
-- ~~If the metasprite is in the desired spot~~
-- ~~Draw move block and shade tiles in the new spot~~
-
-## ~~Bonus counter~~
-~~**Summary:** decrease the bonus counter over time until it reaches zero~~  
-~~**Elaboration:**~~
-- ~~Every 6 frames~~
-- ~~If **not** all bonus timer digits are 0~~
-- ~~Subtract one from the lowest bonus timer digit (LBD)~~
-- ~~If LBD < 0, set to 9 and subtract one from the middle bonus timer digit (MBD)~~
-- ~~If MBD < 0, set to 9 and subtract one from the highest bonus timer digit~~
-- ~~Update bonus score to PPU buffer~~
 
 ## End level routine
 **Summary:** if all color blocks are destroyed, end the current level and load the next one.  
@@ -82,15 +44,6 @@
 - After \* frames
 - Initiate game over routine
 
-## ~~Game over routine~~
-~~**Summary:** show game over message and reset game on button press~~  
-~~**Elaboration:**~~
-- ~~Blind out the screen~~
-- ~~Flash the screen~~
-- ~~Draw GAME OVER tiles over game screen~~
-- ~~If player presses either A or START~~
-- ~~Initiate start screen routine (no hard reset as that resets the high score as well)~~
-
 ## Level design updates
 - Fix level 11 (unbeatable)
 - Fix level 15 (too hard)
@@ -99,14 +52,11 @@
 **Summary:** various minor flaws and fixes, and things that are not required but would be nice to have.  
 **Elaboration:**
 - Improve timing on blinds effect
-- ~~Fix bug where PPU buffer overflows into animation RAM~~
 - Add a high score system
 - Pause ball before each level start
 - Fix move block recoloring flaw
-- ~~Add thud sfx to color block destruction~~
-- ~~Add bounce sfx to color rebound~~
-- ~~Add bounce sfx to all block rebounds~~
 - Move animation loader to subroutine and call it within sub_WaitXFrames to ensure animations to finish before level end
+- Fix blank screen during game over sequence
 
 ## Reference video
 https://www.youtube.com/watch?v=5pBsyOKlrrc
