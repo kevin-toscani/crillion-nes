@@ -25,7 +25,7 @@ lbl_SoftReset:
 ifdef TESTING
     LDA #$FF
     STA ball_lives
-    LDA #15
+    LDA #TESTING
 endif
 
     STA current_level
