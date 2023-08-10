@@ -37,6 +37,7 @@
 **Summary:** various minor flaws and fixes, and things that are not required but would be nice to have.
 **Elaboration:**
 - Add sound effects for move and paint blocks
+- Use ball corners for collision detection, instead of edge centers
 - Improve timing on blinds effect
 - Add a high score system
 - Fix move block recoloring flaw
