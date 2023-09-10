@@ -40,6 +40,7 @@ RESET:
 
 ;; Main game loop
 lbl_MainGameLoop:
+    JSR sub_WaitForNMI ; align main loop
     .include "game/main.asm"
     JMP lbl_MainGameLoop
 

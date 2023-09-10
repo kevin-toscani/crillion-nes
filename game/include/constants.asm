@@ -1,6 +1,6 @@
 
 ;; TEST MODE (comment to disable, or set to level number)
-TESTING = #12
+TESTING = #0 ; start at level 1 with 255 lives
 
 ;; Starting address for screen tile RAM
 ADDR_SCREENTILERAM  = $0400
@@ -94,7 +94,7 @@ PULSE1_VOLUME   = $4000
 PULSE1_SWEEP    = $4001
 PULSE1_TIMER_LO = $4002
 PULSE1_TIMER_HI = $4003
-PULSE1_LENGTH   = $4004
+PULSE1_LENGTH   = $4003
 
 NOISE_VOLUME    = $400C
 NOISE_PERIOD    = $400E

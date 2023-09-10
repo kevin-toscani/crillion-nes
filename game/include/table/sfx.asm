@@ -27,8 +27,16 @@ tbl_BounceSfx:
     .db #$5F, #$46, #$42, #$12
 
     .db #$00
+
 tbl_Sfx_hi:
     .db >#tbl_ExplosionSfx, >#tbl_ThudSfx, >#tbl_BounceSfx
 
 tbl_Sfx_lo:
     .db <#tbl_ExplosionSfx, <#tbl_ThudSfx, <#tbl_BounceSfx
+
+
+;; Volume envelope for move sound effect (reversed)
+tbl_MoveSfxVolume:
+    .db #$00, #$00, #$02, #$03, #$0B, #$0C, #$0B, #$0B
+    .db #$09, #$09, #$08, #$07, #$06, #$06, #$05, #$05
+    .db #$04, #$04, #$03, #$03, #$03, #$03, #$02, #$01

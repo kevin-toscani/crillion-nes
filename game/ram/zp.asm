@@ -97,7 +97,9 @@ noise_muted            .dsb 1
 
 ;; Sound effect variables
 sfx_address            .dsb 2
-sfx_timer              .dsb 1
+sfx_timer              .dsb 2
+sfx_frequency          .dsb 2
+
 
 ;; Additional NMI check for timed PPU fade
 check_nmi              .dsb 1

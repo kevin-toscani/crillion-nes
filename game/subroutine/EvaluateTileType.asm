@@ -339,6 +339,10 @@ sub_Selfdestruct:
     
     ;; - Restore original X
     LDX temp+3
+    
+    ;; - Initiate move sound effect
+    LDA #$18
+    STA sfx_timer+1
 
     ;; Return
     RTS
