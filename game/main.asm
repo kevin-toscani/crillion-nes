@@ -66,7 +66,7 @@
     +
 
     ;; Load sprite 0 in place
-    LDA #$28
+    LDA #$18
     STA ADDR_SPRITERAM
     LDA #$0F
     STA ADDR_SPRITERAM+1

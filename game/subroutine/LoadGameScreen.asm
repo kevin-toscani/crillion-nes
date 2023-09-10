@@ -382,9 +382,6 @@ sub_LoadGameScreen:
     STA PPU_ADDR
     LDA #$3A
     STA PPU_DATA
-    ;; (added background tile for Sprite-0 hit)
-    LDA #$3F
-    STA PPU_DATA
 
     LDA #$23
     STA PPU_ADDR
@@ -399,7 +396,7 @@ sub_LoadGameScreen:
     STA PPU_ADDR
     LDA #$34
     STA PPU_DATA
-
+    
 
     ;; Draw the hud labels
     LDA #$20
@@ -411,7 +408,7 @@ sub_LoadGameScreen:
         LDA tbl_HudText,x
         STA PPU_DATA
         INX
-        CPX #28
+        CPX #$1E
     BNE -
 
 
@@ -510,14 +507,19 @@ sub_LoadGameScreen:
 
     ;; Set attribute data to RAM
     
-    ;; Byte 0-7 of attribute ram should be #%10100000
+    ;; Byte 0-6 of attribute ram should be #%10100000
     LDX #$00
     LDA #$A0
     -
         STA tile_attributes,x
         INX
-        CPX #$08
+        CPX #$07
     BNE -
+    
+    ;; Byte 7 should be #%11100000 (because of opaque tile)
+    LDA #$E0
+    STA tile_attributes,x
+    INX
 
     ;; Byte 8-55 of attribute ram are filled with game subpal data
 

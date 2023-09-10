@@ -28,7 +28,6 @@
 
 ## Nice-to-haves after alpha release
 - Improve up/down collision detection (use six points instead of four)
-- Improve timing on blinds effect
 - Fix move block recoloring flaw
 
 ## Reference video

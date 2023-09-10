@@ -26,5 +26,6 @@
 .include "game/subroutine/SetTileAttributeAddress.asm"
 .include "game/subroutine/SubtractXFromBonus.asm"
 .include "game/subroutine/WaitXFrames.asm"
+.include "game/subroutine/Waste.asm"
 .include "game/subroutine/WriteByteToPPUBuffer.asm"
 

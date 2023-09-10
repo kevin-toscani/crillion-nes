@@ -4,11 +4,11 @@ tbl_IntroScreenPalette:
     .db #$0F, #$2C, #$12, #$30
     .db #$0F, #$16, #$38, #$30
     .db #$0F, #$29, #$14, #$30
-    .db #$0F, #$00, #$10, #$30
+    .db #$0F, #$0F, #$10, #$30
 
     .db #$0F, #$2C, #$12, #$30
     .db #$0F, #$16, #$38, #$30
-    .db #$0F, #$2C, #$14, #$30
+    .db #$0F, #$0F, #$14, #$30
     .db #$0F, #$00, #$10, #$30
 
 
@@ -147,12 +147,12 @@ tbl_GametileBottomRight:
 tbl_GameTileRamByte:
     .db #%01000000, #%00100000, #%00010000, #%00001000, #%00000000
 
-;; HUD text data
+;; HUD text data (with opaque background tile for sprite zero)
 tbl_HudText:
     .db #_S, #_C, #_O, #_R, #_E, #_SPACE, #_SPACE, #_SPACE
     .db #_L, #_E, #_V, #_E, #_L, #_SPACE, #_SPACE
     .db #_L, #_I, #_V, #_E, #_S, #_SPACE, #_SPACE, #_SPACE
-    .db #_B, #_O, #_N, #_U, #_S
+    .db #_B, #_O, #_N, #_U, #_S, #_SPACE, #$3F
 
 ;; Move block top left tile based on color
 tbl_MoveBlockTopLeftTile:

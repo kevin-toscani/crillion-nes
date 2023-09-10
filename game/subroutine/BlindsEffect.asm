@@ -23,7 +23,16 @@ sub_BlindsEffect:
             LDA PPU_STATUS
             AND #SPRITE_0_HIT
         BEQ -
-            
+        
+        ;; Waste time until we're almost at the last HBlank before the playing field
+        JSR sub_Waste6
+        JSR sub_Waste5
+        JSR sub_Waste4
+        JSR sub_Waste3
+        JSR sub_Waste1
+        JSR sub_Waste0
+        
+        
         ;; Setup tile row loop
         LDY #22
         -tileLoop:
@@ -47,25 +56,22 @@ sub_BlindsEffect:
 
                 ;; Waste 12 frames
                 +wasteTime:
-                INC temp+9   ;+5
-                DEC temp+9   ;+5
+                INC void     ;+5
+                DEC void     ;+5
                 EOR #$00     ;+2
                 
-                ;; Waste about 100 frames
+                ;; Waste about a scanline worth of frames
                 +wasteMoreTime:
-                
-                STX temp+1     ;  3 down, 97 to go
-                LDX #$09       ;  5 down, 95 to go
-                -wasteLoop:
-                    NOP
-                    ORA #$FF   ;  5+3L down,  95-3L to go
-                    DEX        ;  5+5L down,  95-5L to go
-                BNE -wasteLoop ;  4+8L down,  96-8L to go
-
-                LDX temp+1     ;  7+8L down, 93-8L to go
-                DEX            ;  9+8L down, 91-8L to go
-            BNE -scanlineLoop  ; 12+8L down, 88-8L to go
-
+                JSR sub_Waste2
+                JSR sub_Waste0
+                JSR sub_Waste0
+                INC void
+                EOR #$00
+                EOR #$00
+                DEX
+            BNE -scanlineLoop
+            DEC void
+            EOR #$00
             DEY
         BNE -tileLoop
 
