@@ -21,12 +21,12 @@
 - After \* frames
 - Initiate game over routine
 
-## Final things before release
-- Add sound effects for move and paint blocks
+## Final things before alpha release
+- Add sound effects for paint blocks
 - Fix blank screen during game over sequence
 - Add a high score system
 
-## Nice-to-haves after release
+## Nice-to-haves after alpha release
 - Improve up/down collision detection (use six points instead of four)
 - Improve timing on blinds effect
 - Fix move block recoloring flaw
