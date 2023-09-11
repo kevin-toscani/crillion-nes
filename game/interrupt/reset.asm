@@ -14,11 +14,13 @@ lbl_SoftReset:
 ;;
     LDX #$00
     LDY #$00
-    LDA check_nmi
+    LDA #$01
+    STA check_nmi
     -
         CMP check_nmi
     BEQ -
-    LDA check_nmi
+    LDA #$01
+    STA check_nmi
     -
         INX
         BNE +
