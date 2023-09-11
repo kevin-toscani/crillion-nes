@@ -37,6 +37,17 @@ tbl_Sfx_lo:
 
 ;; Volume envelope for move sound effect (reversed)
 tbl_MoveSfxVolume:
-    .db #$00, #$00, #$02, #$03, #$0B, #$0C, #$0B, #$0B
-    .db #$09, #$09, #$08, #$07, #$06, #$06, #$05, #$05
-    .db #$04, #$04, #$03, #$03, #$03, #$03, #$02, #$01
+    .db #$70, #$70, #$72, #$73, #$7B, #$7C, #$7B, #$7B
+    .db #$79, #$79, #$78, #$77, #$76, #$76, #$75, #$75
+    .db #$74, #$74, #$73, #$73, #$73, #$73, #$72, #$71
+
+;; Volume and frequency table for paint sound effect (reversed)
+tbl_PaintSfxVolume: .db #$00
+    .db #$B0, #$B1, #$B2, #$B3, #$B2, #$B4, #$B6, #$B3
+    .db #$B6, #$B9, #$B5, #$B9, #$B5, #$B9, #$B5, #$B9
+tbl_PaintSfxFreqHi: .db #$00
+    .db #$08, #$08, #$08, #$08, #$08, #$08, #$08, #$08
+    .db #$08, #$09, #$08, #$09, #$09, #$09, #$09, #$09
+tbl_PaintSfxFreqLo: .db #$00
+    .db #$68, #$90, #$B8, #$E0, #$A4, #$CC, #$F4, #$BC
+    .db #$E4, #$0C, #$F6, #$32, #$1A, #$56, #$44, #$80

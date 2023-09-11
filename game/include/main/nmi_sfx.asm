@@ -47,8 +47,7 @@
         +
         
         ;; Set volume
-        LDA #$70
-        ORA tbl_MoveSfxVolume,y
+        LDA tbl_MoveSfxVolume,y
         STA PULSE1_VOLUME
         
         STY temp
@@ -65,12 +64,26 @@
         ADC #$00
         STA sfx_frequency+1
         STA PULSE1_TIMER_HI
-        
-        CPY #$01
-        BNE +done
+    +done:
 
-        ;; Disable
-        LDA #$00
-        STA $4001
+
+    ;; Check paint sfx
+    LDY sfx_timer+2
+    BEQ +done
+
+        DEC sfx_timer+2
+        CPY #$10
+        BNE +
+            ;; Update APU status
+            LDA #$09
+            STA APU_STATUS
+        +
         
+        ;; Set volume
+        LDA tbl_PaintSfxVolume,y
+        STA PULSE1_VOLUME
+        LDA tbl_PaintSfxFreqLo,y
+        STA PULSE1_TIMER_LO
+        LDA tbl_PaintSfxFreqHi,y
+        STA PULSE1_TIMER_HI
     +done:

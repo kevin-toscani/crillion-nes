@@ -97,7 +97,7 @@ noise_muted            .dsb 1
 
 ;; Sound effect variables
 sfx_address            .dsb 2
-sfx_timer              .dsb 2
+sfx_timer              .dsb 3
 sfx_frequency          .dsb 2
 
 

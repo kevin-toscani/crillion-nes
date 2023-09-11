@@ -135,9 +135,9 @@ sub_EvaluateTileType:
         STA ball_flags
         JSR sub_ColorizeBall
 
-        ;; Play bounce sound effect
-        LDX #SFX_BOUNCE
-        JSR sub_PreloadSfxFromX
+        ;; Play paint sound effect
+        LDA #$10
+        STA sfx_timer+2
 
         ;; Restore x-register
         PLA

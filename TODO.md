@@ -3,7 +3,8 @@
 ## Table of to-do's
 - End level routine
 - End game routine
-- Finetuning/Wishlist
+- Final things
+- Nice-to-haves
 
 ## End level routine
 **Summary:** if all color blocks are destroyed, end the current level and load the next one.  
@@ -22,7 +23,6 @@
 - Initiate game over routine
 
 ## Final things before alpha release
-- Add sound effects for paint blocks
 - Fix blank screen during game over sequence
 - Add a high score system
 
