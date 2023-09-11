@@ -23,7 +23,6 @@
 - Initiate game over routine
 
 ## Final things before alpha release
-- Fix blank screen during game over sequence
 - Add a high score system
 
 ## Nice-to-haves after alpha release

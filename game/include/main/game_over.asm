@@ -20,9 +20,15 @@ lbl_GameOver:
         LDA PPU_STATUS
         AND #SPRITE_0_HIT
     BEQ -
+    JSR sub_Waste6
+    JSR sub_Waste5
+    JSR sub_Waste4
+    JSR sub_Waste3
+    JSR sub_Waste1
+    JSR sub_Waste0
     LDA #$00
     STA PPU_MASK
-
+    
     ;; Remove game area from view
     BIT PPU_STATUS
     LDA #$20
@@ -40,6 +46,21 @@ lbl_GameOver:
         DEX
     BNE -xLoop
     
+    ;; Set lives to 0
+    BIT PPU_STATUS
+    LDA #$20
+    STA PPU_ADDR
+    LDA #$92
+    STA PPU_ADDR
+    LDA #$01
+    STA PPU_DATA
+    
+    ;; Reset scroll
+    LDA #$00
+    STA PPU_SCROLL
+    STA PPU_SCROLL
+    JSR sub_WaitForNMI
+
     ;; Pause for a little while
     LDX #$18
     -

@@ -1,6 +1,12 @@
 
-;; TEST MODE (comment to disable, or set to level number)
-TESTING = #0 ; start at level 1 with 255 lives
+;; Enable test mode
+;; - Test mode adds a test level and allows the developer to start
+;;   at any given level with any number of lives. Remove the line
+;;   that starts with TESTING (or add a semicolon in front) to
+;;   disable test mode.
+TESTING     = 1
+START_LEVEL = 0
+START_LIVES = 1
 
 ;; Starting address for screen tile RAM
 ADDR_SCREENTILERAM  = $0400

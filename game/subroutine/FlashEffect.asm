@@ -10,6 +10,14 @@ sub_FlashEffect:
         LDA tbl_BackgroundFade,x
         STA temp+2
         JSR sub_WriteByteToPPUBuffer
+        LDA #$0D
+        STA temp+1
+        JSR sub_WriteByteToPPUBuffer
+        LDA #$19
+        STA temp+1
+        JSR sub_WriteByteToPPUBuffer
+        LDA #$00
+        STA temp+1
         LDY #$03
         -
             JSR sub_WaitForNMI

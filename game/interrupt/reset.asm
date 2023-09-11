@@ -56,9 +56,9 @@ lbl_SoftReset:
     STA ball_score+5
 
 ifdef TESTING
-    LDA #$FF
+    LDA #START_LIVES
     STA ball_lives
-    LDA #TESTING
+    LDA #START_LEVEL
 endif
 
     STA current_level
