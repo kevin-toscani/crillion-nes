@@ -104,5 +104,8 @@ sfx_frequency          .dsb 2
 ;; Additional NMI check for timed PPU fade
 check_nmi              .dsb 1
 
+;; The TV system this game is running on (0=ntsc, 1=pal, 2=dendy, 3=unknown)
+tv_system              .dsb 1
+
 ;; This variable should be used for absolutely nothing
 void                   .dsb 1
