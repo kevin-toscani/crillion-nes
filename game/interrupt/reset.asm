@@ -5,6 +5,37 @@
 
 lbl_SoftReset:
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  NES TV system detection code
+;;  Copyright 2011 Damian Yerrick
+;;  https://www.nesdev.org/wiki/Detect_TV_system
+;;
+    LDX #$00
+    LDY #$00
+    LDA check_nmi
+    -
+        CMP check_nmi
+    BEQ -
+    LDA check_nmi
+    -
+        INX
+        BNE +
+            INY
+        + CMP check_nmi
+    BEQ -
+    TYA
+    SEC
+    SBC #$0A
+    CMP #$03
+    BCC +
+        LDA #$03
+    + STA tv_system ; 0=ntsc, 1=pal, 2=dendy, 3=unknown
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
     ;; Tell game to load the intro screen
     LDA #LOAD_INTRO_SCREEN
     STA screen_mode
