@@ -156,7 +156,7 @@ tbl_HudText:
 
 ;; Move block top left tile based on color
 tbl_MoveBlockTopLeftTile:
-    .db #$00, #$4A, #$42, #$4A, #$42, #$4A, #$42
+    .db #$42, #$4A, #$42, #$4A, #$42, #$4A, #$42
 
 ;; Game over data
 tbl_GameOver:

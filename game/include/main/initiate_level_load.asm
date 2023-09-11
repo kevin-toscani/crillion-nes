@@ -20,10 +20,15 @@ lbl_InitiateLevelLoad:
     STA ball_flags
 
 +loadLevel:
-    ;; This loops back to level 1 after level 25 for now,
+    ;; This loops back to level 1 after level 25* for now,
     ;; as a proper game ending is yet to be introduced.
+    ;; *26 in test mode
     LDA current_level
-    CMP #25
+    ifdef TESTING
+        CMP #26
+    else
+        CMP #25
+    endif
     BNE +
         LDA #$00
         STA current_level
