@@ -635,11 +635,11 @@
 0C064 F0 10                         BEQ +
 0C066                           
 0C066                                   ;; System not sentient (cold boot)
-0C066                                   ;; Set default hi score to 200.000
-0C066 A9 02                             LDA #$02
-0C068 85 05                             STA hi_score
+0C066                                   ;; Set default hi score to 50.000
+0C066 A9 05                             LDA #$05
+0C068 85 06                             STA hi_score+1
 0C06A A9 00                             LDA #$00
-0C06C 85 06                             STA hi_score+1
+0C06C 85 05                             STA hi_score
 0C06E 85 07                             STA hi_score+2
 0C070 85 08                             STA hi_score+3
 0C072 85 09                             STA hi_score+4
