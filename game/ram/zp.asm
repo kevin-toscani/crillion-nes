@@ -76,6 +76,7 @@ nudge_timer            .dsb 1
 bonus_timer            .dsb 1
 kill_timer             .dsb 1
 unfreeze_timer         .dsb 1
+endgame_palette_timer  .dsb 1
 
 ;; Current level (doubles as level select variable)
 current_level          .dsb 1
@@ -104,6 +105,15 @@ sfx_sweep_volume       .dsb 1
 sfx_sweep_next_volume  .dsb 1
 sfx_sweep_frequency    .dsb 1
 
+sfx_endgame_enabled    .dsb 1
+sfx_endgame_p1_rest    .dsb 1
+sfx_endgame_p1_freq_hi .dsb 1
+sfx_endgame_p1_freq_lo .dsb 1
+sfx_endgame_p2_rest    .dsb 1
+sfx_endgame_p2_freq_hi .dsb 1
+sfx_endgame_p2_freq_lo .dsb 1
+
+
 ;; Additional NMI check for timed PPU fade
 check_nmi              .dsb 1
 
@@ -112,3 +122,6 @@ tv_system              .dsb 1
 
 ;; This variable should be used for absolutely nothing
 void                   .dsb 1
+
+;; Hacky solution to prevent double blinds
+game_won               .dsb 1

@@ -48,6 +48,7 @@ lbl_MainGameLoop:
 .include "game/include/main/game_over.asm"
 .include "game/include/main/level_win.asm"
 .include "game/include/main/initiate_level_load.asm"
+.include "game/include/main/game_win.asm"
 
 
 ;; Subroutines

@@ -185,3 +185,9 @@ tbl_BonusToScore:
 
 ;; Check string for sentience (warm boot)
 tbl_Sentient: .db #$C0, #$FF, #$EE, #$54, #$07
+
+tbl_EndGamePalette:
+    .db #$0F, #$2D, #$00, #$3D
+    .db #$3C, #$3B, #$38, #$37
+    .db #$37, #$38, #$3B, #$3C
+    .db #$3D, #$00, #$2D, #$0F

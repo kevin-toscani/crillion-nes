@@ -52,7 +52,12 @@ lbl_GameOver:
     STA NOISE_VOLUME
     
     ;; Do blinds effect
-    JSR sub_BlindsEffect
+    LDA game_won
+    BNE +
+        JSR sub_BlindsEffect
+    +
+    LDA #$00
+    STA game_won
 
     ;; Disable draw after HUD to disable screen
     JSR sub_WaitForNMI

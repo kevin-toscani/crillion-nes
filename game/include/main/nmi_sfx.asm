@@ -105,3 +105,37 @@
         LDA #$08
         STA PULSE1_TIMER_HI
     +done:
+    
+    
+    ;; Check end game sweep
+    LDA sfx_endgame_enabled
+    BEQ +done
+        CMP #$01
+        BNE +
+            LDA #$03
+            STA APU_STATUS
+            INC sfx_endgame_enabled
+        +
+        
+        CMP #$FF
+        BNE +
+            LDA #$00
+            STA sfx_endgame_enabled
+            STA APU_STATUS
+            STA PULSE1_VOLUME
+            STA PULSE2_VOLUME
+            JMP +done
+        +
+        LDA #$77
+        STA PULSE1_VOLUME
+        STA PULSE2_VOLUME
+        LDA sfx_endgame_p1_freq_hi
+        STA PULSE1_TIMER_HI
+        LDA sfx_endgame_p1_freq_lo
+        STA PULSE1_TIMER_LO 
+        LDA sfx_endgame_p2_freq_hi
+        STA PULSE2_TIMER_HI
+        LDA sfx_endgame_p2_freq_lo
+        STA PULSE2_TIMER_LO
+    +done:
+

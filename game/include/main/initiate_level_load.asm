@@ -25,13 +25,12 @@ lbl_InitiateLevelLoad:
     ;; *26 in test mode
     LDA current_level
     ifdef TESTING
-        CMP #26
+        CMP #LAST_LEVEL
     else
         CMP #25
     endif
     BNE +
-        LDA #$00
-        STA current_level
+        JMP lbl_GameWin
     +
     
     ;; Tell the game to load the level screen on the next loop.
