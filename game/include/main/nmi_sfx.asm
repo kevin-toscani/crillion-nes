@@ -87,3 +87,21 @@
         LDA tbl_PaintSfxFreqHi,y
         STA PULSE1_TIMER_HI
     +done:
+
+
+    ;; Check sweep sfx
+    LDA sfx_sweep_count
+    BEQ +done
+        CMP #$0F
+        BNE +
+            LDA #$01
+            STA APU_STATUS
+        +
+        LDA sfx_sweep_volume
+        ORA #$70
+        STA PULSE1_VOLUME
+        LDA sfx_sweep_frequency
+        STA PULSE1_TIMER_LO
+        LDA #$08
+        STA PULSE1_TIMER_HI
+    +done:

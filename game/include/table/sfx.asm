@@ -51,3 +51,10 @@ tbl_PaintSfxFreqHi: .db #$00
 tbl_PaintSfxFreqLo: .db #$00
     .db #$68, #$90, #$B8, #$E0, #$A4, #$CC, #$F4, #$BC
     .db #$E4, #$0C, #$F6, #$32, #$1A, #$56, #$44, #$80
+    
+;; End level sweep
+tbl_SweepVolume:
+    .db #$00, #$00, #$00, #$01, #$02, #$03, #$03, #$04
+    .db #$05, #$07, #$08, #$09, #$09, #$0A, #$0B, #$0D
+tbl_SweepFrequency:
+    .db #$20, #$48, #$70, #$98, #$C0 ; , #$E8

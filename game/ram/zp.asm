@@ -99,7 +99,10 @@ noise_muted            .dsb 1
 sfx_address            .dsb 2
 sfx_timer              .dsb 3
 sfx_frequency          .dsb 2
-
+sfx_sweep_count        .dsb 1
+sfx_sweep_volume       .dsb 1
+sfx_sweep_next_volume  .dsb 1
+sfx_sweep_frequency    .dsb 1
 
 ;; Additional NMI check for timed PPU fade
 check_nmi              .dsb 1
