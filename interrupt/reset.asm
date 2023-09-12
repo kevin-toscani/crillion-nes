@@ -42,8 +42,13 @@
         STA ADDR_SPRITERAM,x
 
         ;; Clear other memory
+        ;; Skip first eleven bytes
+        ;; (cold boot check and high score)
         LDA #$00
-        STA ADDR_ZEROPAGE,x
+        CPX #$0B
+        BCC +
+            STA ADDR_ZEROPAGE,x
+        +
         STA $0100,x
         STA $0300,x
         STA $0400,x

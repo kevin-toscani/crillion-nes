@@ -2,6 +2,50 @@
 ;; Game over sequence
 lbl_GameOver:
 
+    ;; Check if current score exceeds high score
+    LDX #$00
+    -checkHiScoreLoop:
+
+        ;; Compare ball score digit with high score digit
+        LDA ball_score,x
+        CMP hi_score,x
+
+        ;; If the score digit is lower, the entire score must
+        ;; be lower, so we can skip checking the other digits
+        BCC +hiScoreHandlingDone
+
+        ;; If the score digit is equal, check the next digit
+        BEQ +checkNextDigit
+
+        ;; If the score digit is higher, update the high score
+        JMP +updateHighScore
+
+        ;; Check the next digit (if any digits are left)
+        +checkNextDigit:
+        INX
+        CPX #$06
+    BNE -checkHiScoreLoop
+
+    ;; All digits are equal? What are the odds!
+    ;; Either way, we don't have to update the high score,
+    ;; although doing so won't do any harm, so if we need
+    ;; three more bytes at the cost of a couple dozen
+    ;; cycles, we can skip this jump.
+    JMP +hiScoreHandlingDone
+
+    ;; Transfer the ball score values to the high score values
+    +updateHighScore:
+    LDX #$00
+    -
+        LDA ball_score,x
+        STA hi_score,x
+        INX
+        CPX #$06
+    BNE -
+
+    ;; The high score has been handled now.
+    +hiScoreHandlingDone:
+    
     ;; Disable noise channel
     LDA #$00
     STA APU_STATUS

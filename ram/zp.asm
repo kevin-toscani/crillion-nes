@@ -11,11 +11,18 @@
 ;;
 ;;
 
+    ;; Sentience (warm boot) check string
+    sentience       .dsb 5
+    
+    ;; High score variables (declared up high, so basic reset
+    ;; can skip over those)
+    hi_score        .dsb 6
+    
     ;; Reserve ten temporary variables for use in subroutines.
     temp              .dsb 10
 
-    ;; Reserve a two-byte temporary variable for use with 16-bit
-    ;; operations (like addresses)
+    ;; Reserve a two-byte temporary variable for use with
+    ;; 16-bit operations (like addresses)
     temp16            .dsb 2
 
     ;; Two-byte variable to store a pointer address

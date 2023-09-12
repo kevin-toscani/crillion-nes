@@ -5,6 +5,36 @@
 
 lbl_SoftReset:
 
+    ;; Check for cold or warm boot, by comparing
+    ;; the 6-byte RAM and ROM sentience string.
+    LDX #$00
+    LDY #$00
+    -
+        LDA tbl_Sentient,x
+        CMP sentience,x
+        BEQ +
+            INY
+        +
+        STA sentience,x
+        INX
+        CPX #$05
+    BNE -
+
+    ;; If system is sentient (warm boot), Y is zero now.
+    CPY #$00
+    BEQ +
+
+        ;; System not sentient (cold boot)
+        ;; Set default hi score to 200.000
+        LDA #$02
+        STA hi_score
+        LDA #$00
+        STA hi_score+1
+        STA hi_score+2
+        STA hi_score+3
+        STA hi_score+4
+        STA hi_score+5
+    +
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;

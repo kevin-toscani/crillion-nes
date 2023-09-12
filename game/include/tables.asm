@@ -20,13 +20,21 @@ tbl_IntroScreenLogoChr:
 ;; Intro screen data
 tbl_IntroScreenData:
 
-    ;; Set PPU address $20AC and draw
-    .db #$60, #$AC
+    ;; Set PPU address $20A3 and draw
+    .db #$60, #$A3
     .db #_1, #_DOT, #_L, #_E, #_V, #_E, #_L, #_COLON
 
-    ;; Set PPU address $20CF and draw
-    .db #$60, #$CF
-    .db #_0, #_1
+    ;; Set PPU address $20C6 and draw
+    .db #$60, #$C6
+    .db #_0, #_1    
+
+    ;; Set PPU address $20B4 and draw
+    .db #$60, #$B4
+    .db #_H, #_I, #_SPACE, #_S, #_C, #_O, #_R, #_E, #_COLON
+
+    ;; Set PPU address $20D6 and draw high score
+    .db #$60, #$D6, #$3E
+
     
     ;; Set PPU address $2122 and draw
     .db #$61, #$22
@@ -175,3 +183,5 @@ tbl_BackgroundFade:
 tbl_BonusToScore:
     .db #00, #10, #20, #30, #40, #50, #60, #70, #80, #90
 
+;; Check string for sentience (warm boot)
+tbl_Sentient: .db #$C0, #$FF, #$EE, #$54, #$07

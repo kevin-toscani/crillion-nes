@@ -36,7 +36,7 @@
         STA temp+2
         LDA #$20
         STA temp
-        LDA #$D0
+        LDA #$C7
         STA temp+1
         JSR sub_WriteByteToPPUBuffer
         

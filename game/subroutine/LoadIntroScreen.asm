@@ -32,6 +32,22 @@ sub_LoadIntroScreen:
     ;; Get current byte from intro screen data
     LDA tbl_IntroScreenData,x
 
+    ;; If current byte is #$3E, draw high score
+    CMP #$3E
+    BNE +
+        LDY #$00
+        -
+            LDA hi_score,y
+            CLC
+            ADC #1
+            STA PPU_DATA
+            INY
+            CPY #$06
+        BNE -
+        INX
+        JMP -loop_IntroScreenData
+    +
+
     ;; If current byte is #$3F, we're done drawing.
     CMP #$3F
     BNE +
@@ -109,14 +125,17 @@ sub_LoadIntroScreen:
 
     ;; To color the 1.LEVEL: line green, we need to update two
     ;; values in the PPU attribute data.
+    LDY #$08
     BIT PPU_STATUS
     LDA #$23
     STA PPU_ADDR
-    LDA #$CB
+    LDA #$C8
     STA PPU_ADDR
     LDA #%00001010
-    STA PPU_DATA
-    STA PPU_DATA
+    -
+        STA PPU_DATA
+        DEY
+    BNE -
 
     RTS
 
