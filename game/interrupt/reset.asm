@@ -25,11 +25,11 @@ lbl_SoftReset:
     BEQ +
 
         ;; System not sentient (cold boot)
-        ;; Set default hi score to 50.000
-        LDA #$05
-        STA hi_score+1
-        LDA #$00
+        ;; Set default hi score to 100.000
+        LDA #$01
         STA hi_score
+        LDA #$00
+        STA hi_score+1
         STA hi_score+2
         STA hi_score+3
         STA hi_score+4

@@ -4,7 +4,7 @@
 ;;   at any given level with any number of lives. Remove the line
 ;;   that starts with TESTING (or add a semicolon in front) to
 ;;   disable test mode.
-TESTING     =   1
+;TESTING    =   1
 START_LEVEL =   0
 LAST_LEVEL  =   1
 START_LIVES = 255
