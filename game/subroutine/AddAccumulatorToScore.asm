@@ -44,6 +44,11 @@ sub_AddAccumulatorToScore:
     ;; We're left with 1s
     STA add_to_score+5
 
+    ;; Store the value of the score's second digit (i.e. the 10k
+    ;; digit) so we can check if this has changed later
+    LDA ball_score+1
+    STA temp+5
+
     ;; Byte for byte, add add_to_score to ball_score
     LDA #$00
     STA ppu_buffer_update
@@ -84,6 +89,34 @@ sub_AddAccumulatorToScore:
     JMP -
 
 +done:
+
+    ;; Check if the second digit has changed
+    LDA temp+5
+    CMP ball_score+1
+    BEQ +updateBufferPointer
+
+    ;; Second digit changed; check if player has seven lives
+    LDA ball_lives
+    CMP #$07
+    BEQ +updateBufferPointer
+
+    ;; Player does not have seven lives: add a life
+    INC ball_lives
+
+    ;; Update the lives digit in the HUD via PPU buffer 
+    LDA #$20
+    STA ppu_buffer,y
+    INY
+    LDA #$92
+    STA ppu_buffer,y
+    INY
+    LDA ball_lives
+    CLC
+    ADC #$01
+    STA ppu_buffer,y
+    INY
+
++updateBufferPointer:
     ;; Update PPU buffer pointer and status
     STY ppu_buffer_pointer
     LDA #$01
