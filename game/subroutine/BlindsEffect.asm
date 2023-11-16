@@ -15,14 +15,12 @@ sub_BlindsEffect:
         ;; Now wait for No-sprite 0
         -
             LDA PPU_STATUS
-            AND #SPRITE_0_HIT
-        BNE -
+        BVS -
     
         ;; Now wait for Sprite 0
         -
             LDA PPU_STATUS
-            AND #SPRITE_0_HIT
-        BEQ -
+        BVC -
         
         ;; Waste time until we're almost at the last HBlank before the playing field
         JSR sub_Waste6
